@@ -12,11 +12,15 @@ export function ClueCard({ clueId }: { clueId: string }) {
 
   return (
     <article
-      className={`paper max-w-md rotate-[-0.4deg] rounded-sm border-l-4 border-sepia p-4 ${clue.isNew ? "animate-flash" : ""}`}
+      className={`paper border-sepia max-w-md rotate-[-0.4deg] rounded-sm border-l-4 p-4 ${clue.isNew ? "animate-deal" : ""}`}
     >
       <header className="mb-1 flex items-center justify-between gap-2">
         <h3 className="font-type text-lg">{clue.title}</h3>
-        {clue.isNew && <Stamp tone="alert">New clue</Stamp>}
+        {clue.isNew && (
+          <span className="animate-stamp">
+            <Stamp tone="alert">New clue</Stamp>
+          </span>
+        )}
       </header>
       <p className="leading-relaxed">{clue.text}</p>
       <footer className="mt-3 flex items-center justify-between gap-2">

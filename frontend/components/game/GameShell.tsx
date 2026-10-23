@@ -9,9 +9,12 @@ import { useGame } from "@/lib/game-context";
 import { latestPanel } from "@/lib/protocol/transcript";
 import { useUi, type MobileTab } from "@/lib/store";
 
+import { useGameCues } from "@/lib/use-game-cues";
+
 import { ActionBar } from "./ActionBar";
 import { CasePicker } from "./CasePicker";
 import { InterrogationPanel } from "./InterrogationPanel";
+import { MuteToggle } from "./MuteToggle";
 
 const TABS: { id: MobileTab; label: string }[] = [
   { id: "suspects", label: "Suspects" },
@@ -37,18 +40,50 @@ export function GameShell() {
         .join("\n\n")
     : "";
   const briefing = state?.phase === "briefing";
+  const flashKey = useGameCues(state);
+
+  // Mobile tabs show a dot when something changed in a tab you are not looking at.
+  const activity: Record<MobileTab, string> = {
+    suspects: state ? state.suspects.map((s) => s.composure).join(",") : "",
+    chat: String(messages.length),
+    board: state ? `${state.clues.length}/${state.statements.length}/${state.timeline.length}` : "",
+  };
+  const [seen, setSeen] = useState<Record<MobileTab, string> | null>(null);
+  if (state && (!seen || seen[mobileTab] !== activity[mobileTab])) {
+    setSeen({ ...(seen ?? activity), [mobileTab]: activity[mobileTab] });
+  }
+  const unseen = (tab: MobileTab) => seen !== null && tab !== mobileTab && seen[tab] !== activity[tab];
+
   // On small screens only the selected tab's column shows; from lg up, all three do.
   const column = (tab: MobileTab) => (mobileTab === tab ? "flex" : "hidden lg:flex");
 
   return (
     <div className="mx-auto flex h-dvh max-w-[1500px] flex-col px-4 pt-3 pb-2">
       <header className="border-on-desk/15 mb-3 flex flex-wrap items-end justify-between gap-3 border-b pb-3">
-        <div>
-          <p className="font-type text-brass text-xs tracking-[0.35em] uppercase">The Last Alibi</p>
-          <h1 className="font-type text-on-desk text-xl sm:text-2xl">{state?.title ?? "Opening the case file…"}</h1>
+        <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-type text-brass text-xs tracking-[0.35em] uppercase">The Last Alibi</p>
+            <h1 className="font-type text-on-desk text-xl sm:text-2xl">{state?.title ?? "Opening the case file…"}</h1>
+          </div>
+          <div className="lg:hidden">
+            <MuteToggle />
+          </div>
         </div>
-        {!briefing && <ActionBar />}
+        <div className="flex items-center gap-3">
+          {!briefing && <ActionBar />}
+          <div className="hidden lg:block">
+            <MuteToggle />
+          </div>
+        </div>
       </header>
+
+      {flashKey > 0 && (
+        <div
+          key={flashKey}
+          aria-hidden
+          className="animate-contradiction pointer-events-none fixed inset-0 z-40 shadow-[inset_0_0_160px_40px_var(--string)]"
+        />
+      )}
 
       {!state && !error && (
         <p className="text-on-desk-soft animate-pulse italic" role="status">
@@ -76,14 +111,20 @@ export function GameShell() {
                 type="button"
                 onClick={() => setMobileTab(tab.id)}
                 aria-current={mobileTab === tab.id ? "page" : undefined}
-                className={`font-type flex-1 rounded-sm py-1.5 text-xs uppercase ${mobileTab === tab.id ? "bg-brass text-ink" : "bg-desk-raised text-on-desk-soft"}`}
+                className={`font-type relative flex-1 rounded-sm py-1.5 text-xs uppercase ${mobileTab === tab.id ? "bg-brass text-ink" : "bg-desk-raised text-on-desk-soft"}`}
               >
                 {tab.label}
+                {unseen(tab.id) && (
+                  <>
+                    <span className="bg-string absolute top-1 right-2 h-2 w-2 rounded-full" aria-hidden />
+                    <span className="sr-only"> (new)</span>
+                  </>
+                )}
               </button>
             ))}
           </nav>
 
-          <main className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[290px_minmax(0,1fr)_380px]">
+          <main className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[290px_minmax(0,1fr)_380px]">
             <aside className={`${column("suspects")} min-h-0 flex-col gap-5 overflow-y-auto pr-1`}>
               {roster && <Surface message={roster} />}
               {map && <Surface message={map} />}

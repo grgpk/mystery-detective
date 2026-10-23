@@ -12,8 +12,9 @@ import {
   type Node,
   type NodeChange,
   type NodeProps,
+  type ReactFlowInstance,
 } from "@xyflow/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useGame } from "@/lib/game-context";
 import type { Board, PublicState } from "@/lib/protocol/types";
@@ -91,6 +92,27 @@ export function EvidenceBoard() {
     Object.fromEntries(Object.entries(loadPositions(threadId)).map(([id, position]) => [id, { position }])),
   );
   const board = state?.board;
+  const flow = useRef<ReactFlowInstance<CardNode, Edge> | null>(null);
+  const frame = useRef<HTMLDivElement>(null);
+
+  // The board can mount hidden (a mobile tab), where it measures 0x0 and frames nothing.
+  // Re-frame whenever it gets a real size, and when the number of cards changes.
+  const pinCount = board?.pins.length ?? 0;
+  useEffect(() => {
+    const element = frame.current;
+    if (!element) return;
+    let wasVisible = false;
+    const observer = new ResizeObserver(([entry]) => {
+      const visible = entry.contentRect.width > 0 && entry.contentRect.height > 0;
+      if (visible && !wasVisible) requestAnimationFrame(() => flow.current?.fitView({ padding: 0.15 }));
+      wasVisible = visible;
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => flow.current?.fitView({ padding: 0.15, duration: 300 }));
+  }, [pinCount]);
 
   // A successful confrontation strings the two cards together.
   const contradiction = state?.lastContradiction;
@@ -193,8 +215,11 @@ export function EvidenceBoard() {
       <h2 id="board-heading" className="font-type text-on-desk-soft text-sm tracking-[0.2em] uppercase">
         Evidence board
       </h2>
-      <div className="h-80 overflow-hidden rounded-sm border border-[#5a4632] bg-[#3b2d21] sm:h-96">
+      <div ref={frame} className="h-80 overflow-hidden rounded-sm border border-[#5a4632] bg-[#3b2d21] sm:h-96">
         <ReactFlow
+          onInit={(instance) => {
+            flow.current = instance;
+          }}
           nodes={nodes}
           edges={edges}
           nodeTypes={NODE_TYPES}

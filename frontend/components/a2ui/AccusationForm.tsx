@@ -37,11 +37,11 @@ export function AccusationForm() {
       <h3 className="font-type mb-1 text-xl">The accusation</h3>
       <p className="text-ink-soft mb-4 text-sm">This ends the case. Choose carefully, Inspector.</p>
 
-      <fieldset disabled={closed || isRunning} className="grid gap-4">
-        <label className="grid gap-1 text-sm">
+      <fieldset disabled={closed || isRunning} className="grid min-w-0 gap-4">
+        <label className="grid min-w-0 gap-1 text-sm">
           <span className="font-type text-ink-soft text-xs uppercase">The killer</span>
           <select
-            className="border-ink/30 rounded-sm border bg-white/60 p-2"
+            className="border-ink/30 w-full min-w-0 rounded-sm border bg-white/60 p-2"
             value={suspectId}
             onChange={(e) => setSuspectId(e.target.value)}
             required

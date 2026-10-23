@@ -1,5 +1,6 @@
 "use client";
 
+import { Typewriter } from "@/components/Typewriter";
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
 import { useUi } from "@/lib/store";
@@ -11,7 +12,7 @@ export function CaseBriefing() {
   const { victim } = state;
 
   return (
-    <article className="paper mx-auto max-w-2xl rounded-sm p-6 sm:p-8">
+    <article className="paper animate-deal mx-auto max-w-2xl rounded-sm p-6 sm:p-8">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-type text-ink-soft text-xs tracking-[0.3em] uppercase">Case file</p>
@@ -36,7 +37,11 @@ export function CaseBriefing() {
         </div>
       </dl>
 
-      <p className="mb-4 leading-relaxed">{state.briefing}</p>
+      {state.phase === "briefing" ? (
+        <Typewriter text={state.briefing} className="mb-4 cursor-text leading-relaxed" />
+      ) : (
+        <p className="mb-4 leading-relaxed">{state.briefing}</p>
+      )}
       <p className="text-ink-soft mb-6 text-sm">
         {state.suspects.length} suspects. {state.maxTurns} turns to find the truth.
       </p>

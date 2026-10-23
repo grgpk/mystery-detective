@@ -87,7 +87,7 @@ export function CasePicker() {
             {error}
           </p>
         )}
-        {!cases && !error && (
+        {open && !cases && !error && (
           <p className="text-ink-soft animate-pulse italic" role="status">
             Fetching the files from the archive…
           </p>

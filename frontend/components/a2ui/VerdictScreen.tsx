@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
+import { RANKS, headline, toSearchParams, type SharedResult } from "@/lib/share";
 import { useUi } from "@/lib/store";
 
 export function VerdictScreen() {
@@ -17,12 +18,24 @@ export function VerdictScreen() {
   const turnsUsed = state.maxTurns - state.turnsLeft;
 
   const share = async () => {
-    const text = `The Last Alibi: "${state.title}" — ${score.culpritCorrect ? "Solved" : "Unsolved"} in ${turnsUsed} turns. ${score.rank} (${score.total}/100) 🕵️`;
+    const result: SharedResult = {
+      title: state.title,
+      rank: RANKS.find((r) => r === score.rank) ?? "Rookie",
+      score: score.total,
+      turns: turnsUsed,
+      solved: score.culpritCorrect,
+    };
+    const url = `${window.location.origin}/r?${toSearchParams(result)}`;
+    const text = `The Last Alibi, "${state.title}": ${headline(result)} (${score.total}/100). Can you do better?`;
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.share) {
+        await navigator.share({ title: "The Last Alibi", text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
       setCopied(true);
     } catch {
-      setCopied(false);
+      // Share sheet dismissed, or clipboard unavailable: nothing to do.
     }
   };
 
@@ -100,7 +113,7 @@ export function VerdictScreen() {
       <footer className="mt-6 flex flex-wrap gap-2">
         <Button onClick={() => openCasePicker(true)}>Play again</Button>
         <Button variant="ghost" onClick={share}>
-          {copied ? "Copied!" : "Share result"}
+          {copied ? "Link copied!" : "Share result"}
         </Button>
       </footer>
     </section>
