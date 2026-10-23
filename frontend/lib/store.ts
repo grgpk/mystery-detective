@@ -3,14 +3,29 @@ import { create } from "zustand";
 import type { Difficulty } from "@/lib/protocol/types";
 
 const DIFFICULTY_KEY = "last-alibi:difficulty";
+const THEME_KEY = "last-alibi:theme";
+
+function readStored(key: string): string | null {
+  try {
+    return typeof window !== "undefined"
+      ? window.localStorage.getItem(key)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function store(key: string, value: string): void {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Not remembered; still applies to this visit.
+  }
+}
 
 function readDifficulty(): Difficulty {
-  try {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem(DIFFICULTY_KEY) : null;
-    return stored === "easy" || stored === "hard" ? stored : "normal";
-  } catch {
-    return "normal";
-  }
+  const stored = readStored(DIFFICULTY_KEY);
+  return stored === "easy" || stored === "hard" ? stored : "normal";
 }
 
 // Purely local UI state. Anything about the game itself lives in the agent's shared state.
@@ -27,6 +42,9 @@ interface UiState {
   /** Difficulty for the next new game (remembered per browser). */
   difficulty: Difficulty;
   setDifficulty: (difficulty: Difficulty) => void;
+  /** Theme for the next brand-new (generated) mystery (remembered per browser). */
+  theme: string;
+  setTheme: (theme: string) => void;
   setActiveSuspect: (suspectId: string | null) => void;
   setMobileTab: (tab: MobileTab) => void;
 }
@@ -40,13 +58,15 @@ export const useUi = create<UiState>((set) => ({
   setRunError: (runError) => set({ runError }),
   difficulty: readDifficulty(),
   setDifficulty: (difficulty) => {
-    try {
-      window.localStorage.setItem(DIFFICULTY_KEY, difficulty);
-    } catch {
-      // Not remembered; still applies to this visit.
-    }
+    store(DIFFICULTY_KEY, difficulty);
     set({ difficulty });
   },
-  setActiveSuspect: (activeSuspectId) => set({ activeSuspectId, mobileTab: "chat" }),
+  theme: readStored(THEME_KEY) ?? "golden_age",
+  setTheme: (theme) => {
+    store(THEME_KEY, theme);
+    set({ theme });
+  },
+  setActiveSuspect: (activeSuspectId) =>
+    set({ activeSuspectId, mobileTab: "chat" }),
   setMobileTab: (mobileTab) => set({ mobileTab }),
 }));

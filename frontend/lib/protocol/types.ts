@@ -120,7 +120,7 @@ export interface Accusation {
 }
 
 export type GameAction =
-  | { type: "start"; caseId?: string; difficulty?: Difficulty }
+  | { type: "start"; caseId?: string; difficulty?: Difficulty; theme?: string }
   | { type: "begin" }
   | { type: "interrogate"; suspectId: string; question: string }
   | { type: "examine"; locationId: string }
@@ -148,7 +148,12 @@ export interface CaseSummary {
 /** What /api/cases returns: the hand-written archive plus the generated-case pool's status. */
 export interface CaseCatalogue {
   cases: CaseSummary[];
-  fresh: { enabled: boolean; ready: number; generating: boolean };
+  fresh: {
+    enabled: boolean;
+    ready: number;
+    generating: boolean;
+    themes: { id: string; label: string; blurb: string; ready: number; generating: boolean; enabled: boolean }[];
+  };
 }
 
 /** Asks the agent for a freshly generated case from its pool. */

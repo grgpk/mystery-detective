@@ -46,7 +46,10 @@ npm run dev                                # http://localhost:3000
   within budget and every contradiction can be triggered. Rejected cases go back to Claude with the validator's
   errors, up to 3 attempts. `generation/pool.py` keeps `CASE_POOL_SIZE` validated cases ready in Postgres in the
   background. "A brand-new mystery" in the case picker takes one; if none is ready, the player gets an archive
-  case while the next one is written.
+  case while the next one is written. Generated cases come in themes (`app/themes.py`): Golden Age, space
+  station, 1970s disco, fantasy castle and Tbilisi old town. Each has its own settings, writing voice and
+  fair-play rules (no all-seeing station logs, no magic as the murder method), and the narrator, judge and game
+  master's lines follow the theme. Golden Age keeps `CASE_POOL_SIZE` ready; each other theme `THEMED_POOL_SIZE`.
 - **Daily case.** Each UTC day the archive rotates to one shared case (`engine/case_library.daily_case`:
   deterministic, no repeats within a cycle). Each player gets one attempt, can sign the leaderboard after the
   verdict (names are moderated), and `/daily` shows the standings: score, then fewest turns, then fastest.
@@ -90,7 +93,8 @@ functions are a poor fit: use Fly.io, Railway, Render or Cloud Run with min inst
 | `ANTHROPIC_API_KEY` | Claude credentials |
 | `DATABASE_URL` | Postgres (games, generated-case pool) |
 | `AGENT_SHARED_SECRET` | **Required in production.** Without it anyone who finds the URL can spend your LLM budget |
-| `CASE_POOL_SIZE` | Generated cases kept ready (default 2; 0 turns generation off) |
+| `CASE_POOL_SIZE` | Golden Age generated cases kept ready (default 2; 0 turns them off) |
+| `THEMED_POOL_SIZE` | Generated cases kept ready for each other theme (default 1; 0 turns themes off) |
 | `GAMES_PER_DAY` / `FRESH_CASES_PER_DAY` | Per-player caps over a rolling 24 hours (default 30 / 5) |
 | `RUNS_PER_MINUTE` | Per-player action rate limit (default 30) |
 

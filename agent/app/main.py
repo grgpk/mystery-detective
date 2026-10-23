@@ -22,13 +22,15 @@ from app.game import GameMaster, Limits
 from app.generation.pool import InMemoryCasePool, PoolFiller, PostgresCasePool
 from app.llm import ScriptedLLM, default_llm
 from app.store.repo import InMemoryRepo, PostgresRepo
+from app.themes import DEFAULT_THEME, THEMES
 
 load_dotenv()
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 log = logging.getLogger("last_alibi")
 
 RUNS_PER_MINUTE = int(os.getenv("RUNS_PER_MINUTE", "30"))
-CASE_POOL_SIZE = int(os.getenv("CASE_POOL_SIZE", "2"))
+CASE_POOL_SIZE = int(os.getenv("CASE_POOL_SIZE", "2"))  # Golden Age cases kept ready
+THEMED_POOL_SIZE = int(os.getenv("THEMED_POOL_SIZE", "1"))  # kept ready for each other theme
 LIMITS = Limits(
     games_per_day=int(os.getenv("GAMES_PER_DAY", "30")),
     fresh_cases_per_day=int(os.getenv("FRESH_CASES_PER_DAY", "5")),
@@ -77,10 +79,11 @@ async def lifespan(app: FastAPI):
     llm = default_llm()
     case_pool = await PostgresCasePool.create(repo.pool) if isinstance(repo, PostgresRepo) else InMemoryCasePool()
     # Each generated case is one or more Claude Opus calls; set CASE_POOL_SIZE=0 to turn generation off.
-    pool_size = 0 if isinstance(llm, ScriptedLLM) else CASE_POOL_SIZE
-    filler = PoolFiller(case_pool, llm, target=pool_size)
+    generating = not isinstance(llm, ScriptedLLM)
+    targets = {t: (CASE_POOL_SIZE if t == DEFAULT_THEME else THEMED_POOL_SIZE) if generating else 0 for t in THEMES}
+    filler = PoolFiller(case_pool, llm, targets=targets)
     filler_task = asyncio.create_task(filler.run()) if filler.enabled else None
-    log.info("case generation %s (pool target %d)", "on" if filler.enabled else "off", pool_size)
+    log.info("case generation %s (pool targets %s)", "on" if filler.enabled else "off", targets)
 
     app.state.game = GameMaster(llm, repo, fresh_cases=filler, limits=LIMITS)
     app.state.repo = repo
@@ -111,7 +114,18 @@ async def cases(request: Request) -> dict:
         "fresh": {
             "enabled": filler.enabled,
             "ready": await filler.pool.ready(),
-            "generating": filler.generating,
+            "generating": filler.generating is not None,
+            "themes": [
+                {
+                    "id": t.id,
+                    "label": t.label,
+                    "blurb": t.blurb,
+                    "ready": await filler.pool.ready(t.id),
+                    "generating": filler.generating == t.id,
+                    "enabled": filler.targets.get(t.id, 0) > 0,
+                }
+                for t in THEMES.values()
+            ],
         },
     }
 

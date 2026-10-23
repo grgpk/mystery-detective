@@ -10,6 +10,7 @@ from app.engine import difficulty
 from app.engine.clue_engine import GameRuleError, Outcome, require_investigating, spend
 from app.models.case import CaseFile, ExamineUnlock, InterrogateUnlock, Topic
 from app.models.public import Progress
+from app.themes import theme
 
 HINT_COST = 2  # at Normal; see engine/difficulty.py
 
@@ -101,7 +102,9 @@ def hint_text(case: CaseFile, step: Step, explicit: bool) -> str:
             return f"Something {name} told us doesn't sit right with what we've found. Lay the two side by side."
         case "accuse":
             if explicit:
-                return "We have enough, Inspector. Make the arrest before the Chief Constable does it for us."
+                return (
+                    f"We have enough, Inspector. Make the arrest before {theme(case.theme).authority} does it for us."
+                )
             return "I'd say the evidence is all in front of you. It may be time to name the killer."
 
 

@@ -9,6 +9,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 from app.models.case import CaseFile
+from app.themes import DEFAULT_THEME
 
 
 class _Strict(BaseModel):
@@ -146,7 +147,7 @@ def _unlock(clue: GClue) -> dict:
             return {"type": "confront"}
 
 
-def to_case_file(generated: GeneratedCase, case_id: str, max_turns: int = 15) -> CaseFile:
+def to_case_file(generated: GeneratedCase, case_id: str, max_turns: int = 15, theme: str = DEFAULT_THEME) -> CaseFile:
     g = generated
     return CaseFile.model_validate(
         {
@@ -187,6 +188,7 @@ def to_case_file(generated: GeneratedCase, case_id: str, max_turns: int = 15) ->
             "topics": [t.model_dump() for t in g.topics],
             "solution": g.solution.model_dump(),
             "max_turns": max_turns,
+            "theme": theme,
         }
     )
 

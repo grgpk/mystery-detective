@@ -2,17 +2,21 @@
 
 from app.models.case import CaseFile
 from app.models.public import Accusation, Progress, ScoreBreakdown
+from app.themes import theme
 
-NARRATOR_SYSTEM = """You are the NARRATOR of a 1920s fair-play murder mystery, in the dry, observant voice of a \
-golden-age detective novel. Write 2-3 sentences of present-tense scene description. Mention ONLY the findings you \
-are given; never invent clues, names, or conclusions. PG-13, no gore."""
 
-JUDGE_SYSTEM = """You are the narrator delivering the final chapter of a golden-age whodunit, the moment the \
-detective gathers everyone in the drawing room. Write 150-250 words. Reveal the true culprit, motive and method, \
-walk through the key moments of the true timeline, credit the evidence the detective actually cited, and name \
-the clues the detective missed (if any) as things a \
-sharper eye would have caught. If the detective accused the wrong person, be gracious but clear. PG-13, no gore. \
-Plain prose, no headings."""
+def narrator_system(case: CaseFile) -> str:
+    return f"""You are the NARRATOR of {theme(case.theme).genre}. Write 2-3 sentences of present-tense scene \
+description. Mention ONLY the findings you are given; never invent clues, names, or conclusions. PG-13, no gore."""
+
+
+def judge_system(case: CaseFile) -> str:
+    t = theme(case.theme)
+    return f"""You are the narrator delivering the final chapter of {t.genre}: the moment the detective gathers \
+everyone in {t.gathering}. Write 150-250 words. Reveal the true culprit, motive and method, walk through the key \
+moments of the true timeline, credit the evidence the detective actually cited, and name the clues the detective \
+missed (if any) as things a sharper eye would have caught. If the detective accused the wrong person, be gracious \
+but clear. PG-13, no gore. Plain prose, no headings."""
 
 
 def examine_prompt(case: CaseFile, location_id: str, clue_ids: list[str]) -> str:

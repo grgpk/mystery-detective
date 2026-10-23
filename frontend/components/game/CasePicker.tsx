@@ -6,7 +6,13 @@ import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
 import Link from "next/link";
 
-import { DAILY_CASE_ID, DIFFICULTIES, NEW_CASE_ID, type CaseCatalogue, type DailyBoard } from "@/lib/protocol/types";
+import {
+  DAILY_CASE_ID,
+  DIFFICULTIES,
+  NEW_CASE_ID,
+  type CaseCatalogue,
+  type DailyBoard,
+} from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function CasePicker() {
@@ -14,6 +20,8 @@ export function CasePicker() {
   const open = useUi((s) => s.casePickerOpen);
   const setOpen = useUi((s) => s.setCasePickerOpen);
   const difficulty = useUi((s) => s.difficulty);
+  const theme = useUi((s) => s.theme);
+  const setTheme = useUi((s) => s.setTheme);
   const setDifficulty = useUi((s) => s.setDifficulty);
   const dialog = useRef<HTMLDialogElement>(null);
   const [catalogue, setCatalogue] = useState<CaseCatalogue | null>(null);
@@ -32,9 +40,17 @@ export function CasePicker() {
     if (!open) return;
     let cancelled = false;
     fetch("/api/cases")
-      .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
+      .then((response) =>
+        response.ok
+          ? response.json()
+          : Promise.reject(new Error(String(response.status))),
+      )
       .then((data: CaseCatalogue) => !cancelled && setCatalogue(data))
-      .catch(() => !cancelled && setError("The case archive is unreachable. Try again in a moment."));
+      .catch(
+        () =>
+          !cancelled &&
+          setError("The case archive is unreachable. Try again in a moment."),
+      );
     fetch("/api/daily")
       .then((response) => (response.ok ? response.json() : null))
       .then((data: DailyBoard | null) => !cancelled && setDaily(data))
@@ -46,9 +62,11 @@ export function CasePicker() {
 
   const cases = catalogue?.cases ?? null;
   const fresh = catalogue?.fresh;
+  const chosenTheme = fresh?.themes.find((t) => t.id === theme);
 
   const currentCaseId = state?.caseId;
-  const inProgress = state?.phase === "investigating" || state?.phase === "accusing";
+  const inProgress =
+    state?.phase === "investigating" || state?.phase === "accusing";
 
   const start = (caseId?: string) => {
     setOpen(false);
@@ -59,7 +77,11 @@ export function CasePicker() {
     // Prefer a case other than the one just played; fall back to any.
     const others = (cases ?? []).filter((c) => c.caseId !== currentCaseId);
     const pool = others.length ? others : (cases ?? []);
-    start(pool.length ? pool[Math.floor(Math.random() * pool.length)].caseId : undefined);
+    start(
+      pool.length
+        ? pool[Math.floor(Math.random() * pool.length)].caseId
+        : undefined,
+    );
   };
 
   return (
@@ -72,7 +94,9 @@ export function CasePicker() {
       <div className="p-5 sm:p-7">
         <header className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <p className="font-type text-ink-soft text-xs tracking-[0.3em] uppercase">Case files</p>
+            <p className="font-type text-ink-soft text-xs tracking-[0.3em] uppercase">
+              Case files
+            </p>
             <h2 id="case-picker-title" className="font-type text-2xl">
               Choose your next case
             </h2>
@@ -88,7 +112,9 @@ export function CasePicker() {
         </header>
 
         <fieldset className="mb-4">
-          <legend className="font-type text-ink-soft mb-1 text-xs uppercase">Difficulty</legend>
+          <legend className="font-type text-ink-soft mb-1 text-xs uppercase">
+            Difficulty
+          </legend>
           <div className="grid grid-cols-3 gap-1">
             {DIFFICULTIES.map((d) => (
               <label
@@ -103,8 +129,12 @@ export function CasePicker() {
                   onChange={() => setDifficulty(d.id)}
                   className="sr-only"
                 />
-                <span className="font-type block text-sm uppercase">{d.label}</span>
-                <span className={`block text-[11px] leading-tight ${difficulty === d.id ? "text-paper/80" : "text-ink-soft"}`}>
+                <span className="font-type block text-sm uppercase">
+                  {d.label}
+                </span>
+                <span
+                  className={`block text-[11px] leading-tight ${difficulty === d.id ? "text-paper/80" : "text-ink-soft"}`}
+                >
                   {d.blurb}
                 </span>
               </label>
@@ -113,7 +143,9 @@ export function CasePicker() {
         </fieldset>
 
         {inProgress && (
-          <p className="text-alert mb-4 text-sm">Starting a new case abandons the one you are working on.</p>
+          <p className="text-alert mb-4 text-sm">
+            Starting a new case abandons the one you are working on.
+          </p>
         )}
 
         {error && (
@@ -130,20 +162,25 @@ export function CasePicker() {
         {daily && (
           <div className="border-brass bg-paper-shade/40 mb-3 grid gap-1 rounded-sm border-2 p-3">
             <span className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="font-type text-lg">Today&apos;s case: {daily.case.title}</span>
+              <span className="font-type text-lg">
+                Today&apos;s case: {daily.case.title}
+              </span>
               <Stamp tone={daily.you?.phase === "ended" ? "success" : "ink"}>
                 {daily.you?.phase === "ended" ? "Played" : daily.date}
               </Stamp>
             </span>
             <span className="text-sm">
-              The same mystery for every detective today, one attempt each, always at Normal.{" "}
+              The same mystery for every detective today, one attempt each,
+              always at Normal.{" "}
               {daily.players > 0 &&
                 `${daily.players} detective${daily.players === 1 ? " has" : "s have"} closed it so far.`}
             </span>
             {daily.you?.phase === "ended" && (
               <span className="text-ink-soft text-sm">
                 You scored {daily.you.score}
-                {daily.you.rank && `, rank ${daily.you.rank} of ${daily.players}`}.
+                {daily.you.rank &&
+                  `, rank ${daily.you.rank} of ${daily.players}`}
+                .
               </span>
             )}
             <span className="mt-1 flex flex-wrap gap-2">
@@ -154,10 +191,14 @@ export function CasePicker() {
                     resumeGame(daily.you!.threadId);
                   }}
                 >
-                  {daily.you.phase === "ended" ? "See your verdict" : "Continue today's case"}
+                  {daily.you.phase === "ended"
+                    ? "See your verdict"
+                    : "Continue today's case"}
                 </Button>
               ) : (
-                <Button onClick={() => start(DAILY_CASE_ID)}>Play today&apos;s case</Button>
+                <Button onClick={() => start(DAILY_CASE_ID)}>
+                  Play today&apos;s case
+                </Button>
               )}
               <Link
                 href="/daily"
@@ -170,26 +211,73 @@ export function CasePicker() {
         )}
 
         {fresh?.enabled && (
-          <button
-            type="button"
-            onClick={() => start(NEW_CASE_ID)}
-            className="border-string/60 hover:border-string hover:bg-paper-shade/60 mb-3 grid w-full gap-1 rounded-sm border-2 border-dashed p-3 text-left transition-colors"
+          <section
+            aria-labelledby="fresh-title"
+            className="border-string/60 mb-3 grid gap-2 rounded-sm border-2 border-dashed p-3"
           >
-            <span className="flex flex-wrap items-baseline justify-between gap-2">
-              <span className="font-type text-lg">A brand-new mystery</span>
-              <Stamp tone={fresh.ready > 0 ? "success" : "ink"}>
-                {fresh.ready > 0 ? `${fresh.ready} ready` : fresh.generating ? "Being written" : "None ready"}
-              </Stamp>
-            </span>
-            <span className="text-sm">
-              A case nobody has played before, written for you and checked for fair play before it reaches you.
-            </span>
-            {fresh.ready === 0 && (
-              <span className="text-ink-soft text-xs italic">
-                None is ready yet; you will get a case from the archive while the next one is written.
-              </span>
+            <h3 id="fresh-title" className="font-type text-lg">
+              A brand-new mystery
+            </h3>
+            <p className="text-sm">
+              A case nobody has played before, written for you and checked for
+              fair play before it reaches you.
+            </p>
+            <fieldset>
+              <legend className="font-type text-ink-soft mb-1 text-xs uppercase">
+                Theme
+              </legend>
+              <div className="flex flex-wrap gap-1.5">
+                {fresh.themes
+                  .filter((t) => t.enabled)
+                  .map((t) => (
+                    <label
+                      key={t.id}
+                      title={t.blurb}
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-sm transition-colors ${theme === t.id ? "border-ink bg-ink text-paper" : "border-ink/25 hover:bg-ink/10"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={t.id}
+                        checked={theme === t.id}
+                        onChange={() => setTheme(t.id)}
+                        className="sr-only"
+                      />
+                      {t.label}
+                      <span
+                        className={
+                          theme === t.id ? "text-paper/70" : "text-ink-soft"
+                        }
+                      >
+                        {" "}
+                        ·{" "}
+                        {t.ready > 0
+                          ? `${t.ready} ready`
+                          : t.generating
+                            ? "writing"
+                            : "none"}
+                      </span>
+                    </label>
+                  ))}
+              </div>
+            </fieldset>
+            {chosenTheme && (
+              <p className="text-ink-soft text-xs italic">
+                {chosenTheme.blurb}
+              </p>
             )}
-          </button>
+            {chosenTheme && chosenTheme.ready === 0 && (
+              <p className="text-ink-soft text-xs">
+                No {chosenTheme.label} case is ready yet. You will get one from
+                the archive while the next is written.
+              </p>
+            )}
+            <span>
+              <Button variant="danger" onClick={() => start(NEW_CASE_ID)}>
+                Start a brand-new mystery
+              </Button>
+            </span>
+          </section>
         )}
 
         {cases && (
@@ -205,9 +293,13 @@ export function CasePicker() {
                     <span className="font-type text-lg">{c.title}</span>
                     {c.caseId === currentCaseId && <Stamp>Current case</Stamp>}
                   </span>
-                  <span className="text-ink-soft text-sm italic">{c.place}</span>
+                  <span className="text-ink-soft text-sm italic">
+                    {c.place}
+                  </span>
                   <span className="text-sm">{c.blurb}</span>
-                  <span className="text-ink-soft text-xs">{c.suspects} suspects</span>
+                  <span className="text-ink-soft text-xs">
+                    {c.suspects} suspects
+                  </span>
                 </button>
               </li>
             ))}

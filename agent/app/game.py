@@ -17,7 +17,7 @@ from app.a2ui import catalog
 from app.agents import guards, moderation
 from app.agents.classifier import classify_topics
 from app.agents.extractor import extract_claim
-from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
+from app.agents.narrator import examine_prompt, judge_prompt, judge_system, narrator_system
 from app.agents.persona import persona_messages, persona_system_prompt, record_exchange, turn_context
 from app.engine import clue_engine, difficulty, hints, scoring
 from app.engine.case_library import DAILY_CASE_ID, NEW_CASE_ID, daily_case, pick_case
@@ -44,6 +44,7 @@ from app.models.case import CaseFile
 from app.models.public import Board, Progress, Statement
 from app.protocol import agui
 from app.store.repo import GameSession, SessionRepo
+from app.themes import DEFAULT_THEME, theme
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ DAILY_TAKEN = "You've already opened today's case. Continue it from the case pic
 class FreshCases(Protocol):
     """Source of newly generated, validated cases (the background pool)."""
 
-    async def take(self) -> CaseFile | None: ...
+    async def take(self, theme_id: str = DEFAULT_THEME) -> CaseFile | None: ...
     async def release(self, case: CaseFile) -> None: ...
 
 
@@ -190,7 +191,7 @@ class GameMaster:
                     await self.repo.count_games(owner, since, generated_only=True) >= self.limits.fresh_cases_per_day
                 ):
                     requested, notice = None, FRESH_LIMIT
-                case, chosen_notice = await self._choose_case(requested)
+                case, chosen_notice = await self._choose_case(requested, getattr(action, "theme", None))
                 notice = notice or chosen_notice
                 level = getattr(action, "difficulty", difficulty.DEFAULT)
                 session = GameSession(thread_id, owner, case, clue_engine.new_progress(case, level))
@@ -234,11 +235,11 @@ class GameMaster:
         progress.daily_date = day.isoformat()
         return GameSession(thread_id, owner, case, progress)
 
-    async def _choose_case(self, requested: str | None) -> tuple[CaseFile, str | None]:
+    async def _choose_case(self, requested: str | None, theme_id: str | None = None) -> tuple[CaseFile, str | None]:
         if requested != NEW_CASE_ID:
             return pick_case(requested), None
         await self._return_unstarted(idle_for=ABANDONED_BRIEFING)  # tabs closed on the briefing
-        if self.fresh_cases and (case := await self.fresh_cases.take()):
+        if self.fresh_cases and (case := await self.fresh_cases.take(theme(theme_id).id)):
             return case, None
         return pick_case(None), NO_FRESH_CASE
 
@@ -314,7 +315,7 @@ class GameMaster:
             yield event
         level = "" if turn.progress.difficulty == difficulty.DEFAULT else f" ({turn.progress.difficulty} case)"
         text = (
-            f"You have {turn.progress.turns_left} turns{level} before the Chief Constable arrives. "
+            f"You have {turn.progress.turns_left} turns{level} before {theme(turn.case.theme).authority} arrives. "
             "Question the household, "
             "search the rooms, and catch a liar out with proof."
         )
@@ -350,7 +351,7 @@ class GameMaster:
         case = turn.case
         outcome = clue_engine.examine(case, turn.progress, action.location_id)
         prompt = examine_prompt(case, action.location_id, outcome.new_clues)
-        async for event in self._narrate(NARRATOR_SYSTEM, prompt, PERSONA_MODEL, max_tokens=400):
+        async for event in self._narrate(narrator_system(case), prompt, PERSONA_MODEL, max_tokens=400):
             yield event
         if not outcome.new_clues:
             async for event in agui.text_message("narrator", "Nothing here seems to bear on the case."):
@@ -441,7 +442,7 @@ class GameMaster:
         for event in turn.surface("verdict", [catalog.verdict_screen()]):
             yield event
         prompt = judge_prompt(case, progress, accusation, progress.score)
-        async for event in self._narrate(JUDGE_SYSTEM, prompt, JUDGE_MODEL, max_tokens=2000, effort="medium"):
+        async for event in self._narrate(judge_system(case), prompt, JUDGE_MODEL, max_tokens=2000, effort="medium"):
             yield event
 
     async def _set_name(self, turn: Turn, action: SetName) -> AsyncIterator[BaseEvent]:
@@ -465,7 +466,7 @@ class GameMaster:
             for event in turn.surface("clue", catalog.clue_cards(outcome.new_clues)):
                 yield event
         if turn.progress.phase == "accusing":
-            text = "Your time is up. The Chief Constable is at the door. Name the killer."
+            text = f"Your time is up. {theme(turn.case.theme).authority.capitalize()} is at the door. Name the killer."
             for event in turn.surface("narration", [catalog.narration(text, title="Time's up", tone="alert")]):
                 yield event
             for event in turn.surface("accuse", [catalog.accusation_form()]):

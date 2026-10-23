@@ -19,6 +19,7 @@ from app.engine.validator import validate_case
 from app.generation.schema import GeneratedCase, from_case_file, to_case_file
 from app.llm import GENERATOR_MODEL, LLM, LLMRefusal, LLMTruncated
 from app.models.case import GENERATED_PREFIX, CaseFile
+from app.themes import DEFAULT_THEME, THEMES, theme
 
 log = logging.getLogger(__name__)
 
@@ -26,34 +27,22 @@ MAX_ATTEMPTS = 3
 MAX_TOKENS = 32000
 EXAMPLE_CASE_ID = "ashford_manor"
 
-# Settings the generator is steered toward; the hand-written cases already cover a manor, a train and a hotel.
-SETTINGS = [
-    "a lighthouse keeper's cottage on a storm-cut Cornish island, 1925",
-    "an archaeologists' dig house outside Luxor, 1934",
-    "a supra feast in a wine merchant's house in Tbilisi's old town, 1927",
-    "a crumbling Venetian palazzo during Carnival, 1929",
-    "a transatlantic ocean liner in mid-crossing, 1932",
-    "a Highland shooting lodge cut off by floods, 1926",
-    "a Hollywood film studio's sound stage after hours, 1938",
-    "a Cambridge college on the night of the May Ball, 1931",
-    "a remote tea estate bungalow in the Ceylon hills during the monsoon, 1933",
-    "a Monte Carlo casino villa during the Grand Prix, 1930",
-    "a Swiss sanatorium high above Davos, 1928",
-    "a Paris couture house the night before a collection is shown, 1935",
-]
+# Golden Age settings (kept as the default list; other themes live in app/themes.py).
+SETTINGS = list(THEMES[DEFAULT_THEME].settings)
 
 
-def choose_setting(recent: list[str], rng: random.Random | None = None) -> str:
-    """A setting not used recently; once every setting has been used, the one used longest ago.
+def choose_setting(recent: list[str], rng: random.Random | None = None, theme_id: str = DEFAULT_THEME) -> str:
+    """A setting of the theme not used recently; once every one has been used, the one used longest ago.
 
     `recent` lists settings newest first (duplicates allowed).
     """
     rng = rng or random
-    fresh = [s for s in SETTINGS if s not in recent]
+    options = list(theme(theme_id).settings)
+    fresh = [s for s in options if s not in recent]
     if fresh:
         return rng.choice(fresh)
-    last_used = {s: recent.index(s) for s in SETTINGS}  # higher index = used longer ago
-    return max(SETTINGS, key=last_used.__getitem__)
+    last_used = {s: recent.index(s) for s in options}  # higher index = used longer ago
+    return max(options, key=last_used.__getitem__)
 
 
 DESIGN_RULES = """You are a mystery novelist designing a fair-play golden-age whodunit for an interactive detective \
@@ -64,7 +53,10 @@ you) decides what is revealed when, so your case must fit the engine's mechanics
 - Exactly one culprit, with clear means, motive, and opportunity. Every suspect has a plausible motive and one secret.
 - Innocent suspects lie only about their own secrets, never about the murder. They do not know who did it.
 - 5 suspects, 5 locations, 6-8 topics, 12-16 clues. PG-13: no gore.
-- Write in the voice of a 1920s/30s detective novel. Names, roles and details must suit the setting.
+- Write in {voice}. Names, roles and details must suit the setting.
+
+## Genre rules
+- {fair_play}
 
 ## Ids
 - Suspects: s1..s5. Clues: c1, c2, ... Locations and topics: short snake_case ids.
@@ -123,13 +115,17 @@ culprit has an event at the crime scene inside the time-of-death window. Every e
 ## Output
 Reply with ONE JSON object and nothing else: no prose, no code fences. It must match the example's structure \
 exactly: the same keys, nesting and types, every key present (use "" for an empty string field, [] for an empty \
-list). Below is a complete, valid example. Do not reuse its setting, names, plot or clues."""
+list). Below is a complete, valid example. It is a Golden Age case; follow your own theme's era and voice. Do \
+not reuse its setting, names, plot or clues."""
 
 
 @cache
-def system_prompt() -> str:
+def system_prompt(theme_id: str = DEFAULT_THEME) -> str:
+    """Stable per theme, so each theme's prompt is its own cache prefix."""
+    t = theme(theme_id)
+    rules = DESIGN_RULES.replace("{voice}", t.voice).replace("{fair_play}", t.fair_play)
     example = from_case_file(library()[EXAMPLE_CASE_ID]).model_dump_json(indent=1)
-    return f"{DESIGN_RULES}\n\n<example_case>\n{example}\n</example_case>"
+    return f"{rules}\n\n<example_case>\n{example}\n</example_case>"
 
 
 @dataclass
@@ -160,11 +156,11 @@ def _schema_errors(exc: ValidationError) -> list[str]:
     return [f"schema: {'.'.join(str(p) for p in err['loc'])}: {err['msg']}" for err in exc.errors()[:30]]
 
 
-def check(reply: str, case_id: str) -> tuple[CaseFile | None, list[str]]:
+def check(reply: str, case_id: str, theme_id: str = DEFAULT_THEME) -> tuple[CaseFile | None, list[str]]:
     """Parses and validates a reply. Every failure becomes an error message the model can act on."""
     try:
         generated = GeneratedCase.model_validate_json(_json_object(reply))
-        case = to_case_file(generated, case_id)
+        case = to_case_file(generated, case_id, theme=theme_id)
     except ValidationError as exc:
         return None, _schema_errors(exc)
     errors = validate_case(case)
@@ -194,10 +190,15 @@ def _add_usage(total: dict[str, int], usage: dict[str, int]) -> None:
 
 
 async def generate_case(
-    llm: LLM, setting: str | None = None, rng: random.Random | None = None, max_attempts: int = MAX_ATTEMPTS
+    llm: LLM,
+    setting: str | None = None,
+    rng: random.Random | None = None,
+    max_attempts: int = MAX_ATTEMPTS,
+    theme_id: str = DEFAULT_THEME,
 ) -> GenerationResult:
     """Generates and validates one case, repairing it up to max_attempts times. `case` is None if all fail."""
-    setting = setting or (rng or random).choice(SETTINGS)
+    theme_id = theme(theme_id).id
+    setting = setting or (rng or random).choice(theme(theme_id).settings)
     case_id = f"{GENERATED_PREFIX}{uuid.uuid4().hex[:10]}"
     result = GenerationResult(case=None, setting=setting)
     messages: list[dict] = [{"role": "user", "content": _brief(setting)}]
@@ -206,16 +207,16 @@ async def generate_case(
         started = time.monotonic()
         try:
             output = await llm.complete(
-                model=GENERATOR_MODEL, system=system_prompt(), messages=messages, max_tokens=MAX_TOKENS
+                model=GENERATOR_MODEL, system=system_prompt(theme_id), messages=messages, max_tokens=MAX_TOKENS
             )
-        except anthropic.BadRequestError:
-            raise  # a malformed request never succeeds on retry
+        except (anthropic.BadRequestError, anthropic.AuthenticationError, anthropic.PermissionDeniedError):
+            raise  # a malformed request, bad key or missing access never succeeds on retry
         except (LLMRefusal, LLMTruncated, anthropic.APIError) as err:
             log.warning("case generation call failed: %s", err)
             result.attempts.append(Attempt(errors=[f"generation failed: {type(err).__name__}"], seconds=0.0))
             continue
         _add_usage(result.usage, output.usage)
-        case, errors = check(output.text, case_id)
+        case, errors = check(output.text, case_id, theme_id)
         result.attempts.append(Attempt(errors=errors, seconds=time.monotonic() - started))
         if case is not None:
             result.case = case

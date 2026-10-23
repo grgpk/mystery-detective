@@ -150,6 +150,7 @@ class CaseFile(CamelModel):
     topics: list[Topic]
     solution: Solution
     max_turns: int = 15
+    theme: str = "golden_age"  # app/themes.py; hand-written archive cases are all Golden Age
 
     def suspect(self, suspect_id: str) -> Suspect:
         return next(s for s in self.suspects if s.id == suspect_id)

@@ -1,11 +1,31 @@
 "use client";
 
 import type { Message } from "@ag-ui/client";
-import { UseAgentUpdate, useAgent, useCopilotKit } from "@copilotkit/react-core/v2";
-import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  UseAgentUpdate,
+  useAgent,
+  useCopilotKit,
+} from "@copilotkit/react-core/v2";
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { useUi } from "@/lib/store";
-import { DAILY_CASE_ID, isPublicState, type DailyBoard, type Difficulty, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
+import {
+  DAILY_CASE_ID,
+  isPublicState,
+  type DailyBoard,
+  type Difficulty,
+  type Board,
+  type GameAction,
+  type PublicState,
+} from "@/lib/protocol/types";
 
 const RUNTIME_AGENT_ID = "game_master";
 const THREAD_STORAGE_KEY = "last-alibi:thread";
@@ -59,15 +79,28 @@ function storeThreadId(threadId: string): string {
 
 /** Client-only (rendered with ssr: false): owns the thread id, remounting the session for a new case. */
 export function GameProvider({ children }: { children: ReactNode }) {
-  const [game, setGame] = useState<{ threadId: string; caseId?: string; difficulty?: Difficulty }>(() => ({
+  const [game, setGame] = useState<{
+    threadId: string;
+    caseId?: string;
+    difficulty?: Difficulty;
+    theme?: string;
+  }>(() => ({
     threadId: readThreadId(),
   }));
   const newGame = useCallback(
     (caseId?: string) =>
-      setGame({ threadId: storeThreadId(crypto.randomUUID()), caseId, difficulty: useUi.getState().difficulty }),
+      setGame({
+        threadId: storeThreadId(crypto.randomUUID()),
+        caseId,
+        difficulty: useUi.getState().difficulty,
+        theme: useUi.getState().theme,
+      }),
     [],
   );
-  const resumeGame = useCallback((threadId: string) => setGame({ threadId: storeThreadId(threadId) }), []);
+  const resumeGame = useCallback(
+    (threadId: string) => setGame({ threadId: storeThreadId(threadId) }),
+    [],
+  );
 
   // `/?daily=1` (from the leaderboard page or a shared link) opens today's case: yours if already started.
   useEffect(() => {
@@ -90,6 +123,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       threadId={game.threadId}
       caseId={game.caseId}
       difficulty={game.difficulty}
+      theme={game.theme}
       newGame={newGame}
       resumeGame={resumeGame}
     >
@@ -104,12 +138,22 @@ interface GameSessionProps {
   caseId?: string;
   /** Difficulty if this thread has no game yet (ignored for an existing game, and for the daily case). */
   difficulty?: Difficulty;
+  /** Theme if this thread has no game yet and asks for a brand-new mystery. */
+  theme?: string;
   newGame: (caseId?: string) => void;
   resumeGame: (threadId: string) => void;
   children: ReactNode;
 }
 
-function GameSession({ threadId, caseId, difficulty, newGame, resumeGame, children }: GameSessionProps) {
+function GameSession({
+  threadId,
+  caseId,
+  difficulty,
+  theme,
+  newGame,
+  resumeGame,
+  children,
+}: GameSessionProps) {
   const { agent, isReady } = useAgent({
     agentId: `game-${threadId}`,
     runtimeAgentId: RUNTIME_AGENT_ID,
@@ -126,13 +170,25 @@ function GameSession({ threadId, caseId, difficulty, newGame, resumeGame, childr
     async (action: GameAction, playerText?: string) => {
       if (agent.isRunning) return;
       if (boardTimer.current) clearTimeout(boardTimer.current); // this run carries the board in its state
-      if (playerText) agent.addMessage({ id: crypto.randomUUID(), role: "user", content: playerText });
+      if (playerText)
+        agent.addMessage({
+          id: crypto.randomUUID(),
+          role: "user",
+          content: playerText,
+        });
       setError(null);
       useUi.getState().setRunError(null);
       try {
-        await copilotkit.runAgent({ agent, forwardedProps: { gameAction: action } });
+        await copilotkit.runAgent({
+          agent,
+          forwardedProps: { gameAction: action },
+        });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "The line to the station went dead. Try again.");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "The line to the station went dead. Try again.",
+        );
       }
     },
     [agent, copilotkit],
@@ -141,12 +197,15 @@ function GameSession({ threadId, caseId, difficulty, newGame, resumeGame, childr
   useEffect(() => {
     if (!isReady || started.current) return;
     started.current = true;
-    void send({ type: "start", caseId, difficulty });
-  }, [isReady, send, caseId, difficulty]);
+    void send({ type: "start", caseId, difficulty, theme });
+  }, [isReady, send, caseId, difficulty, theme]);
 
-  useEffect(() => () => {
-    if (boardTimer.current) clearTimeout(boardTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (boardTimer.current) clearTimeout(boardTimer.current);
+    },
+    [],
+  );
 
   const state = isPublicState(agent.state) ? agent.state : null;
 

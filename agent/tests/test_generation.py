@@ -204,3 +204,21 @@ async def test_other_players_cases_are_returned_only_once_idle(monkeypatch):
     monkeypatch.setattr("app.game.ABANDONED_BRIEFING", timedelta(0))
     snapshot, texts = await start_new_case(game, owner="carol")
     assert snapshot["caseId"].startswith("gen_") and NO_FRESH_CASE not in texts
+
+
+async def test_permanent_api_errors_are_not_retried():
+    import anthropic
+    import httpx2
+    import pytest
+
+    llm = ScriptedLLM()
+
+    async def bad_key(**kwargs):
+        request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+        raise anthropic.AuthenticationError(
+            "invalid x-api-key", response=httpx2.Response(401, request=request), body=None
+        )
+
+    llm.complete = bad_key
+    with pytest.raises(anthropic.AuthenticationError):
+        await generate_case(llm)
