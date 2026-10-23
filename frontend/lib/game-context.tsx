@@ -4,6 +4,7 @@ import type { Message } from "@ag-ui/client";
 import { UseAgentUpdate, useAgent, useCopilotKit } from "@copilotkit/react-core/v2";
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
+import { useUi } from "@/lib/store";
 import { isPublicState, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
 
 const RUNTIME_AGENT_ID = "game_master";
@@ -85,6 +86,7 @@ function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) 
   });
   const { copilotkit } = useCopilotKit();
   const [error, setError] = useState<string | null>(null);
+  const runError = useUi((s) => s.runError);
   const started = useRef(false);
   const boardTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -94,6 +96,7 @@ function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) 
       if (boardTimer.current) clearTimeout(boardTimer.current); // this run carries the board in its state
       if (playerText) agent.addMessage({ id: crypto.randomUUID(), role: "user", content: playerText });
       setError(null);
+      useUi.getState().setRunError(null);
       try {
         await copilotkit.runAgent({ agent, forwardedProps: { gameAction: action } });
       } catch (err) {
@@ -133,7 +136,7 @@ function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) 
     state,
     messages: [...agent.messages],
     isRunning: agent.isRunning,
-    error,
+    error: error ?? runError,
     threadId,
     send,
     updateBoard,

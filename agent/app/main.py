@@ -1,20 +1,23 @@
 """FastAPI app exposing the game master as an AG-UI endpoint (SSE)."""
 
 import asyncio
+import hmac
 import logging
 import os
 import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager, suppress
+from datetime import UTC, datetime, timedelta
 
 from ag_ui.core import RunAgentInput
 from ag_ui.encoder import EventEncoder
 from dotenv import load_dotenv
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
+from app.analytics import summarize
 from app.engine.case_library import catalogue, library
-from app.game import GameMaster
+from app.game import GameMaster, Limits
 from app.generation.pool import InMemoryCasePool, PoolFiller, PostgresCasePool
 from app.llm import ScriptedLLM, default_llm
 from app.store.repo import InMemoryRepo, PostgresRepo
@@ -25,6 +28,20 @@ log = logging.getLogger("last_alibi")
 
 RUNS_PER_MINUTE = int(os.getenv("RUNS_PER_MINUTE", "30"))
 CASE_POOL_SIZE = int(os.getenv("CASE_POOL_SIZE", "2"))
+LIMITS = Limits(
+    games_per_day=int(os.getenv("GAMES_PER_DAY", "30")),
+    fresh_cases_per_day=int(os.getenv("FRESH_CASES_PER_DAY", "5")),
+)
+# Shared with the Next.js server; without it anyone who finds this URL could spend the LLM budget.
+AGENT_SHARED_SECRET = os.getenv("AGENT_SHARED_SECRET", "")
+AGENT_KEY_HEADER = "x-agent-key"
+
+
+def require_agent_key(key: str | None = Header(default=None, alias=AGENT_KEY_HEADER)) -> None:
+    if AGENT_SHARED_SECRET and not hmac.compare_digest(key or "", AGENT_SHARED_SECRET):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+
 SESSION_HEADER = "x-session-id"
 
 
@@ -50,6 +67,8 @@ class RateLimiter:
 async def lifespan(app: FastAPI):
     cases = library()  # fail fast if a hand-written case is broken
     log.info("loaded %d validated case(s): %s", len(cases), ", ".join(cases))
+    if not AGENT_SHARED_SECRET:
+        log.warning("AGENT_SHARED_SECRET not set: the agent accepts calls from anyone (fine for local dev only)")
     dsn = os.getenv("DATABASE_URL")
     repo = await PostgresRepo.connect(dsn) if dsn else InMemoryRepo()
     if not dsn:
@@ -62,7 +81,8 @@ async def lifespan(app: FastAPI):
     filler_task = asyncio.create_task(filler.run()) if filler.enabled else None
     log.info("case generation %s (pool target %d)", "on" if filler.enabled else "off", pool_size)
 
-    app.state.game = GameMaster(llm, repo, fresh_cases=filler)
+    app.state.game = GameMaster(llm, repo, fresh_cases=filler, limits=LIMITS)
+    app.state.repo = repo
     app.state.filler = filler
     app.state.limiter = RateLimiter(RUNS_PER_MINUTE)
     yield
@@ -82,7 +102,7 @@ async def health() -> dict:
     return {"status": "ok", "cases": list(library())}
 
 
-@app.get("/cases")
+@app.get("/cases", dependencies=[Depends(require_agent_key)])
 async def cases(request: Request) -> dict:
     filler: PoolFiller = request.app.state.filler
     return {
@@ -95,7 +115,14 @@ async def cases(request: Request) -> dict:
     }
 
 
-@app.post("/agent")
+@app.get("/stats", dependencies=[Depends(require_agent_key)])
+async def stats(request: Request, days: int = 30) -> dict:
+    now = datetime.now(UTC)
+    records = await request.app.state.repo.records(since=now - timedelta(days=max(1, min(days, 365))))
+    return {"days": days, **summarize(records, now)}
+
+
+@app.post("/agent", dependencies=[Depends(require_agent_key)])
 async def run_agent(
     run_input: RunAgentInput,
     request: Request,

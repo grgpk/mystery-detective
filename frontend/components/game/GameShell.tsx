@@ -91,9 +91,10 @@ export function GameShell() {
         </p>
       )}
       {!state && error && (
-        <p className="text-string" role="alert">
-          Could not reach the game server: {error}
-        </p>
+        <div className="paper mx-auto mt-6 max-w-lg rounded-sm p-6" role="alert">
+          <p className="font-type text-lg">The case file could not be opened</p>
+          <p className="text-ink-soft mt-1">{error}</p>
+        </div>
       )}
 
       {state && briefing && (

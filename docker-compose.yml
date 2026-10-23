@@ -15,5 +15,19 @@ services:
       timeout: 3s
       retries: 15
 
+  # `docker compose --profile full up` also runs the agent in a container (port 8000).
+  agent:
+    profiles: ["full"]
+    build: ./agent
+    env_file: ./agent/.env
+    environment:
+      DATABASE_URL: postgresql://alibi:alibi@postgres:5432/last_alibi
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   pgdata:

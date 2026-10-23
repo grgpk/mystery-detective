@@ -4,7 +4,8 @@ import asyncio
 import logging
 from collections import defaultdict
 from collections.abc import AsyncIterator
-from datetime import timedelta
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from typing import Protocol
 
 import anthropic
@@ -12,7 +13,7 @@ from ag_ui.core import BaseEvent, RunAgentInput
 from pydantic import ValidationError
 
 from app.a2ui import catalog
-from app.agents import guards
+from app.agents import guards, moderation
 from app.agents.classifier import classify_topics
 from app.agents.extractor import extract_claim
 from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
@@ -50,6 +51,21 @@ LLM_ERRORS = (anthropic.APIError, LLMRefusal)
 
 class SessionOwnershipError(Exception):
     pass
+
+
+class LimitReached(Exception):
+    """A per-player daily cap; shown to the player as-is."""
+
+
+@dataclass(frozen=True)
+class Limits:
+    games_per_day: int = 30
+    fresh_cases_per_day: int = 5  # each generated case costs real money
+
+
+DAY = timedelta(days=1)
+GAMES_LIMIT = "That's all the cases for today, Inspector. The Yard will have more for you tomorrow."
+FRESH_LIMIT = "That's all the brand-new cases for today, so here is one from the archive."
 
 
 class FreshCases(Protocol):
@@ -114,10 +130,13 @@ class Turn:
 
 
 class GameMaster:
-    def __init__(self, llm: LLM, repo: SessionRepo, fresh_cases: FreshCases | None = None):
+    def __init__(
+        self, llm: LLM, repo: SessionRepo, fresh_cases: FreshCases | None = None, limits: Limits | None = None
+    ):
         self.llm = llm
         self.repo = repo
         self.fresh_cases = fresh_cases
+        self.limits = limits or Limits()
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
 
     async def run(self, run_input: RunAgentInput, owner: str) -> AsyncIterator[BaseEvent]:
@@ -129,6 +148,9 @@ class GameMaster:
                     yield event
         except SessionOwnershipError:
             yield agui.run_error("This case belongs to another session.", code="forbidden")
+            return
+        except LimitReached as err:
+            yield agui.run_error(str(err), code="limit")
             return
         except Exception:
             log.exception("run failed")
@@ -150,10 +172,19 @@ class GameMaster:
             return
 
         fresh = session is None or isinstance(action, NewGame)
-        notice = None
+        notice: str | None = None
         if fresh:
             await self._return_unstarted(owner=owner)
-            case, notice = await self._choose_case(getattr(action, "case_id", None))
+            since = datetime.now(UTC) - DAY
+            if await self.repo.count_games(owner, since) >= self.limits.games_per_day:
+                raise LimitReached(GAMES_LIMIT)
+            requested = getattr(action, "case_id", None)
+            if requested == NEW_CASE_ID and (
+                await self.repo.count_games(owner, since, generated_only=True) >= self.limits.fresh_cases_per_day
+            ):
+                requested, notice = None, FRESH_LIMIT
+            case, chosen_notice = await self._choose_case(requested)
+            notice = notice or chosen_notice
             session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
 
         client_state = run_input.state if isinstance(run_input.state, dict) else None
@@ -276,6 +307,8 @@ class GameMaster:
         self._ensure_started(turn)
         case, progress = turn.case, turn.progress
         clue_engine.known_suspect(case, action.suspect_id)
+        if refusal := moderation.refusal_for(action.question):
+            raise GameRuleError(refusal)  # narrated, no turn spent, never sent to a model
         topics = await classify_topics(self.llm, case, action.question)
         outcome = clue_engine.interrogate(case, progress, action.suspect_id, topics)
 

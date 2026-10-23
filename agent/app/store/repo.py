@@ -7,6 +7,7 @@ from typing import Protocol
 
 import asyncpg
 
+from app.analytics import GameRecord
 from app.models.case import GENERATED_PREFIX, CaseFile
 from app.models.public import Progress
 
@@ -24,16 +25,25 @@ class SessionRepo(Protocol):
     async def save(self, session: GameSession) -> None: ...
     async def delete(self, thread_id: str) -> None: ...
 
+    async def count_games(self, owner: str, since: datetime, generated_only: bool = False) -> int:
+        """Games this owner created since `since` (optionally only on generated cases)."""
+        ...
+
     async def unstarted_generated(
         self, owner: str | None = None, idle_for: timedelta | None = None
     ) -> list[GameSession]:
         """Games on a generated case still on the briefing: one owner's, or anyone's idle for `idle_for`."""
         ...
 
+    async def records(self, since: datetime) -> list[GameRecord]:
+        """Every game created since `since`, for analytics."""
+        ...
+
 
 class InMemoryRepo:
     def __init__(self) -> None:
         self._rows: dict[str, tuple[str, dict, dict, datetime]] = {}
+        self._created: dict[str, datetime] = {}
 
     async def get(self, thread_id: str) -> GameSession | None:
         row = self._rows.get(thread_id)
@@ -44,6 +54,7 @@ class InMemoryRepo:
 
     async def save(self, session: GameSession) -> None:
         # Store serialized copies so callers can't mutate persisted state by reference.
+        self._created.setdefault(session.thread_id, datetime.now(UTC))
         self._rows[session.thread_id] = (
             session.owner,
             session.case.dump(),
@@ -53,6 +64,23 @@ class InMemoryRepo:
 
     async def delete(self, thread_id: str) -> None:
         self._rows.pop(thread_id, None)
+        self._created.pop(thread_id, None)
+
+    async def records(self, since: datetime) -> list[GameRecord]:
+        return [
+            GameRecord(CaseFile.model_validate(case), Progress.model_validate(progress), self._created[tid], updated)
+            for tid, (_, case, progress, updated) in self._rows.items()
+            if self._created[tid] >= since
+        ]
+
+    async def count_games(self, owner: str, since: datetime, generated_only: bool = False) -> int:
+        return sum(
+            1
+            for thread_id, (row_owner, case, _, _) in self._rows.items()
+            if row_owner == owner
+            and self._created[thread_id] >= since
+            and (not generated_only or case["caseId"].startswith(GENERATED_PREFIX))
+        )
 
     async def unstarted_generated(
         self, owner: str | None = None, idle_for: timedelta | None = None
@@ -129,6 +157,32 @@ class PostgresRepo:
 
     async def delete(self, thread_id: str) -> None:
         await self.pool.execute("DELETE FROM game_sessions WHERE thread_id = $1", thread_id)
+
+    async def records(self, since: datetime) -> list[GameRecord]:
+        rows = await self.pool.fetch(
+            "SELECT case_file, progress, created_at, updated_at FROM game_sessions WHERE created_at >= $1", since
+        )
+        return [
+            GameRecord(
+                CaseFile.model_validate(json.loads(r["case_file"])),
+                Progress.model_validate(json.loads(r["progress"])),
+                r["created_at"],
+                r["updated_at"],
+            )
+            for r in rows
+        ]
+
+    async def count_games(self, owner: str, since: datetime, generated_only: bool = False) -> int:
+        return await self.pool.fetchval(
+            """
+            SELECT count(*) FROM game_sessions
+             WHERE owner = $1 AND created_at >= $2 AND (NOT $3 OR starts_with(case_id, $4))
+            """,
+            owner,
+            since,
+            generated_only,
+            GENERATED_PREFIX,
+        )
 
     async def unstarted_generated(
         self, owner: str | None = None, idle_for: timedelta | None = None

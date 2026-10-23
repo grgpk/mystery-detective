@@ -2,9 +2,8 @@ import { HttpAgent } from "@ag-ui/client";
 import { CopilotRuntime, createCopilotRuntimeHandler } from "@copilotkit/runtime/v2";
 import type { NextRequest } from "next/server";
 
+import { agentHeaders, agentRunUrl } from "@/lib/agent-server";
 import { SESSION_COOKIE } from "@/lib/session";
-
-const AGENT_URL = process.env.AGENT_URL ?? "http://localhost:8000/agent";
 
 function sessionFrom(request: Request): string | null {
   const cookies = request.headers.get("cookie") ?? "";
@@ -16,8 +15,8 @@ const runtime = new CopilotRuntime({
   // Per request, so the anonymous session travels to the agent, which uses it to own game threads.
   agents: ({ request }) => ({
     game_master: new HttpAgent({
-      url: AGENT_URL,
-      headers: { "X-Session-Id": sessionFrom(request) ?? "" },
+      url: agentRunUrl,
+      headers: agentHeaders({ "X-Session-Id": sessionFrom(request) ?? "" }),
     }),
   }),
   // Turns `show_ui` tool results carrying `a2ui_operations` into A2UI surface activities.

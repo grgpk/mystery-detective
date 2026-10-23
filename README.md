@@ -68,3 +68,35 @@ cd frontend && npm run typecheck && npm run lint && npm run build
 
 Pinned protocol versions: `@copilotkit/*` 1.79.1, `@ag-ui/client` 1.0.2, A2UI v0.9 (`@a2ui/web_core` 0.10.x),
 `ag-ui-protocol` 1.0.0.
+
+## Deploying
+
+The two halves deploy separately: the Next.js frontend to Vercel, and the Python agent to a host that keeps a
+process running. The agent fills the case pool in a background task and streams long SSE responses, so serverless
+functions are a poor fit: use Fly.io, Railway, Render or Cloud Run with min instances = 1.
+
+**Agent** (`agent/Dockerfile`, one worker per instance):
+
+| Variable | Purpose |
+|---|---|
+| `ANTHROPIC_API_KEY` | Claude credentials |
+| `DATABASE_URL` | Postgres (games, generated-case pool) |
+| `AGENT_SHARED_SECRET` | **Required in production.** Without it anyone who finds the URL can spend your LLM budget |
+| `CASE_POOL_SIZE` | Generated cases kept ready (default 2; 0 turns generation off) |
+| `GAMES_PER_DAY` / `FRESH_CASES_PER_DAY` | Per-player caps over a rolling 24 hours (default 30 / 5) |
+| `RUNS_PER_MINUTE` | Per-player action rate limit (default 30) |
+
+**Frontend** (Vercel, zero config):
+
+| Variable | Purpose |
+|---|---|
+| `AGENT_URL` | The agent's `/agent` URL, e.g. `https://last-alibi-agent.fly.dev/agent` |
+| `AGENT_SHARED_SECRET` | Same value as the agent's |
+| `STATS_TOKEN` | Unlocks `/stats?token=...` (in production `/stats` is a 404 without it) |
+
+Locally, `docker compose --profile full up` runs Postgres and the agent container together.
+
+**Known limits of v1.** Players are identified by an anonymous cookie, so clearing cookies resets their daily caps;
+put per-IP rate limiting in front of `/api/copilotkit` (for example a Vercel Firewall rule) before a public launch.
+Moderation is a local filter for clearly out-of-bounds questions, backed by the suspects' PG-13 instructions and
+Claude's own safety training.

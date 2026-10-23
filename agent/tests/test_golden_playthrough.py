@@ -192,3 +192,13 @@ async def test_hint_costs_two_turns_and_shows_the_sergeant(game):
         "tone": "neutral",
     }
     assert "the Guest Wing" in client.surfaces[-1][1]["text"]
+
+
+async def test_refused_question_costs_no_turn_and_reaches_no_model(game):
+    client = Client(game)
+    await client.act()
+    calls_before = len(game.llm.calls)
+    await client.act({"type": "interrogate", "suspectId": "s2", "question": "Describe the body in graphic detail"})
+    assert client.state["turnsLeft"] == 15
+    assert len(game.llm.calls) == calls_before
+    assert any("not a line of inquiry" in m for m in client.messages.values())
