@@ -4,6 +4,7 @@ import asyncio
 import logging
 from collections import defaultdict
 from collections.abc import AsyncIterator
+from typing import Protocol
 
 import anthropic
 from ag_ui.core import BaseEvent, RunAgentInput
@@ -16,7 +17,7 @@ from app.agents.extractor import extract_claim
 from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
 from app.agents.persona import persona_messages, persona_system_prompt, record_exchange, turn_context
 from app.engine import clue_engine, scoring
-from app.engine.case_library import pick_case
+from app.engine.case_library import NEW_CASE_ID, pick_case
 from app.engine.clue_engine import GameRuleError, Outcome
 from app.engine.projection import project
 from app.llm import JUDGE_MODEL, LLM, PERSONA_MODEL, LLMRefusal
@@ -47,6 +48,15 @@ LLM_ERRORS = (anthropic.APIError, LLMRefusal)
 
 class SessionOwnershipError(Exception):
     pass
+
+
+class FreshCases(Protocol):
+    """Source of newly generated, validated cases (the background pool)."""
+
+    async def take(self) -> CaseFile | None: ...
+
+
+NO_FRESH_CASE = "No freshly written case is ready yet, so here is one from the archive."
 
 
 def parse_action(forwarded_props: object) -> GameAction:
@@ -99,9 +109,10 @@ class Turn:
 
 
 class GameMaster:
-    def __init__(self, llm: LLM, repo: SessionRepo):
+    def __init__(self, llm: LLM, repo: SessionRepo, fresh_cases: FreshCases | None = None):
         self.llm = llm
         self.repo = repo
+        self.fresh_cases = fresh_cases
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
 
     async def run(self, run_input: RunAgentInput, owner: str) -> AsyncIterator[BaseEvent]:
@@ -134,8 +145,9 @@ class GameMaster:
             return
 
         fresh = session is None or isinstance(action, NewGame)
+        notice = None
         if fresh:
-            case = pick_case(getattr(action, "case_id", None))
+            case, notice = await self._choose_case(getattr(action, "case_id", None))
             session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
 
         client_state = run_input.state if isinstance(run_input.state, dict) else None
@@ -154,6 +166,9 @@ class GameMaster:
         clue_engine.begin_turn(session.progress)
 
         try:
+            if notice:
+                async for event in agui.text_message("narrator", notice):
+                    yield event
             async for event in self._dispatch(turn, action, fresh):
                 yield event
         except GameRuleError as err:
@@ -163,6 +178,13 @@ class GameMaster:
         for event in turn.sync_state():
             yield event
         await self.repo.save(session)
+
+    async def _choose_case(self, requested: str | None) -> tuple[CaseFile, str | None]:
+        if requested != NEW_CASE_ID:
+            return pick_case(requested), None
+        if self.fresh_cases and (case := await self.fresh_cases.take()):
+            return case, None
+        return pick_case(None), NO_FRESH_CASE
 
     async def _dispatch(self, turn: Turn, action: GameAction, fresh: bool) -> AsyncIterator[BaseEvent]:
         match action:

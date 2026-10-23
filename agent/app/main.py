@@ -1,10 +1,11 @@
 """FastAPI app exposing the game master as an AG-UI endpoint (SSE)."""
 
+import asyncio
 import logging
 import os
 import time
 from collections import defaultdict, deque
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from ag_ui.core import RunAgentInput
 from ag_ui.encoder import EventEncoder
@@ -14,7 +15,8 @@ from fastapi.responses import StreamingResponse
 
 from app.engine.case_library import catalogue, library
 from app.game import GameMaster
-from app.llm import default_llm
+from app.generation.pool import InMemoryCasePool, PoolFiller, PostgresCasePool
+from app.llm import ScriptedLLM, default_llm
 from app.store.repo import InMemoryRepo, PostgresRepo
 
 load_dotenv()
@@ -22,6 +24,7 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 log = logging.getLogger("last_alibi")
 
 RUNS_PER_MINUTE = int(os.getenv("RUNS_PER_MINUTE", "30"))
+CASE_POOL_SIZE = int(os.getenv("CASE_POOL_SIZE", "2"))
 SESSION_HEADER = "x-session-id"
 
 
@@ -50,10 +53,23 @@ async def lifespan(app: FastAPI):
     dsn = os.getenv("DATABASE_URL")
     repo = await PostgresRepo.connect(dsn) if dsn else InMemoryRepo()
     if not dsn:
-        log.warning("DATABASE_URL not set: games are kept in memory only")
-    app.state.game = GameMaster(default_llm(), repo)
+        log.warning("DATABASE_URL not set: games and generated cases are kept in memory only")
+    llm = default_llm()
+    case_pool = await PostgresCasePool.create(repo.pool) if isinstance(repo, PostgresRepo) else InMemoryCasePool()
+    # Each generated case is one or more Claude Opus calls; set CASE_POOL_SIZE=0 to turn generation off.
+    pool_size = 0 if isinstance(llm, ScriptedLLM) else CASE_POOL_SIZE
+    filler = PoolFiller(case_pool, llm, target=pool_size)
+    filler_task = asyncio.create_task(filler.run()) if filler.enabled else None
+    log.info("case generation %s (pool target %d)", "on" if filler.enabled else "off", pool_size)
+
+    app.state.game = GameMaster(llm, repo, fresh_cases=filler)
+    app.state.filler = filler
     app.state.limiter = RateLimiter(RUNS_PER_MINUTE)
     yield
+    if filler_task:
+        filler_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await filler_task
     if isinstance(repo, PostgresRepo):
         await repo.close()
 
@@ -67,8 +83,16 @@ async def health() -> dict:
 
 
 @app.get("/cases")
-async def cases() -> list[dict]:
-    return catalogue()
+async def cases(request: Request) -> dict:
+    filler: PoolFiller = request.app.state.filler
+    return {
+        "cases": catalogue(),
+        "fresh": {
+            "enabled": filler.enabled,
+            "ready": await filler.pool.ready(),
+            "generating": filler.generating,
+        },
+    }
 
 
 @app.post("/agent")

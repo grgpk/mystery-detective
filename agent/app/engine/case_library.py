@@ -9,6 +9,7 @@ from app.engine.validator import parse_case, validate_case
 from app.models.case import CaseFile
 
 CASES_DIR = Path(__file__).resolve().parent.parent / "cases"
+NEW_CASE_ID = "new"  # asks for a freshly generated case from the pool
 
 
 class InvalidCaseError(Exception):

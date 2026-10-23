@@ -130,3 +130,12 @@ export interface CaseSummary {
   blurb: string;
   suspects: number;
 }
+
+/** What /api/cases returns: the hand-written archive plus the generated-case pool's status. */
+export interface CaseCatalogue {
+  cases: CaseSummary[];
+  fresh: { enabled: boolean; ready: number; generating: boolean };
+}
+
+/** Asks the agent for a freshly generated case from its pool. */
+export const NEW_CASE_ID = "new";

@@ -6,13 +6,15 @@ tests and as a dev fallback when no Anthropic credentials are configured.
 
 import os
 from collections.abc import AsyncIterator, Callable
+from dataclasses import dataclass, field
 from typing import Protocol, TypeVar
 
 import anthropic
 from pydantic import BaseModel
 
 PERSONA_MODEL = "claude-haiku-5-5"  # personas, topic classifier, statement extraction, scene narration
-JUDGE_MODEL = "claude-opus-5-5"  # verdict narrative (and, in M4, case generation)
+JUDGE_MODEL = "claude-opus-5-5"  # verdict narrative
+GENERATOR_MODEL = "claude-opus-5-5"  # case generation (M4)
 
 T = TypeVar("T", bound=BaseModel)
 Message = dict  # {"role": "user" | "assistant", "content": str}
@@ -20,6 +22,16 @@ Message = dict  # {"role": "user" | "assistant", "content": str}
 
 class LLMRefusal(Exception):
     pass
+
+
+class LLMTruncated(Exception):
+    """Output hit max_tokens, so it is incomplete."""
+
+
+@dataclass
+class Completion:
+    text: str
+    usage: dict[str, int] = field(default_factory=dict)
 
 
 class LLM(Protocol):
@@ -30,6 +42,12 @@ class LLM(Protocol):
     async def parse(
         self, *, model: str, system: str, messages: list[Message], output_type: type[T], max_tokens: int = 1024
     ) -> T: ...
+
+    async def complete(
+        self, *, model: str, system: str, messages: list[Message], max_tokens: int, effort: str = "high"
+    ) -> Completion:
+        """One long completion, streamed so a large max_tokens never times out."""
+        ...
 
 
 class AnthropicLLM:
@@ -68,6 +86,29 @@ class AnthropicLLM:
             raise LLMRefusal(model)
         return response.parsed_output
 
+    async def complete(
+        self, *, model: str, system: str, messages: list[Message], max_tokens: int, effort: str = "high"
+    ) -> Completion:
+        async with self.client.messages.stream(
+            model=model,
+            max_tokens=max_tokens,
+            system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
+            messages=messages,
+            output_config={"effort": effort},
+        ) as stream:
+            final = await stream.get_final_message()
+        if final.stop_reason == "refusal":
+            raise LLMRefusal(model)
+        if final.stop_reason == "max_tokens":
+            raise LLMTruncated(model)
+        usage = {
+            "input_tokens": final.usage.input_tokens,
+            "output_tokens": final.usage.output_tokens,
+            "cache_read_input_tokens": final.usage.cache_read_input_tokens or 0,
+            "cache_creation_input_tokens": final.usage.cache_creation_input_tokens or 0,
+        }
+        return Completion(text="".join(b.text for b in final.content if b.type == "text"), usage=usage)
+
 
 class ScriptedLLM:
     """Offline stand-in. `respond` maps (system, last user message) to the reply text."""
@@ -76,9 +117,11 @@ class ScriptedLLM:
         self,
         respond: Callable[[str, str], str] | None = None,
         parsers: dict[type, Callable[[str], BaseModel]] | None = None,
+        completer: Callable[[str], str] | None = None,
     ):
         self.respond = respond or _default_scripted_reply
         self.parsers = parsers or {}
+        self.completer = completer
         self.calls: list[dict] = []
 
     async def stream(
@@ -96,6 +139,15 @@ class ScriptedLLM:
         if output_type in self.parsers:
             return self.parsers[output_type](messages[-1]["content"])  # type: ignore[return-value]
         return output_type.model_validate({})
+
+    async def complete(
+        self, *, model: str, system: str, messages: list[Message], max_tokens: int, effort: str = "high"
+    ) -> Completion:
+        """Replies with `completer(last user message)`; tests script whole generated cases this way."""
+        self.calls.append({"model": model, "system": system, "messages": messages})
+        if self.completer is None:
+            raise LLMRefusal("scripted LLM has no completer")
+        return Completion(text=self.completer(messages[-1]["content"]))
 
 
 def _default_scripted_reply(system: str, user: str) -> str:

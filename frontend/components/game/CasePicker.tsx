@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
-import type { CaseSummary } from "@/lib/protocol/types";
+import { NEW_CASE_ID, type CaseCatalogue } from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function CasePicker() {
@@ -12,7 +12,7 @@ export function CasePicker() {
   const open = useUi((s) => s.casePickerOpen);
   const setOpen = useUi((s) => s.setCasePickerOpen);
   const dialog = useRef<HTMLDialogElement>(null);
-  const [cases, setCases] = useState<CaseSummary[] | null>(null);
+  const [catalogue, setCatalogue] = useState<CaseCatalogue | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,17 +22,21 @@ export function CasePicker() {
     if (!open && element.open) element.close();
   }, [open]);
 
+  // Refetch on every open: the generated-case pool fills and drains between visits.
   useEffect(() => {
-    if (!open || cases) return;
+    if (!open) return;
     let cancelled = false;
     fetch("/api/cases")
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
-      .then((data: CaseSummary[]) => !cancelled && setCases(data))
+      .then((data: CaseCatalogue) => !cancelled && setCatalogue(data))
       .catch(() => !cancelled && setError("The case archive is unreachable. Try again in a moment."));
     return () => {
       cancelled = true;
     };
-  }, [open, cases]);
+  }, [open]);
+
+  const cases = catalogue?.cases ?? null;
+  const fresh = catalogue?.fresh;
 
   const currentCaseId = state?.caseId;
   const inProgress = state?.phase === "investigating" || state?.phase === "accusing";
@@ -87,6 +91,29 @@ export function CasePicker() {
           <p className="text-ink-soft animate-pulse italic" role="status">
             Fetching the files from the archive…
           </p>
+        )}
+
+        {fresh?.enabled && (
+          <button
+            type="button"
+            onClick={() => start(NEW_CASE_ID)}
+            className="border-string/60 hover:border-string hover:bg-paper-shade/60 mb-3 grid w-full gap-1 rounded-sm border-2 border-dashed p-3 text-left transition-colors"
+          >
+            <span className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="font-type text-lg">A brand-new mystery</span>
+              <Stamp tone={fresh.ready > 0 ? "success" : "ink"}>
+                {fresh.ready > 0 ? `${fresh.ready} ready` : fresh.generating ? "Being written" : "None ready"}
+              </Stamp>
+            </span>
+            <span className="text-sm">
+              A case nobody has played before, written for you and checked for fair play before it reaches you.
+            </span>
+            {fresh.ready === 0 && (
+              <span className="text-ink-soft text-xs italic">
+                None is ready yet; you will get a case from the archive while the next one is written.
+              </span>
+            )}
+          </button>
         )}
 
         {cases && (

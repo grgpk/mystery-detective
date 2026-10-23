@@ -1,14 +1,17 @@
 """Fair-play checks run on every case file before it is played (plan section 6)."""
 
 import math
+import re
 from collections import Counter
 
 from pydantic import ValidationError
 
+from app.engine import solver
 from app.engine.clue_engine import IMPLICIT_FIRST_TOPIC, QUESTIONS_PER_TURN
 from app.models.case import CaseFile, ConfrontUnlock, ExamineUnlock, InterrogateUnlock
 
 BUDGET_RATIO = 0.6
+_HHMM = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 
 
 def _minutes(hhmm: str) -> int:
@@ -50,6 +53,78 @@ def _referential_errors(case: CaseFile) -> list[str]:
             errors.append(f"acceptable motive {motive} is not offered to the player")
     if len(case.suspects) < 3:
         errors.append("need at least 3 suspects")
+    return errors
+
+
+def _integrity_errors(case: CaseFile) -> list[str]:
+    """Ids are unique and every reference anywhere resolves (generated cases get this wrong most often)."""
+    errors = []
+    suspect_ids = {s.id for s in case.suspects}
+    location_ids = case.location_ids()
+    topic_ids = {t.id for t in case.topics}
+
+    def unique(kind: str, ids: list[str]) -> None:
+        for dup in sorted({i for i in ids if ids.count(i) > 1}):
+            errors.append(f"duplicate {kind} id {dup}")
+
+    unique("suspect", [s.id for s in case.suspects])
+    unique("clue", [c.id for c in case.clues])
+    unique("location", [loc.id for loc in case.setting.locations])
+    unique("topic", [t.id for t in case.topics])
+    unique("lie/secret", [x.id for s in case.suspects for x in (*s.lies, *s.secrets)])
+    if IMPLICIT_FIRST_TOPIC not in topic_ids:
+        errors.append(f"topics must include '{IMPLICIT_FIRST_TOPIC}'")
+
+    for clue in case.clues:
+        unlock = clue.unlock
+        if clue.location is not None and clue.location not in location_ids:
+            errors.append(f"clue {clue.id} is at unknown location {clue.location}")
+        if isinstance(unlock, ExamineUnlock) and unlock.target not in location_ids:
+            errors.append(f"clue {clue.id} unlocks at unknown location {unlock.target}")
+        if isinstance(unlock, InterrogateUnlock) and (
+            unlock.suspect not in suspect_ids or unlock.topic not in topic_ids
+        ):
+            errors.append(f"clue {clue.id} unlocks via unknown suspect {unlock.suspect} or topic {unlock.topic}")
+        for s in clue.points_to:
+            if s not in suspect_ids:
+                errors.append(f"clue {clue.id} points to unknown suspect {s}")
+        if clue.is_red_herring and case.culprit in clue.points_to:
+            errors.append(f"red herring {clue.id} points at the culprit")
+        if clue.timeline_event and (
+            clue.timeline_event.suspect not in suspect_ids or not _HHMM.match(clue.timeline_event.time)
+        ):
+            errors.append(f"clue {clue.id} has a bad timeline event")
+
+    for event in case.truth_timeline:
+        if event.suspect not in suspect_ids or not _HHMM.match(event.time):
+            errors.append(f"truth timeline event at {event.time} has a bad suspect or time")
+        if event.location is not None and event.location not in location_ids:
+            errors.append(f"truth timeline event at {event.time} is at unknown location {event.location}")
+    window = case.victim.time_of_death.split("-")
+    if len(window) != 2 or not all(_HHMM.match(t) for t in window):
+        errors.append("time of death must look like HH:MM-HH:MM")
+
+    for c in case.contradictions:
+        if c.effect.suspect not in suspect_ids:
+            errors.append(f"contradiction {c.a}/{c.b} affects unknown suspect {c.effect.suspect}")
+        elif c.effect.composure >= 0:
+            errors.append(f"contradiction {c.a}/{c.b} must lower composure")
+        for ref in (c.a, c.b):
+            owner = case.lie(ref)
+            if owner and owner[0].id != c.effect.suspect:
+                errors.append(f"contradiction {c.a}/{c.b} must affect {owner[0].id}, who told lie {ref}")
+    for s in case.suspects:
+        if not s.secrets:
+            errors.append(f"suspect {s.id} has no secret")
+        for lie in s.lies:
+            if not lie.topics:
+                errors.append(f"lie {lie.id} has no topics, so it can never be told")
+        for claim in s.claimed_timeline:
+            if not _HHMM.match(claim.time):
+                errors.append(f"suspect {s.id} has a bad claimed time {claim.time}")
+    examinable = {c.unlock.target for c in case.clues if isinstance(c.unlock, ExamineUnlock)}
+    for loc in sorted(location_ids - examinable):
+        errors.append(f"location {loc} has nothing to find")
     return errors
 
 
@@ -163,10 +238,32 @@ def _budget_errors(case: CaseFile) -> list[str]:
     return [] if needed <= budget else [f"needs {needed} actions, budget is {budget}"]
 
 
+def _simulation_errors(case: CaseFile) -> list[str]:
+    """Rule 8: play it. The required evidence is reachable through the real engine within budget, and every
+    contradiction can actually be set off by a player."""
+    errors = []
+    try:
+        progress = solver.solve(case)
+        used = case.max_turns - progress.turns_left
+        budget = math.floor(case.max_turns * BUDGET_RATIO)
+        if used > budget:
+            errors.append(f"simulated solve used {used} turns, budget is {budget}")
+    except solver.Unsolvable as err:
+        errors.append(f"simulated solve failed: {err}")
+    for index in range(len(case.contradictions)):
+        try:
+            solver.trigger_contradiction(case, index)
+        except solver.Unsolvable as err:
+            errors.append(str(err))
+    return errors
+
+
 def validate_case(case: CaseFile) -> list[str]:
-    errors = _referential_errors(case)
+    errors = _referential_errors(case) + _integrity_errors(case)
     if errors:
         return errors  # later rules assume ids resolve
     for rule in (_reachability_errors, _coverage_errors, _pointing_errors, _timeline_errors, _budget_errors):
         errors.extend(rule(case))
+    if not errors:
+        errors.extend(_simulation_errors(case))  # only meaningful once the structure is sound
     return errors

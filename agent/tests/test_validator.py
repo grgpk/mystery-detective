@@ -75,3 +75,46 @@ def test_time_window_may_cross_midnight(raw_case):
         {"time": "00:30", "suspect": "s2", "event": "Too late", "location": "study"}
     ]
     assert any("crime scene" in e for e in errors_for(raw))
+
+
+@pytest.mark.parametrize(
+    ("mutate", "expected"),
+    [
+        (lambda r: r["clues"][1].update(id="c3"), "duplicate clue id c3"),
+        (lambda r: r.__setitem__("topics", [t for t in r["topics"] if t["id"] != "whereabouts"]), "whereabouts"),
+        (lambda r: r["clues"][0].update(location="attic"), "unknown location attic"),
+        (lambda r: [c.update(pointsTo=["s2"]) for c in r["clues"] if c["id"] == "c7"], "points at the culprit"),
+        (lambda r: r["victim"].update(timeOfDeath="10pm-10:30pm"), "HH:MM-HH:MM"),
+        (lambda r: r["suspects"][0].update(secrets=[]), "has no secret"),
+        (lambda r: r["contradictions"][0]["effect"].update(composure=10), "must lower composure"),
+        (
+            lambda r: [c.update(unlock={"type": "examine", "target": "study"}) for c in r["clues"] if c["id"] == "c16"],
+            "location library has nothing to find",
+        ),
+    ],
+)
+def test_integrity_rules(raw_case, mutate, expected):
+    raw = copy.deepcopy(raw_case)
+    mutate(raw)
+    errors = errors_for(raw)
+    assert any(expected in e for e in errors), errors
+
+
+def test_contradiction_must_affect_the_liar(raw_case):
+    raw = copy.deepcopy(raw_case)
+    raw["contradictions"][0]["effect"]["suspect"] = "s3"  # confronting Mrs. Pell with Henry's lie
+    assert any("must affect s2" in e for e in errors_for(raw))
+
+
+def test_simulation_catches_circular_evidence(raw_case):
+    """Structurally valid, but the admission needs a clue that is only revealed by the admission itself."""
+    raw = copy.deepcopy(raw_case)
+    raw["contradictions"] = [c for c in raw["contradictions"] if c["b"] != "c3"]
+    for clue in raw["clues"]:
+        if clue["id"] == "c8":
+            clue["unlock"] = {"type": "confront"}
+    raw["contradictions"].append(
+        {"a": "s2_lie_garden", "b": "c9", "effect": {"suspect": "s2", "composure": -20, "reveals": "c8"}}
+    )
+    errors = errors_for(raw)
+    assert any("simulated solve failed" in e for e in errors), errors

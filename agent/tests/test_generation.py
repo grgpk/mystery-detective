@@ -1,0 +1,140 @@
+"""Case generation pipeline, offline: scripted 'Claude' outputs drive the generate -> validate -> repair loop."""
+
+import uuid
+
+from ag_ui.core import RunAgentInput
+
+from app.engine.case_library import NEW_CASE_ID, library
+from app.game import NO_FRESH_CASE, GameMaster
+from app.generation import generator
+from app.generation.generator import check, generate_case, system_prompt
+from app.generation.pool import InMemoryCasePool, PoolFiller
+from app.generation.schema import GeneratedCase, from_case_file, to_case_file
+from app.llm import ScriptedLLM
+from app.store.repo import InMemoryRepo
+
+
+def valid_generated() -> GeneratedCase:
+    return from_case_file(library()["midnight_sleeper"])
+
+
+def broken_generated() -> GeneratedCase:
+    """Plausible-looking but unfair: the culprit's accounts lie can never be broken."""
+    g = valid_generated()
+    g.contradictions = [c for c in g.contradictions if c.lie_id != "s3_lie_accounts"]
+    return g
+
+
+def scripted(*outputs: GeneratedCase | str) -> ScriptedLLM:
+    queue = [o if isinstance(o, str) else o.model_dump_json() for o in outputs]
+    return ScriptedLLM(completer=lambda _: queue.pop(0))
+
+
+def test_schema_roundtrip_is_lossless():
+    for case in library().values():
+        assert to_case_file(from_case_file(case), case.case_id, case.max_turns) == case
+
+
+def test_check_reports_validator_errors():
+    case, errors = check(broken_generated().model_dump_json(), "gen_test")
+    assert case is None
+    assert any("s3_lie_accounts has no contradiction" in e for e in errors)
+
+
+def test_check_reports_schema_errors_instead_of_raising():
+    reply = valid_generated().model_dump_json().replace('"unlock_type":"examine"', '"unlock_type":"search"', 1)
+    case, errors = check(reply, "gen_test")
+    assert case is None
+    assert any(e.startswith("schema: clues.0.unlock_type") for e in errors), errors
+
+
+def test_check_tolerates_fences_and_prose():
+    reply = "Here is the case:\n```json\n" + valid_generated().model_dump_json() + "\n```"
+    case, errors = check(reply, "gen_test")
+    assert errors == [] and case is not None
+
+
+def test_check_reports_unparseable_json():
+    case, errors = check('{"setting": {"title": "Half a case"', "gen_test")
+    assert case is None and errors[0].startswith("schema")
+
+
+def test_system_prompt_carries_rules_and_example():
+    prompt = system_prompt()
+    assert '"whereabouts"' in prompt
+    assert "Lord Edmund Ashford" in prompt  # the worked example
+    assert "Do not reuse" in prompt
+
+
+async def test_valid_first_try():
+    result = await generate_case(scripted(valid_generated()), setting="a lighthouse, 1925")
+    assert result.case is not None and result.first_try
+    assert result.case.case_id.startswith("gen_")
+
+
+async def test_repair_loop_feeds_errors_back():
+    llm = scripted(broken_generated(), valid_generated())
+    result = await generate_case(llm, setting="a lighthouse, 1925")
+    assert result.case is not None
+    assert len(result.attempts) == 2 and not result.first_try
+    repair_request = llm.calls[-1]["messages"]
+    assert [m["role"] for m in repair_request] == ["user", "assistant", "user"]
+    assert "a lighthouse, 1925" in repair_request[0]["content"]
+    assert "s3_lie_accounts has no contradiction" in repair_request[-1]["content"]
+
+
+async def test_gives_up_after_max_attempts():
+    llm = scripted(*[broken_generated()] * generator.MAX_ATTEMPTS)
+    result = await generate_case(llm)
+    assert result.case is None
+    assert len(result.attempts) == generator.MAX_ATTEMPTS
+    assert result.setting in generator.SETTINGS
+
+
+async def test_filler_tops_up_pool_and_take_drains_it():
+    pool = InMemoryCasePool()
+    filler = PoolFiller(pool, scripted(valid_generated(), valid_generated()), target=2)
+    assert await filler.fill_once() and await filler.fill_once()
+    assert await pool.ready() == 2
+    assert await filler.fill_once()  # already full: no generation call
+    taken = await filler.take()
+    assert taken is not None and await pool.ready() == 1
+
+
+async def test_filler_reports_failure():
+    filler = PoolFiller(InMemoryCasePool(), scripted(*[broken_generated()] * 3), target=1)
+    assert not await filler.fill_once()
+    assert await filler.pool.ready() == 0
+
+
+async def start_new_case(game: GameMaster) -> tuple[dict, list[str]]:
+    run_input = RunAgentInput(
+        thread_id=f"t-{uuid.uuid4().hex[:6]}",
+        run_id="r1",
+        state={},
+        messages=[],
+        tools=[],
+        context=[],
+        forwarded_props={"gameAction": {"type": "start", "caseId": NEW_CASE_ID}},
+    )
+    events = [e async for e in game.run(run_input, "player")]
+    snapshot = next(e.snapshot for e in events if e.type == "STATE_SNAPSHOT")
+    texts = [e.delta for e in events if e.type == "TEXT_MESSAGE_CONTENT"]
+    return snapshot, texts
+
+
+async def test_new_game_takes_a_generated_case():
+    pool = InMemoryCasePool()
+    filler = PoolFiller(pool, scripted(valid_generated()), target=1)
+    await filler.fill_once()
+    game = GameMaster(ScriptedLLM(), InMemoryRepo(), fresh_cases=filler)
+    snapshot, texts = await start_new_case(game)
+    assert snapshot["caseId"].startswith("gen_")
+    assert NO_FRESH_CASE not in texts
+
+
+async def test_new_game_falls_back_to_archive_when_pool_is_empty():
+    game = GameMaster(ScriptedLLM(), InMemoryRepo(), fresh_cases=PoolFiller(InMemoryCasePool(), ScriptedLLM(), 1))
+    snapshot, texts = await start_new_case(game)
+    assert snapshot["caseId"] in library()
+    assert NO_FRESH_CASE in texts
