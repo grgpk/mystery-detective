@@ -6,13 +6,15 @@ import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
 import Link from "next/link";
 
-import { DAILY_CASE_ID, NEW_CASE_ID, type CaseCatalogue, type DailyBoard } from "@/lib/protocol/types";
+import { DAILY_CASE_ID, DIFFICULTIES, NEW_CASE_ID, type CaseCatalogue, type DailyBoard } from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function CasePicker() {
   const { state, newGame, resumeGame } = useGame();
   const open = useUi((s) => s.casePickerOpen);
   const setOpen = useUi((s) => s.setCasePickerOpen);
+  const difficulty = useUi((s) => s.difficulty);
+  const setDifficulty = useUi((s) => s.setDifficulty);
   const dialog = useRef<HTMLDialogElement>(null);
   const [catalogue, setCatalogue] = useState<CaseCatalogue | null>(null);
   const [daily, setDaily] = useState<DailyBoard | null>(null);
@@ -85,6 +87,31 @@ export function CasePicker() {
           </button>
         </header>
 
+        <fieldset className="mb-4">
+          <legend className="font-type text-ink-soft mb-1 text-xs uppercase">Difficulty</legend>
+          <div className="grid grid-cols-3 gap-1">
+            {DIFFICULTIES.map((d) => (
+              <label
+                key={d.id}
+                className={`cursor-pointer rounded-sm border p-2 text-center transition-colors ${difficulty === d.id ? "border-ink bg-ink text-paper" : "border-ink/25 hover:bg-ink/10"}`}
+              >
+                <input
+                  type="radio"
+                  name="difficulty"
+                  value={d.id}
+                  checked={difficulty === d.id}
+                  onChange={() => setDifficulty(d.id)}
+                  className="sr-only"
+                />
+                <span className="font-type block text-sm uppercase">{d.label}</span>
+                <span className={`block text-[11px] leading-tight ${difficulty === d.id ? "text-paper/80" : "text-ink-soft"}`}>
+                  {d.blurb}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
         {inProgress && (
           <p className="text-alert mb-4 text-sm">Starting a new case abandons the one you are working on.</p>
         )}
@@ -109,7 +136,7 @@ export function CasePicker() {
               </Stamp>
             </span>
             <span className="text-sm">
-              The same mystery for every detective today, one attempt each.{" "}
+              The same mystery for every detective today, one attempt each, always at Normal.{" "}
               {daily.players > 0 &&
                 `${daily.players} detective${daily.players === 1 ? " has" : "s have"} closed it so far.`}
             </span>

@@ -28,6 +28,7 @@ interface Stats {
     ranks: Record<string, number>;
   };
   stalls: Record<string, number>;
+  difficulty: Record<string, { begun: number; accusation_rate: number | null; solve_rate: number | null }>;
   cases: {
     caseId: string;
     title: string;
@@ -147,6 +148,34 @@ async function StatsBody({ searchParams }: Pick<Props, "searchParams">) {
           </ul>
         )}
       </section>
+
+      {Object.keys(stats.difficulty).length > 0 && (
+        <section className="paper mb-6 rounded-sm p-5" aria-labelledby="by-difficulty">
+          <h2 id="by-difficulty" className="font-type mb-3 text-lg">
+            By difficulty
+          </h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="font-type text-ink-soft border-ink/20 border-b text-left text-xs uppercase">
+                <th className="py-1 font-normal">Level</th>
+                <th className="py-1 text-right font-normal">Begun</th>
+                <th className="py-1 text-right font-normal">Reach accusation</th>
+                <th className="py-1 text-right font-normal">Solve rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(stats.difficulty).map(([level, row]) => (
+                <tr key={level} className="border-ink/10 border-b">
+                  <td className="py-1 capitalize">{level}</td>
+                  <td className="py-1 text-right tabular-nums">{row.begun}</td>
+                  <td className="py-1 text-right tabular-nums">{pct(row.accusation_rate)}</td>
+                  <td className="py-1 text-right tabular-nums">{pct(row.solve_rate)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
 
       <section className="paper overflow-x-auto rounded-sm p-5" aria-labelledby="per-case">
         <h2 id="per-case" className="font-type mb-3 text-lg">

@@ -6,11 +6,12 @@ Wording escalates: the first hint about a step is a nudge, asking again about th
 from dataclasses import dataclass
 from typing import Literal
 
+from app.engine import difficulty
 from app.engine.clue_engine import GameRuleError, Outcome, require_investigating, spend
 from app.models.case import CaseFile, ExamineUnlock, InterrogateUnlock, Topic
 from app.models.public import Progress
 
-HINT_COST = 2
+HINT_COST = 2  # at Normal; see engine/difficulty.py
 
 StepKind = Literal["examine", "ask", "confront", "accuse"]
 
@@ -107,12 +108,13 @@ def hint_text(case: CaseFile, step: Step, explicit: bool) -> str:
 def take_hint(case: CaseFile, progress: Progress) -> tuple[str, Outcome]:
     """Spends HINT_COST turns for the next step. Never spends the player's last turns."""
     require_investigating(progress)
-    if progress.turns_left <= HINT_COST:
-        raise GameRuleError(f"A hint costs {HINT_COST} turns, and you can't spare them now.")
+    cost = difficulty.settings(progress.difficulty).hint_cost
+    if progress.turns_left <= cost:
+        raise GameRuleError(f"A hint costs {cost} turn{'s' if cost != 1 else ''}, and you can't spare them now.")
     step = next_step(case, progress)
     explicit = step.key in progress.hints
     progress.hints.append(step.key)
     outcome = Outcome()
-    spend(progress, outcome, HINT_COST)
+    spend(progress, outcome, cost)
     progress.conversation = None
     return hint_text(case, step, explicit), outcome

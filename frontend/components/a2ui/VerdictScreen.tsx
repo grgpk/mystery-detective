@@ -25,6 +25,7 @@ export function VerdictScreen() {
       score: score.total,
       turns: turnsUsed,
       solved: score.culpritCorrect,
+      difficulty: state.difficulty,
     };
     const url = `${window.location.origin}/r?${toSearchParams(result)}`;
     const text = `The Last Alibi, "${state.title}": ${headline(result)} (${score.total}/100). Can you do better?`;
@@ -59,7 +60,10 @@ export function VerdictScreen() {
             It was <strong className="text-ink">{verdict.culpritName}</strong>. {verdict.motive}
           </p>
         </div>
-        <Stamp tone={score.culpritCorrect ? "success" : "alert"}>{score.culpritCorrect ? "Solved" : "Wrong man"}</Stamp>
+        <span className="flex flex-col items-end gap-1">
+          <Stamp tone={score.culpritCorrect ? "success" : "alert"}>{score.culpritCorrect ? "Solved" : "Wrong suspect"}</Stamp>
+          {state.difficulty !== "normal" && <Stamp>{state.difficulty}</Stamp>}
+        </span>
       </header>
 
       <div className="grid gap-6 md:grid-cols-2">

@@ -10,6 +10,7 @@ export interface SharedResult {
   score: number;
   turns: number;
   solved: boolean;
+  difficulty: "easy" | "normal" | "hard";
 }
 
 const MAX_TITLE = 80;
@@ -21,6 +22,7 @@ export function toSearchParams(result: SharedResult): URLSearchParams {
     s: String(result.score),
     n: String(result.turns),
     ok: result.solved ? "1" : "0",
+    ...(result.difficulty !== "normal" ? { d: result.difficulty } : {}),
   });
 }
 
@@ -37,11 +39,20 @@ export function fromSearchParams(params: Record<string, string | string[] | unde
   const title = (get("t") ?? "").trim().slice(0, MAX_TITLE);
   const rank = RANKS.find((r) => r === get("r"));
   if (!title || !rank) return null;
-  return { title, rank, score: int(get("s"), 0, 100), turns: int(get("n"), 0, 99), solved: get("ok") === "1" };
+  const level = get("d");
+  return {
+    title,
+    rank,
+    score: int(get("s"), 0, 100),
+    turns: int(get("n"), 0, 99),
+    solved: get("ok") === "1",
+    difficulty: level === "easy" || level === "hard" ? level : "normal",
+  };
 }
 
 export function headline(result: SharedResult): string {
+  const level = result.difficulty === "normal" ? "" : ` on ${result.difficulty[0].toUpperCase()}${result.difficulty.slice(1)}`;
   return result.solved
-    ? `Solved in ${result.turns} turn${result.turns === 1 ? "" : "s"}: ${result.rank}`
-    : `The killer got away: ${result.rank}`;
+    ? `Solved in ${result.turns} turn${result.turns === 1 ? "" : "s"}${level}: ${result.rank}`
+    : `The killer got away${level}: ${result.rank}`;
 }

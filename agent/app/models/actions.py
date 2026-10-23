@@ -13,11 +13,13 @@ class Start(CamelModel):
 
     type: Literal["start"]
     case_id: str | None = None
+    difficulty: Literal["easy", "normal", "hard"] = "normal"  # only used when a new game is created
 
 
 class NewGame(CamelModel):
     type: Literal["new_game"]
     case_id: str | None = None
+    difficulty: Literal["easy", "normal", "hard"] = "normal"
 
 
 class Begin(CamelModel):

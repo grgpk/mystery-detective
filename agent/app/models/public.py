@@ -60,6 +60,8 @@ class ScoreBreakdown(CamelModel):
 
 class Progress(CamelModel):
     phase: Phase = "briefing"
+    difficulty: Literal["easy", "normal", "hard"] = "normal"
+    max_turns: int | None = None  # the turn budget at this difficulty (None on games saved before levels)
     turns_left: int
     revealed_clues: list[str] = Field(default_factory=list)
     new_clues: list[str] = Field(default_factory=list)
@@ -151,6 +153,8 @@ class DailyInfo(CamelModel):
 
 class PublicState(CamelModel):
     case_id: str
+    difficulty: Literal["easy", "normal", "hard"]
+    hint_cost: int
     title: str
     place: str
     briefing: str

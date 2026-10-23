@@ -35,7 +35,7 @@ class GameRecord:
 
     @property
     def turns_used(self) -> int:
-        return self.case.max_turns - self.progress.turns_left
+        return (self.progress.max_turns or self.case.max_turns) - self.progress.turns_left
 
 
 def _rate(part: int, whole: int) -> float | None:
@@ -113,6 +113,18 @@ def summarize(records: list[GameRecord], now: datetime) -> dict:
             "ranks": dict(Counter(r.progress.score.rank for r in ended)),  # type: ignore[union-attr]
         },
         "stalls": dict(Counter(_stall_reason(r) for r in abandoned).most_common()),
+        "difficulty": {
+            level: {
+                "begun": len(group),
+                "accusation_rate": _rate(sum(r.ended for r in group), len(group)),
+                "solve_rate": _rate(
+                    sum(r.progress.score.culprit_correct for r in group if r.ended),  # type: ignore[union-attr]
+                    sum(r.ended for r in group),
+                ),
+            }
+            for level in ("easy", "normal", "hard")
+            if (group := [r for r in begun if r.progress.difficulty == level])
+        },
         "cases": sorted(
             (
                 {

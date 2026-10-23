@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
-import { HINT_COST } from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function ActionBar() {
   const { state, send, isRunning } = useGame();
   const openCasePicker = useUi((s) => s.setCasePickerOpen);
   if (!state) return null;
-  const { turnsLeft, maxTurns, phase } = state;
+  const { turnsLeft, maxTurns, phase, hintCost } = state;
   const canAccuse = phase === "investigating" || phase === "accusing";
 
   return (
@@ -28,11 +27,11 @@ export function ActionBar() {
       </div>
       <Button
         variant="brass"
-        disabled={phase !== "investigating" || isRunning || turnsLeft <= HINT_COST}
-        title={turnsLeft <= HINT_COST ? "Not enough turns left for a hint" : `Costs ${HINT_COST} turns`}
+        disabled={phase !== "investigating" || isRunning || turnsLeft <= hintCost}
+        title={turnsLeft <= hintCost ? "Not enough turns left for a hint" : `Costs ${hintCost} turns`}
         onClick={() => send({ type: "hint" }, "I ask my sergeant what they make of it.")}
       >
-        Hint · {HINT_COST} turns
+        Hint · {hintCost} turn{hintCost === 1 ? "" : "s"}
       </Button>
       <Button
         variant="danger"

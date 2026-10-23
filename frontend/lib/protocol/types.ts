@@ -79,8 +79,18 @@ export interface Verdict {
   missedClues: PublicClue[];
 }
 
+export type Difficulty = "easy" | "normal" | "hard";
+
+export const DIFFICULTIES: { id: Difficulty; label: string; blurb: string }[] = [
+  { id: "easy", label: "Easy", blurb: "20 turns, cheap hints, suspects crack sooner" },
+  { id: "normal", label: "Normal", blurb: "15 turns, as the case was written" },
+  { id: "hard", label: "Hard", blurb: "11 turns, dear hints, suspects hold out" },
+];
+
 export interface PublicState {
   caseId: string;
+  difficulty: Difficulty;
+  hintCost: number;
   title: string;
   place: string;
   briefing: string;
@@ -109,7 +119,7 @@ export interface Accusation {
 }
 
 export type GameAction =
-  | { type: "start"; caseId?: string }
+  | { type: "start"; caseId?: string; difficulty?: Difficulty }
   | { type: "begin" }
   | { type: "interrogate"; suspectId: string; question: string }
   | { type: "examine"; locationId: string }
@@ -120,9 +130,6 @@ export type GameAction =
   | { type: "accuse"; accusation: Accusation }
   | { type: "set_name"; name: string }
   | { type: "sync_board"; board: Board };
-
-/** Turns a hint costs (agent/app/engine/hints.py HINT_COST). */
-export const HINT_COST = 2;
 
 export function isPublicState(value: unknown): value is PublicState {
   return typeof value === "object" && value !== null && "caseId" in value && "suspects" in value;

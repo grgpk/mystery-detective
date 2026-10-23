@@ -5,6 +5,7 @@ Nothing in here calls an LLM. The LLM only ever narrates outcomes decided here.
 
 from dataclasses import dataclass, field
 
+from app.engine import difficulty
 from app.models.case import CaseFile, Contradiction, ExamineUnlock, InterrogateUnlock
 from app.models.public import BoardLink, Conversation, Progress, Statement
 
@@ -31,11 +32,18 @@ class Outcome:
         return [*self.new_clues, *self.revealed_secrets]
 
 
-def new_progress(case: CaseFile) -> Progress:
+def new_progress(case: CaseFile, level: str = difficulty.DEFAULT) -> Progress:
+    budget = case.max_turns + difficulty.settings(level).turn_delta
     return Progress(
-        turns_left=case.max_turns,
+        difficulty=level,
+        max_turns=budget,
+        turns_left=budget,
         composure={s.id: s.starting_composure for s in case.suspects},
     )
+
+
+def max_turns(case: CaseFile, progress: Progress) -> int:
+    return progress.max_turns or case.max_turns
 
 
 def mood_for(composure: int) -> str:
@@ -181,8 +189,9 @@ def confront(case: CaseFile, progress: Progress, suspect_id: str, items: list[st
         if (entry.a in left and entry.b in right) or (entry.a in right and entry.b in left):
             progress.contradictions_found.append(index)
             outcome.contradiction = entry
-            outcome.composure_delta = entry.effect.composure
-            progress.composure[suspect_id] = max(0, progress.composure[suspect_id] + entry.effect.composure)
+            drop = round(entry.effect.composure * difficulty.settings(progress.difficulty).composure_multiplier)
+            outcome.composure_delta = drop
+            progress.composure[suspect_id] = max(0, progress.composure[suspect_id] + drop)
             progress.last_contradiction = BoardLink(from_=items[0], to=items[1])
             if entry.effect.reveals:
                 _reveal_clue(progress, outcome, entry.effect.reveals)

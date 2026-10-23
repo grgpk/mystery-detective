@@ -1,5 +1,6 @@
 """The ONLY path from hidden case + progress to what the browser sees."""
 
+from app.engine import clue_engine, difficulty
 from app.engine.clue_engine import mood_for
 from app.models.case import CaseFile
 from app.models.public import (
@@ -65,7 +66,9 @@ def project(case: CaseFile, progress: Progress) -> PublicState:
         briefing=case.briefing,
         phase=progress.phase,
         turns_left=progress.turns_left,
-        max_turns=case.max_turns,
+        max_turns=clue_engine.max_turns(case, progress),
+        difficulty=progress.difficulty,
+        hint_cost=difficulty.settings(progress.difficulty).hint_cost,
         victim=PublicVictim(
             name=case.victim.name,
             cause_of_death=case.victim.cause_of_death,

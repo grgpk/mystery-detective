@@ -1,3 +1,4 @@
+from app.engine import difficulty
 from app.models.case import CaseFile
 from app.models.public import Accusation, Progress, ScoreBreakdown
 
@@ -30,7 +31,9 @@ def score(case: CaseFile, progress: Progress, accusation: Accusation) -> ScoreBr
     valid = [c for c in dict.fromkeys(accusation.evidence) if is_valid_evidence(case, progress, c)][:MAX_EVIDENCE]
     # Evidence and spare turns only count when the right person is named.
     evidence_points = EVIDENCE_POINTS * len(valid) if culprit_correct else 0
-    turn_points = min(progress.turns_left, MAX_TURN_POINTS) if culprit_correct else 0
+    # Turns an easier level adds earn nothing, so Easy can't outscore Normal on spare turns.
+    spare = max(0, progress.turns_left - difficulty.settings(progress.difficulty).unscored_turns)
+    turn_points = min(spare, MAX_TURN_POINTS) if culprit_correct else 0
     culprit_points = CULPRIT_POINTS if culprit_correct else 0
     motive_points = MOTIVE_POINTS if motive_correct else 0
     total = culprit_points + motive_points + evidence_points + turn_points

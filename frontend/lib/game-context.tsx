@@ -5,7 +5,7 @@ import { UseAgentUpdate, useAgent, useCopilotKit } from "@copilotkit/react-core/
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useUi } from "@/lib/store";
-import { DAILY_CASE_ID, isPublicState, type DailyBoard, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
+import { DAILY_CASE_ID, isPublicState, type DailyBoard, type Difficulty, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
 
 const RUNTIME_AGENT_ID = "game_master";
 const THREAD_STORAGE_KEY = "last-alibi:thread";
@@ -59,9 +59,12 @@ function storeThreadId(threadId: string): string {
 
 /** Client-only (rendered with ssr: false): owns the thread id, remounting the session for a new case. */
 export function GameProvider({ children }: { children: ReactNode }) {
-  const [game, setGame] = useState<{ threadId: string; caseId?: string }>(() => ({ threadId: readThreadId() }));
+  const [game, setGame] = useState<{ threadId: string; caseId?: string; difficulty?: Difficulty }>(() => ({
+    threadId: readThreadId(),
+  }));
   const newGame = useCallback(
-    (caseId?: string) => setGame({ threadId: storeThreadId(crypto.randomUUID()), caseId }),
+    (caseId?: string) =>
+      setGame({ threadId: storeThreadId(crypto.randomUUID()), caseId, difficulty: useUi.getState().difficulty }),
     [],
   );
   const resumeGame = useCallback((threadId: string) => setGame({ threadId: storeThreadId(threadId) }), []);
@@ -86,6 +89,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       key={game.threadId}
       threadId={game.threadId}
       caseId={game.caseId}
+      difficulty={game.difficulty}
       newGame={newGame}
       resumeGame={resumeGame}
     >
@@ -98,12 +102,14 @@ interface GameSessionProps {
   threadId: string;
   /** Case to open if this thread has no game yet; the agent ignores it for an existing game. */
   caseId?: string;
+  /** Difficulty if this thread has no game yet (ignored for an existing game, and for the daily case). */
+  difficulty?: Difficulty;
   newGame: (caseId?: string) => void;
   resumeGame: (threadId: string) => void;
   children: ReactNode;
 }
 
-function GameSession({ threadId, caseId, newGame, resumeGame, children }: GameSessionProps) {
+function GameSession({ threadId, caseId, difficulty, newGame, resumeGame, children }: GameSessionProps) {
   const { agent, isReady } = useAgent({
     agentId: `game-${threadId}`,
     runtimeAgentId: RUNTIME_AGENT_ID,
@@ -135,8 +141,8 @@ function GameSession({ threadId, caseId, newGame, resumeGame, children }: GameSe
   useEffect(() => {
     if (!isReady || started.current) return;
     started.current = true;
-    void send({ type: "start", caseId });
-  }, [isReady, send, caseId]);
+    void send({ type: "start", caseId, difficulty });
+  }, [isReady, send, caseId, difficulty]);
 
   useEffect(() => () => {
     if (boardTimer.current) clearTimeout(boardTimer.current);

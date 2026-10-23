@@ -19,7 +19,7 @@ from app.agents.classifier import classify_topics
 from app.agents.extractor import extract_claim
 from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
 from app.agents.persona import persona_messages, persona_system_prompt, record_exchange, turn_context
-from app.engine import clue_engine, hints, scoring
+from app.engine import clue_engine, difficulty, hints, scoring
 from app.engine.case_library import DAILY_CASE_ID, NEW_CASE_ID, daily_case, pick_case
 from app.engine.clue_engine import GameRuleError, Outcome
 from app.engine.projection import project
@@ -192,7 +192,8 @@ class GameMaster:
                     requested, notice = None, FRESH_LIMIT
                 case, chosen_notice = await self._choose_case(requested)
                 notice = notice or chosen_notice
-                session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
+                level = getattr(action, "difficulty", difficulty.DEFAULT)
+                session = GameSession(thread_id, owner, case, clue_engine.new_progress(case, level))
 
         client_state = run_input.state if isinstance(run_input.state, dict) else None
         board_drift = False
@@ -229,7 +230,7 @@ class GameMaster:
         if await self.repo.daily_games(day.isoformat(), owner=owner):
             raise LimitReached(DAILY_TAKEN)
         case = daily_case(day)
-        progress = clue_engine.new_progress(case)
+        progress = clue_engine.new_progress(case)  # always Normal, so the leaderboard compares like with like
         progress.daily_date = day.isoformat()
         return GameSession(thread_id, owner, case, progress)
 
@@ -311,8 +312,10 @@ class GameMaster:
             yield event
         for event in self._board_surfaces(turn):
             yield event
+        level = "" if turn.progress.difficulty == difficulty.DEFAULT else f" ({turn.progress.difficulty} case)"
         text = (
-            f"You have {turn.progress.turns_left} turns before the Chief Constable arrives. Question the household, "
+            f"You have {turn.progress.turns_left} turns{level} before the Chief Constable arrives. "
+            "Question the household, "
             "search the rooms, and catch a liar out with proof."
         )
         for event in turn.surface("narration", [catalog.narration(text, title="The investigation begins")]):
