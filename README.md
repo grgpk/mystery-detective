@@ -47,6 +47,10 @@ npm run dev                                # http://localhost:3000
   errors, up to 3 attempts. `generation/pool.py` keeps `CASE_POOL_SIZE` validated cases ready in Postgres in the
   background. "A brand-new mystery" in the case picker takes one; if none is ready, the player gets an archive
   case while the next one is written.
+- **Daily case.** Each UTC day the archive rotates to one shared case (`engine/case_library.daily_case`:
+  deterministic, no repeats within a cycle). Each player gets one attempt, can sign the leaderboard after the
+  verdict (names are moderated), and `/daily` shows the standings: score, then fewest turns, then fastest.
+  `/?daily=1` opens today's case directly (or resumes yours).
 - **Personas see only their slice** (`agents/persona.py`), are told per turn what they may reveal, and stream
   through a sentence-level leak guard (`agents/guards.py`).
 - **Protocol.** Each player action is one AG-UI run, sent as `forwardedProps.gameAction`. The agent emits

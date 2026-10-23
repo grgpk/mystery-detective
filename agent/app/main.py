@@ -15,8 +15,9 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
+from app import daily
 from app.analytics import summarize
-from app.engine.case_library import catalogue, library
+from app.engine.case_library import catalogue, daily_case, library
 from app.game import GameMaster, Limits
 from app.generation.pool import InMemoryCasePool, PoolFiller, PostgresCasePool
 from app.llm import ScriptedLLM, default_llm
@@ -120,6 +121,34 @@ async def stats(request: Request, days: int = 30) -> dict:
     now = datetime.now(UTC)
     records = await request.app.state.repo.records(since=now - timedelta(days=max(1, min(days, 365))))
     return {"days": days, **summarize(records, now)}
+
+
+@app.get("/daily", dependencies=[Depends(require_agent_key)])
+async def daily_board(request: Request, session_id: str | None = Header(default=None, alias=SESSION_HEADER)) -> dict:
+    """Today's case, the leaderboard, and (with a session) the caller's own daily game."""
+    day = daily.today()
+    case = daily_case(day)
+    entries = daily.leaderboard(await request.app.state.repo.daily_games(day.isoformat()))
+    mine = None
+    if session_id:
+        own = await request.app.state.repo.daily_games(day.isoformat(), owner=session_id)
+        if own:
+            game = own[0]
+            entry = next((e for e in entries if e.thread_id == game.thread_id), None)
+            mine = {
+                "threadId": game.thread_id,
+                "phase": game.record.progress.phase,
+                "score": entry.score if entry else None,
+                "rank": entry.rank if entry else None,
+                "name": game.record.progress.leaderboard_name,
+            }
+    return {
+        "date": day.isoformat(),
+        "case": {"caseId": case.case_id, "title": case.setting.title, "place": case.setting.place},
+        "players": len(entries),
+        "leaderboard": [e.public() for e in entries[: daily.LEADERBOARD_SIZE]],
+        "you": mine,
+    }
 
 
 @app.post("/agent", dependencies=[Depends(require_agent_key)])

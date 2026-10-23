@@ -4,15 +4,18 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
-import { NEW_CASE_ID, type CaseCatalogue } from "@/lib/protocol/types";
+import Link from "next/link";
+
+import { DAILY_CASE_ID, NEW_CASE_ID, type CaseCatalogue, type DailyBoard } from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function CasePicker() {
-  const { state, newGame } = useGame();
+  const { state, newGame, resumeGame } = useGame();
   const open = useUi((s) => s.casePickerOpen);
   const setOpen = useUi((s) => s.setCasePickerOpen);
   const dialog = useRef<HTMLDialogElement>(null);
   const [catalogue, setCatalogue] = useState<CaseCatalogue | null>(null);
+  const [daily, setDaily] = useState<DailyBoard | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +33,10 @@ export function CasePicker() {
       .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
       .then((data: CaseCatalogue) => !cancelled && setCatalogue(data))
       .catch(() => !cancelled && setError("The case archive is unreachable. Try again in a moment."));
+    fetch("/api/daily")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: DailyBoard | null) => !cancelled && setDaily(data))
+      .catch(() => undefined); // the daily card just doesn't show
     return () => {
       cancelled = true;
     };
@@ -91,6 +98,48 @@ export function CasePicker() {
           <p className="text-ink-soft animate-pulse italic" role="status">
             Fetching the files from the archive…
           </p>
+        )}
+
+        {daily && (
+          <div className="border-brass bg-paper-shade/40 mb-3 grid gap-1 rounded-sm border-2 p-3">
+            <span className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="font-type text-lg">Today&apos;s case: {daily.case.title}</span>
+              <Stamp tone={daily.you?.phase === "ended" ? "success" : "ink"}>
+                {daily.you?.phase === "ended" ? "Played" : daily.date}
+              </Stamp>
+            </span>
+            <span className="text-sm">
+              The same mystery for every detective today, one attempt each.{" "}
+              {daily.players > 0 &&
+                `${daily.players} detective${daily.players === 1 ? " has" : "s have"} closed it so far.`}
+            </span>
+            {daily.you?.phase === "ended" && (
+              <span className="text-ink-soft text-sm">
+                You scored {daily.you.score}
+                {daily.you.rank && `, rank ${daily.you.rank} of ${daily.players}`}.
+              </span>
+            )}
+            <span className="mt-1 flex flex-wrap gap-2">
+              {daily.you ? (
+                <Button
+                  onClick={() => {
+                    setOpen(false);
+                    resumeGame(daily.you!.threadId);
+                  }}
+                >
+                  {daily.you.phase === "ended" ? "See your verdict" : "Continue today's case"}
+                </Button>
+              ) : (
+                <Button onClick={() => start(DAILY_CASE_ID)}>Play today&apos;s case</Button>
+              )}
+              <Link
+                href="/daily"
+                className="font-type border-ink/30 hover:bg-ink/10 rounded-sm border px-3 py-1.5 text-sm uppercase"
+              >
+                Leaderboard
+              </Link>
+            </span>
+          </div>
         )}
 
         {fresh?.enabled && (

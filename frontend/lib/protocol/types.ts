@@ -99,6 +99,7 @@ export interface PublicState {
   board: Board;
   lastContradiction: BoardLink | null;
   verdict: Verdict | null;
+  daily: { date: string; leaderboardName: string | null } | null;
 }
 
 export interface Accusation {
@@ -117,6 +118,7 @@ export type GameAction =
   | { type: "confront"; suspectId: string; items: [string, string] }
   | { type: "open_accuse" }
   | { type: "accuse"; accusation: Accusation }
+  | { type: "set_name"; name: string }
   | { type: "sync_board"; board: Board };
 
 /** Turns a hint costs (agent/app/engine/hints.py HINT_COST). */
@@ -143,3 +145,23 @@ export interface CaseCatalogue {
 
 /** Asks the agent for a freshly generated case from its pool. */
 export const NEW_CASE_ID = "new";
+
+/** Asks the agent for today's shared case. */
+export const DAILY_CASE_ID = "daily";
+
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  score: number;
+  turns: number;
+  minutes: number;
+}
+
+/** What /api/daily returns: today's case, the leaderboard, and the caller's own daily game if any. */
+export interface DailyBoard {
+  date: string;
+  case: { caseId: string; title: string; place: string };
+  players: number;
+  leaderboard: LeaderboardEntry[];
+  you: { threadId: string; phase: Phase; score: number | null; rank: number | null; name: string | null } | null;
+}

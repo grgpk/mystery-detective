@@ -8,6 +8,7 @@ from typing import Protocol
 import asyncpg
 
 from app.analytics import GameRecord
+from app.daily import DailyGame
 from app.models.case import GENERATED_PREFIX, CaseFile
 from app.models.public import Progress
 
@@ -39,6 +40,10 @@ class SessionRepo(Protocol):
         """Every game created since `since`, for analytics."""
         ...
 
+    async def daily_games(self, day: str, owner: str | None = None) -> list[DailyGame]:
+        """Games on the shared case of `day` (ISO date), optionally one owner's."""
+        ...
+
 
 class InMemoryRepo:
     def __init__(self) -> None:
@@ -65,6 +70,16 @@ class InMemoryRepo:
     async def delete(self, thread_id: str) -> None:
         self._rows.pop(thread_id, None)
         self._created.pop(thread_id, None)
+
+    async def daily_games(self, day: str, owner: str | None = None) -> list[DailyGame]:
+        found = []
+        for thread_id, (row_owner, case, progress, updated) in self._rows.items():
+            if progress.get("dailyDate") == day and (owner is None or row_owner == owner):
+                record = GameRecord(
+                    CaseFile.model_validate(case), Progress.model_validate(progress), self._created[thread_id], updated
+                )
+                found.append(DailyGame(thread_id, row_owner, record))
+        return found
 
     async def records(self, since: datetime) -> list[GameRecord]:
         return [
@@ -109,6 +124,8 @@ CREATE TABLE IF NOT EXISTS game_sessions (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS game_sessions_owner_idx ON game_sessions (owner);
+CREATE INDEX IF NOT EXISTS game_sessions_daily_idx ON game_sessions ((progress->>'dailyDate'))
+    WHERE progress->>'dailyDate' IS NOT NULL;
 """
 
 
@@ -157,6 +174,29 @@ class PostgresRepo:
 
     async def delete(self, thread_id: str) -> None:
         await self.pool.execute("DELETE FROM game_sessions WHERE thread_id = $1", thread_id)
+
+    async def daily_games(self, day: str, owner: str | None = None) -> list[DailyGame]:
+        rows = await self.pool.fetch(
+            """
+            SELECT thread_id, owner, case_file, progress, created_at, updated_at FROM game_sessions
+             WHERE progress->>'dailyDate' = $1 AND ($2::text IS NULL OR owner = $2)
+            """,
+            day,
+            owner,
+        )
+        return [
+            DailyGame(
+                r["thread_id"],
+                r["owner"],
+                GameRecord(
+                    CaseFile.model_validate(json.loads(r["case_file"])),
+                    Progress.model_validate(json.loads(r["progress"])),
+                    r["created_at"],
+                    r["updated_at"],
+                ),
+            )
+            for r in rows
+        ]
 
     async def records(self, since: datetime) -> list[GameRecord]:
         rows = await self.pool.fetch(

@@ -59,13 +59,31 @@ class Accuse(CamelModel):
     accusation: Accusation
 
 
+class SetName(CamelModel):
+    """Puts the player's name on the daily leaderboard (after the verdict)."""
+
+    type: Literal["set_name"]
+    name: str = Field(min_length=1, max_length=40)
+
+
 class SyncBoard(CamelModel):
     type: Literal["sync_board"]
     board: Board
 
 
 GameAction = Annotated[
-    Start | NewGame | Begin | Interrogate | Examine | Hint | OpenConfront | Confront | OpenAccuse | Accuse | SyncBoard,
+    Start
+    | NewGame
+    | Begin
+    | Interrogate
+    | Examine
+    | Hint
+    | OpenConfront
+    | Confront
+    | OpenAccuse
+    | Accuse
+    | SetName
+    | SyncBoard,
     Field(discriminator="type"),
 ]
 game_action_adapter: TypeAdapter[GameAction] = TypeAdapter(GameAction)

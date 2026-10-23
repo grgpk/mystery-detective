@@ -74,6 +74,8 @@ class Progress(CamelModel):
     board: Board = Field(default_factory=Board)
     contradictions_found: list[int] = Field(default_factory=list)
     hints: list[str] = Field(default_factory=list)  # step keys hinted, to escalate repeat hints
+    daily_date: str | None = None  # ISO date when this is that day's shared case
+    leaderboard_name: str | None = None
     last_contradiction: BoardLink | None = None
     accusation: Accusation | None = None
     score: ScoreBreakdown | None = None
@@ -142,6 +144,11 @@ class Verdict(CamelModel):
     missed_clues: list[PublicClue]
 
 
+class DailyInfo(CamelModel):
+    date: str
+    leaderboard_name: str | None
+
+
 class PublicState(CamelModel):
     case_id: str
     title: str
@@ -162,3 +169,4 @@ class PublicState(CamelModel):
     board: Board
     last_contradiction: BoardLink | None
     verdict: Verdict | None = None
+    daily: DailyInfo | None = None

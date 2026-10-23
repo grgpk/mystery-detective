@@ -5,7 +5,7 @@ import { UseAgentUpdate, useAgent, useCopilotKit } from "@copilotkit/react-core/
 import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useUi } from "@/lib/store";
-import { isPublicState, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
+import { DAILY_CASE_ID, isPublicState, type DailyBoard, type Board, type GameAction, type PublicState } from "@/lib/protocol/types";
 
 const RUNTIME_AGENT_ID = "game_master";
 const THREAD_STORAGE_KEY = "last-alibi:thread";
@@ -26,6 +26,8 @@ interface GameContextValue {
   updateBoard: (board: Board) => void;
   /** Starts a fresh thread; omit caseId for a random case. */
   newGame: (caseId?: string) => void;
+  /** Switches to an existing game thread (e.g. today's daily case, started earlier). */
+  resumeGame: (threadId: string) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -62,8 +64,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
     (caseId?: string) => setGame({ threadId: storeThreadId(crypto.randomUUID()), caseId }),
     [],
   );
+  const resumeGame = useCallback((threadId: string) => setGame({ threadId: storeThreadId(threadId) }), []);
+
+  // `/?daily=1` (from the leaderboard page or a shared link) opens today's case: yours if already started.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("daily") !== "1") return;
+    url.searchParams.delete("daily");
+    window.history.replaceState(null, "", url);
+    fetch("/api/daily")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((board: DailyBoard | null) => {
+        if (board?.you) resumeGame(board.you.threadId);
+        else newGame(DAILY_CASE_ID);
+      })
+      .catch(() => newGame(DAILY_CASE_ID));
+  }, [newGame, resumeGame]);
+
   return (
-    <GameSession key={game.threadId} threadId={game.threadId} caseId={game.caseId} newGame={newGame}>
+    <GameSession
+      key={game.threadId}
+      threadId={game.threadId}
+      caseId={game.caseId}
+      newGame={newGame}
+      resumeGame={resumeGame}
+    >
       {children}
     </GameSession>
   );
@@ -74,10 +99,11 @@ interface GameSessionProps {
   /** Case to open if this thread has no game yet; the agent ignores it for an existing game. */
   caseId?: string;
   newGame: (caseId?: string) => void;
+  resumeGame: (threadId: string) => void;
   children: ReactNode;
 }
 
-function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) {
+function GameSession({ threadId, caseId, newGame, resumeGame, children }: GameSessionProps) {
   const { agent, isReady } = useAgent({
     agentId: `game-${threadId}`,
     runtimeAgentId: RUNTIME_AGENT_ID,
@@ -141,6 +167,7 @@ function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) 
     send,
     updateBoard,
     newGame,
+    resumeGame,
   };
 
   return <GameContext value={value}>{children}</GameContext>;

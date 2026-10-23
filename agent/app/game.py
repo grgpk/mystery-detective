@@ -12,6 +12,7 @@ import anthropic
 from ag_ui.core import BaseEvent, RunAgentInput
 from pydantic import ValidationError
 
+from app import daily
 from app.a2ui import catalog
 from app.agents import guards, moderation
 from app.agents.classifier import classify_topics
@@ -19,7 +20,7 @@ from app.agents.extractor import extract_claim
 from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
 from app.agents.persona import persona_messages, persona_system_prompt, record_exchange, turn_context
 from app.engine import clue_engine, hints, scoring
-from app.engine.case_library import NEW_CASE_ID, pick_case
+from app.engine.case_library import DAILY_CASE_ID, NEW_CASE_ID, daily_case, pick_case
 from app.engine.clue_engine import GameRuleError, Outcome
 from app.engine.projection import project
 from app.llm import JUDGE_MODEL, LLM, PERSONA_MODEL, LLMRefusal
@@ -34,6 +35,7 @@ from app.models.actions import (
     NewGame,
     OpenAccuse,
     OpenConfront,
+    SetName,
     Start,
     SyncBoard,
     game_action_adapter,
@@ -66,6 +68,7 @@ class Limits:
 DAY = timedelta(days=1)
 GAMES_LIMIT = "That's all the cases for today, Inspector. The Yard will have more for you tomorrow."
 FRESH_LIMIT = "That's all the brand-new cases for today, so here is one from the archive."
+DAILY_TAKEN = "You've already opened today's case. Continue it from the case picker."
 
 
 class FreshCases(Protocol):
@@ -137,6 +140,7 @@ class GameMaster:
         self.repo = repo
         self.fresh_cases = fresh_cases
         self.limits = limits or Limits()
+        self.today = daily.today  # replaceable in tests
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
 
     async def run(self, run_input: RunAgentInput, owner: str) -> AsyncIterator[BaseEvent]:
@@ -179,13 +183,16 @@ class GameMaster:
             if await self.repo.count_games(owner, since) >= self.limits.games_per_day:
                 raise LimitReached(GAMES_LIMIT)
             requested = getattr(action, "case_id", None)
-            if requested == NEW_CASE_ID and (
-                await self.repo.count_games(owner, since, generated_only=True) >= self.limits.fresh_cases_per_day
-            ):
-                requested, notice = None, FRESH_LIMIT
-            case, chosen_notice = await self._choose_case(requested)
-            notice = notice or chosen_notice
-            session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
+            if requested == DAILY_CASE_ID:
+                session = await self._daily_session(thread_id, owner)
+            else:
+                if requested == NEW_CASE_ID and (
+                    await self.repo.count_games(owner, since, generated_only=True) >= self.limits.fresh_cases_per_day
+                ):
+                    requested, notice = None, FRESH_LIMIT
+                case, chosen_notice = await self._choose_case(requested)
+                notice = notice or chosen_notice
+                session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
 
         client_state = run_input.state if isinstance(run_input.state, dict) else None
         board_drift = False
@@ -215,6 +222,16 @@ class GameMaster:
         for event in turn.sync_state():
             yield event
         await self.repo.save(session)
+
+    async def _daily_session(self, thread_id: str, owner: str) -> GameSession:
+        """Today's shared case. One attempt per player: a second thread for it is refused."""
+        day = self.today()
+        if await self.repo.daily_games(day.isoformat(), owner=owner):
+            raise LimitReached(DAILY_TAKEN)
+        case = daily_case(day)
+        progress = clue_engine.new_progress(case)
+        progress.daily_date = day.isoformat()
+        return GameSession(thread_id, owner, case, progress)
 
     async def _choose_case(self, requested: str | None) -> tuple[CaseFile, str | None]:
         if requested != NEW_CASE_ID:
@@ -253,6 +270,8 @@ class GameMaster:
                 handler = self._open_accuse(turn)
             case Accuse():
                 handler = self._accuse(turn, action)
+            case SetName():
+                handler = self._set_name(turn, action)
             case SyncBoard():
                 turn.progress.board = sanitize_board(action.board, turn.progress)
                 return
@@ -417,6 +436,17 @@ class GameMaster:
             yield event
         prompt = judge_prompt(case, progress, accusation, progress.score)
         async for event in self._narrate(JUDGE_SYSTEM, prompt, JUDGE_MODEL, max_tokens=2000, effort="medium"):
+            yield event
+
+    async def _set_name(self, turn: Turn, action: SetName) -> AsyncIterator[BaseEvent]:
+        progress = turn.progress
+        if not progress.daily_date or progress.phase != "ended":
+            raise GameRuleError("Names go on the leaderboard once today's case is closed.")
+        name, problem = daily.clean_name(action.name)
+        if name is None:
+            raise GameRuleError(problem or "That name won't do.")
+        progress.leaderboard_name = name
+        for event in turn.sync_state():
             yield event
 
     # ---- helpers --------------------------------------------------------------

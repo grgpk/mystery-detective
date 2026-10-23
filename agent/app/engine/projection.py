@@ -3,6 +3,7 @@
 from app.engine.clue_engine import mood_for
 from app.models.case import CaseFile
 from app.models.public import (
+    DailyInfo,
     Option,
     Progress,
     PublicClue,
@@ -100,4 +101,9 @@ def project(case: CaseFile, progress: Progress) -> PublicState:
         board=progress.board,
         last_contradiction=progress.last_contradiction,
         verdict=verdict(case, progress),
+        daily=(
+            DailyInfo(date=progress.daily_date, leaderboard_name=progress.leaderboard_name)
+            if progress.daily_date
+            else None
+        ),
     )

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { Button, Stamp } from "@/components/ui";
@@ -110,12 +111,85 @@ export function VerdictScreen() {
         </div>
       )}
 
+      {state.daily && <DailyEntry />}
+
       <footer className="mt-6 flex flex-wrap gap-2">
         <Button onClick={() => openCasePicker(true)}>Play again</Button>
         <Button variant="ghost" onClick={share}>
           {copied ? "Link copied!" : "Share result"}
         </Button>
       </footer>
+    </section>
+  );
+}
+
+/** For the daily case: put your name on today's leaderboard. */
+// Mirrors the agent's rule (app/daily.py); the agent still decides, this just catches typos early.
+const NAME_PATTERN = /^[\p{L}\p{N}_ .'-]{2,24}$/u;
+
+function DailyEntry() {
+  const { state, messages, send, isRunning, error } = useGame();
+  const [name, setName] = useState("");
+  const [submittedAt, setSubmittedAt] = useState<number | null>(null);
+  const listed = state?.daily?.leaderboardName;
+  const trimmed = name.trim().replace(/\s+/g, " ");
+  const valid = NAME_PATTERN.test(trimmed);
+  // A rejected name comes back as narration (it lands in the case log, behind this dialog): show it here.
+  const rejection =
+    submittedAt !== null && !isRunning && !listed
+      ? messages
+          .slice(submittedAt)
+          .filter((m) => m.role === "assistant" && typeof m.content === "string" && m.content)
+          .map((m) => m.content as string)
+          .at(-1)
+      : undefined;
+
+  return (
+    <section className="border-ink/20 mt-5 border-t pt-4" aria-labelledby="daily-entry">
+      <h3 id="daily-entry" className="font-type text-ink-soft mb-2 text-xs uppercase">
+        Today&apos;s leaderboard
+      </h3>
+      {listed ? (
+        <p className="text-sm">
+          You&apos;re on today&apos;s board as <strong>{listed}</strong>.{" "}
+          <Link href="/daily" className="underline">
+            See the standings
+          </Link>
+        </p>
+      ) : (
+        <form
+          className="flex flex-wrap items-end gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!valid) return;
+            setSubmittedAt(messages.length);
+            void send({ type: "set_name", name: trimmed });
+          }}
+        >
+          <label className="grid min-w-0 flex-1 gap-1 text-sm">
+            <span>Sign the case file to join today&apos;s leaderboard</span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={24}
+              autoComplete="nickname"
+              placeholder="Inspector …"
+              className="border-ink/30 min-w-0 rounded-sm border bg-white/60 p-2"
+            />
+          </label>
+          <Button type="submit" disabled={isRunning || !valid}>
+            Sign
+          </Button>
+          {trimmed && !valid && (
+            <p className="text-ink-soft w-full text-xs">2-24 letters, numbers, spaces or . &apos; -</p>
+          )}
+          {(rejection || error) && (
+            <p className="text-alert w-full text-sm" role="alert">
+              {rejection ?? error}
+            </p>
+          )}
+        </form>
+      )}
     </section>
   );
 }

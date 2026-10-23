@@ -2,6 +2,7 @@
 
 import json
 import random
+from datetime import date
 from functools import cache
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from app.models.case import CaseFile
 
 CASES_DIR = Path(__file__).resolve().parent.parent / "cases"
 NEW_CASE_ID = "new"  # asks for a freshly generated case from the pool
+DAILY_CASE_ID = "daily"  # asks for today's shared case
 
 
 class InvalidCaseError(Exception):
@@ -56,3 +58,13 @@ def catalogue() -> list[dict]:
         }
         for case in library().values()
     ]
+
+
+def daily_case(day: date) -> CaseFile:
+    """The same archive case for everyone on a given UTC day. Each cycle through the archive is shuffled
+    differently, and no case repeats within a cycle."""
+    cases = library()
+    ids = sorted(cases)
+    cycle, position = divmod(day.toordinal(), len(ids))
+    random.Random(cycle).shuffle(ids)
+    return cases[ids[position]]
