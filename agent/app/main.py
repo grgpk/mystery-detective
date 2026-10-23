@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
-from app import daily
+from app import career, daily
 from app.analytics import summarize
 from app.engine.case_library import catalogue, daily_case, library
 from app.game import GameMaster, Limits
@@ -149,6 +149,14 @@ async def daily_board(request: Request, session_id: str | None = Header(default=
         "leaderboard": [e.public() for e in entries[: daily.LEADERBOARD_SIZE]],
         "you": mine,
     }
+
+
+@app.get("/career", dependencies=[Depends(require_agent_key)])
+async def career_page(request: Request, session_id: str | None = Header(default=None, alias=SESSION_HEADER)) -> dict:
+    """The calling player's career (their identity is the anonymous session)."""
+    if not session_id:
+        raise HTTPException(status_code=401, detail="missing session")
+    return career.summarize(await request.app.state.repo.owner_records(session_id), daily.today())
 
 
 @app.post("/agent", dependencies=[Depends(require_agent_key)])

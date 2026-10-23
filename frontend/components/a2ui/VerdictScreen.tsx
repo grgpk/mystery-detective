@@ -66,6 +66,12 @@ export function VerdictScreen() {
         </span>
       </header>
 
+      {verdict.promotion && (
+        <p className="animate-stamp border-success text-success font-type mb-5 border-2 px-3 py-2 text-center uppercase">
+          Promoted to {verdict.promotion}
+        </p>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2">
         <table className="w-full text-sm">
           <caption className="font-type text-ink-soft mb-1 text-left text-xs uppercase">Score</caption>
@@ -119,6 +125,12 @@ export function VerdictScreen() {
 
       <footer className="mt-6 flex flex-wrap gap-2">
         <Button onClick={() => openCasePicker(true)}>Play again</Button>
+        <Link
+          href="/career"
+          className="font-type border-ink/30 text-ink hover:bg-ink/10 rounded-sm border px-3 py-1.5 text-sm tracking-wide uppercase"
+        >
+          Your casebook
+        </Link>
         <Button variant="ghost" onClick={share}>
           {copied ? "Link copied!" : "Share result"}
         </Button>

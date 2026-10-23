@@ -78,6 +78,7 @@ class Progress(CamelModel):
     hints: list[str] = Field(default_factory=list)  # step keys hinted, to escalate repeat hints
     daily_date: str | None = None  # ISO date when this is that day's shared case
     leaderboard_name: str | None = None
+    promotion: str | None = None  # career title earned by closing this case
     last_contradiction: BoardLink | None = None
     accusation: Accusation | None = None
     score: ScoreBreakdown | None = None
@@ -144,6 +145,7 @@ class Verdict(CamelModel):
     true_timeline: list[PublicTimelineEvent]
     found_clues: list[str]
     missed_clues: list[PublicClue]
+    promotion: str | None = None
 
 
 class DailyInfo(CamelModel):

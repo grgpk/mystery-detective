@@ -51,6 +51,10 @@ npm run dev                                # http://localhost:3000
   deterministic, no repeats within a cycle). Each player gets one attempt, can sign the leaderboard after the
   verdict (names are moderated), and `/daily` shows the standings: score, then fewest turns, then fastest.
   `/?daily=1` opens today's case directly (or resumes yours).
+- **Difficulty and career.** Easy / Normal / Hard change the turn budget, hint cost and how fast suspects crack
+  (`engine/difficulty.py`); the daily case is always Normal. `/career` is the player's casebook: a career title
+  on the police ladder by cases solved (promotions are announced on the verdict), streaks including a daily
+  streak, and recent cases. Like everything per-player, it is keyed to the anonymous session cookie.
 - **Personas see only their slice** (`agents/persona.py`), are told per turn what they may reveal, and stream
   through a sentence-level leak guard (`agents/guards.py`).
 - **Protocol.** Each player action is one AG-UI run, sent as `forwardedProps.gameAction`. The agent emits

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { Surface } from "@/components/a2ui/catalog";
@@ -15,6 +16,18 @@ import { ActionBar } from "./ActionBar";
 import { CasePicker } from "./CasePicker";
 import { InterrogationPanel } from "./InterrogationPanel";
 import { MuteToggle } from "./MuteToggle";
+
+function CasebookLink() {
+  return (
+    <Link
+      href="/career"
+      title="Your casebook"
+      className="font-type border-on-desk/30 text-on-desk-soft hover:text-on-desk hover:bg-on-desk/10 grid h-8 place-items-center rounded-sm border px-2 text-xs uppercase"
+    >
+      Casebook
+    </Link>
+  );
+}
 
 const TABS: { id: MobileTab; label: string }[] = [
   { id: "suspects", label: "Suspects" },
@@ -65,13 +78,15 @@ export function GameShell() {
             <p className="font-type text-brass text-xs tracking-[0.35em] uppercase">The Last Alibi</p>
             <h1 className="font-type text-on-desk text-xl sm:text-2xl">{state?.title ?? "Opening the case file…"}</h1>
           </div>
-          <div className="lg:hidden">
+          <div className="flex gap-2 lg:hidden">
+            <CasebookLink />
             <MuteToggle />
           </div>
         </div>
         <div className="flex items-center gap-3">
           {!briefing && <ActionBar />}
-          <div className="hidden lg:block">
+          <div className="hidden gap-2 lg:flex">
+            <CasebookLink />
             <MuteToggle />
           </div>
         </div>

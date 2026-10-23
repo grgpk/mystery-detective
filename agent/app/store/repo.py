@@ -44,6 +44,10 @@ class SessionRepo(Protocol):
         """Games on the shared case of `day` (ISO date), optionally one owner's."""
         ...
 
+    async def owner_records(self, owner: str) -> list[GameRecord]:
+        """Every game this player has, for their career."""
+        ...
+
 
 class InMemoryRepo:
     def __init__(self) -> None:
@@ -80,6 +84,13 @@ class InMemoryRepo:
                 )
                 found.append(DailyGame(thread_id, row_owner, record))
         return found
+
+    async def owner_records(self, owner: str) -> list[GameRecord]:
+        return [
+            GameRecord(CaseFile.model_validate(case), Progress.model_validate(progress), self._created[tid], updated)
+            for tid, (row_owner, case, progress, updated) in self._rows.items()
+            if row_owner == owner
+        ]
 
     async def records(self, since: datetime) -> list[GameRecord]:
         return [
@@ -194,6 +205,20 @@ class PostgresRepo:
                     r["created_at"],
                     r["updated_at"],
                 ),
+            )
+            for r in rows
+        ]
+
+    async def owner_records(self, owner: str) -> list[GameRecord]:
+        rows = await self.pool.fetch(
+            "SELECT case_file, progress, created_at, updated_at FROM game_sessions WHERE owner = $1", owner
+        )
+        return [
+            GameRecord(
+                CaseFile.model_validate(json.loads(r["case_file"])),
+                Progress.model_validate(json.loads(r["progress"])),
+                r["created_at"],
+                r["updated_at"],
             )
             for r in rows
         ]

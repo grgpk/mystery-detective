@@ -77,6 +77,7 @@ export interface Verdict {
   trueTimeline: TimelineEvent[];
   foundClues: string[];
   missedClues: PublicClue[];
+  promotion: string | null;
 }
 
 export type Difficulty = "easy" | "normal" | "hard";
@@ -171,4 +172,28 @@ export interface DailyBoard {
   players: number;
   leaderboard: LeaderboardEntry[];
   you: { threadId: string; phase: Phase; score: number | null; rank: number | null; name: string | null } | null;
+}
+
+/** What /career returns: the player's record, derived from their games. */
+export interface Career {
+  title: string;
+  next: { title: string; solvesNeeded: number } | null;
+  closed: number;
+  solved: number;
+  solveRate: number | null;
+  bestScore: number | null;
+  bestRank: string | null;
+  hintsUsed: number;
+  streak: { current: number; best: number };
+  dailyStreak: { current: number; best: number; playedToday: boolean };
+  byDifficulty: Partial<Record<Difficulty, { closed: number; solved: number }>>;
+  casebook: {
+    title: string;
+    closedOn: string;
+    difficulty: Difficulty;
+    daily: boolean;
+    solved: boolean;
+    score: number;
+    rank: string;
+  }[];
 }

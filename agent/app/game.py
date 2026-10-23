@@ -12,7 +12,7 @@ import anthropic
 from ag_ui.core import BaseEvent, RunAgentInput
 from pydantic import ValidationError
 
-from app import daily
+from app import career, daily
 from app.a2ui import catalog
 from app.agents import guards, moderation
 from app.agents.classifier import classify_topics
@@ -431,6 +431,9 @@ class GameMaster:
 
         progress.accusation = accusation
         progress.score = scoring.score(case, progress, accusation)
+        earlier = [r for r in await self.repo.owner_records(turn.session.owner) if r.ended]
+        solved_before = sum(r.progress.score.culprit_correct for r in earlier)  # type: ignore[union-attr]
+        progress.promotion = career.promotion(solved_before, progress.score.culprit_correct)
         progress.phase = "ended"
         progress.conversation = None
         for event in turn.sync_state():

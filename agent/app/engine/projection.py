@@ -55,6 +55,7 @@ def verdict(case: CaseFile, progress: Progress) -> Verdict | None:
         missed_clues=[
             PublicClue(id=c.id, title=c.title, text=c.text, location=c.location, is_new=False) for c in missed
         ],
+        promotion=progress.promotion,
     )
 
 
