@@ -73,6 +73,7 @@ class Progress(CamelModel):
     histories: dict[str, list[ChatTurn]] = Field(default_factory=dict)
     board: Board = Field(default_factory=Board)
     contradictions_found: list[int] = Field(default_factory=list)
+    hints: list[str] = Field(default_factory=list)  # step keys hinted, to escalate repeat hints
     last_contradiction: BoardLink | None = None
     accusation: Accusation | None = None
     score: ScoreBreakdown | None = None

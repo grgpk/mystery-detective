@@ -128,7 +128,7 @@ export function InterrogationPanel() {
                   placeholder={`Ask ${suspect.name.split(" ").at(-1)} anything…`}
                   className="bg-desk-raised text-on-desk placeholder:text-on-desk-soft/60 border-on-desk/20 focus:border-brass min-w-0 flex-1 rounded-sm border px-3 py-2"
                 />
-                <Button type="submit" className="bg-brass text-ink hover:bg-brass/85" disabled={isRunning || !question.trim()}>
+                <Button type="submit" variant="accent" disabled={isRunning || !question.trim()}>
                   Ask
                 </Button>
               </div>

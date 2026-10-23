@@ -48,14 +48,14 @@ def mood_for(composure: int) -> str:
     return "cracking"
 
 
-def _require_investigating(progress: Progress) -> None:
+def require_investigating(progress: Progress) -> None:
     if progress.phase == "ended":
         raise GameRuleError("The case is closed.")
     if progress.phase == "accusing" or progress.turns_left <= 0:
         raise GameRuleError("You are out of turns. It is time to name the killer.")
 
 
-def _spend(progress: Progress, outcome: Outcome, turns: int = 1) -> None:
+def spend(progress: Progress, outcome: Outcome, turns: int = 1) -> None:
     progress.turns_left = max(0, progress.turns_left - turns)
     outcome.turns_spent += turns
     if progress.turns_left == 0:
@@ -99,13 +99,13 @@ def known_suspect(case: CaseFile, suspect_id: str) -> None:
 
 def interrogate(case: CaseFile, progress: Progress, suspect_id: str, topics: list[str]) -> Outcome:
     """One question to a suspect. A turn buys up to three questions to the same suspect."""
-    _require_investigating(progress)
+    require_investigating(progress)
     known_suspect(case, suspect_id)
     outcome = Outcome()
 
     conv = progress.conversation
     if conv is None or conv.suspect_id != suspect_id or conv.questions_left <= 0:
-        _spend(progress, outcome)
+        spend(progress, outcome)
         conv = Conversation(suspect_id=suspect_id, questions_left=QUESTIONS_PER_TURN)
     conv.questions_left -= 1
     progress.conversation = conv
@@ -139,13 +139,13 @@ def interrogate(case: CaseFile, progress: Progress, suspect_id: str, topics: lis
 
 
 def examine(case: CaseFile, progress: Progress, location_id: str) -> Outcome:
-    _require_investigating(progress)
+    require_investigating(progress)
     if location_id not in case.location_ids():
         raise GameRuleError("There is no such place in the house.")
     if location_id in progress.examined_locations:
         raise GameRuleError("You have already searched there thoroughly.")
     outcome = Outcome()
-    _spend(progress, outcome)
+    spend(progress, outcome)
     progress.conversation = None
     progress.examined_locations.append(location_id)
     for clue in case.clues:
@@ -165,14 +165,14 @@ def _resolve_item(case: CaseFile, progress: Progress, item_id: str) -> set[str]:
 
 
 def confront(case: CaseFile, progress: Progress, suspect_id: str, items: list[str]) -> Outcome:
-    _require_investigating(progress)
+    require_investigating(progress)
     known_suspect(case, suspect_id)
     if len(items) != 2 or items[0] == items[1]:
         raise GameRuleError("Choose exactly two different pieces: a statement and the evidence that contradicts it.")
     left, right = (_resolve_item(case, progress, i) for i in items)
 
     outcome = Outcome()
-    _spend(progress, outcome)
+    spend(progress, outcome)
     progress.conversation = None
 
     for index, entry in enumerate(case.contradictions):

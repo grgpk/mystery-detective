@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
+import { HINT_COST } from "@/lib/protocol/types";
 import { useUi } from "@/lib/store";
 
 export function ActionBar() {
@@ -26,6 +27,14 @@ export function ActionBar() {
         <span className="font-type text-on-desk tabular-nums">{turnsLeft}</span>
       </div>
       <Button
+        variant="brass"
+        disabled={phase !== "investigating" || isRunning || turnsLeft <= HINT_COST}
+        title={turnsLeft <= HINT_COST ? "Not enough turns left for a hint" : `Costs ${HINT_COST} turns`}
+        onClick={() => send({ type: "hint" }, "I ask my sergeant what they make of it.")}
+      >
+        Hint · {HINT_COST} turns
+      </Button>
+      <Button
         variant="danger"
         disabled={!canAccuse || isRunning}
         onClick={() => send({ type: "open_accuse" })}
@@ -33,8 +42,7 @@ export function ActionBar() {
         Accuse
       </Button>
       <Button
-        variant="ghost"
-        className="border-on-desk/30 text-on-desk-soft hover:bg-on-desk/10"
+        variant="desk"
         onClick={() => openCasePicker(true)}
       >
         New case

@@ -17,7 +17,7 @@ from app.agents.classifier import classify_topics
 from app.agents.extractor import extract_claim
 from app.agents.narrator import JUDGE_SYSTEM, NARRATOR_SYSTEM, examine_prompt, judge_prompt
 from app.agents.persona import persona_messages, persona_system_prompt, record_exchange, turn_context
-from app.engine import clue_engine, scoring
+from app.engine import clue_engine, hints, scoring
 from app.engine.case_library import NEW_CASE_ID, pick_case
 from app.engine.clue_engine import GameRuleError, Outcome
 from app.engine.projection import project
@@ -28,6 +28,7 @@ from app.models.actions import (
     Confront,
     Examine,
     GameAction,
+    Hint,
     Interrogate,
     NewGame,
     OpenAccuse,
@@ -211,6 +212,8 @@ class GameMaster:
                 handler = self._interrogate(turn, action)
             case Examine():
                 handler = self._examine(turn, action)
+            case Hint():
+                handler = self._hint(turn)
             case OpenConfront():
                 handler = self._open_confront(turn, action)
             case Confront():
@@ -297,6 +300,16 @@ class GameMaster:
         if not outcome.new_clues:
             async for event in agui.text_message("narrator", "Nothing here seems to bear on the case."):
                 yield event
+        async for event in self._after_outcome(turn, outcome):
+            yield event
+
+    async def _hint(self, turn: Turn) -> AsyncIterator[BaseEvent]:
+        self._ensure_started(turn)
+        text, outcome = hints.take_hint(turn.case, turn.progress)
+        for event in turn.sync_state():
+            yield event
+        for event in turn.surface("narration", [catalog.narration(text, title="A word from your sergeant")]):
+            yield event
         async for event in self._after_outcome(turn, outcome):
             yield event
 

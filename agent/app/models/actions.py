@@ -46,6 +46,10 @@ class Confront(CamelModel):
     items: list[str] = Field(min_length=2, max_length=2)
 
 
+class Hint(CamelModel):
+    type: Literal["hint"]
+
+
 class OpenAccuse(CamelModel):
     type: Literal["open_accuse"]
 
@@ -61,7 +65,7 @@ class SyncBoard(CamelModel):
 
 
 GameAction = Annotated[
-    Start | NewGame | Begin | Interrogate | Examine | OpenConfront | Confront | OpenAccuse | Accuse | SyncBoard,
+    Start | NewGame | Begin | Interrogate | Examine | Hint | OpenConfront | Confront | OpenAccuse | Accuse | SyncBoard,
     Field(discriminator="type"),
 ]
 game_action_adapter: TypeAdapter[GameAction] = TypeAdapter(GameAction)

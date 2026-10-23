@@ -112,11 +112,15 @@ export type GameAction =
   | { type: "begin" }
   | { type: "interrogate"; suspectId: string; question: string }
   | { type: "examine"; locationId: string }
+  | { type: "hint" }
   | { type: "open_confront"; suspectId: string }
   | { type: "confront"; suspectId: string; items: [string, string] }
   | { type: "open_accuse" }
   | { type: "accuse"; accusation: Accusation }
   | { type: "sync_board"; board: Board };
+
+/** Turns a hint costs (agent/app/engine/hints.py HINT_COST). */
+export const HINT_COST = 2;
 
 export function isPublicState(value: unknown): value is PublicState {
   return typeof value === "object" && value !== null && "caseId" in value && "suspects" in value;

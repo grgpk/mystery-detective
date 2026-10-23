@@ -176,3 +176,19 @@ async def test_api_outage_degrades_instead_of_crashing():
     assert client.errors == []
     assert client.state["turnsLeft"] == 13
     assert any("library reading all evening" in m for m in client.messages.values())
+
+
+async def test_hint_costs_two_turns_and_shows_the_sergeant(game):
+    client = Client(game)
+    await client.act()
+    await client.act({"type": "begin"})
+    await client.act({"type": "hint"})
+    assert client.state["turnsLeft"] == 13
+    assert client.surfaces[-1][1] == {
+        "id": "root",
+        "component": "NarrationBlock",
+        "title": "A word from your sergeant",
+        "text": client.surfaces[-1][1]["text"],
+        "tone": "neutral",
+    }
+    assert "the Guest Wing" in client.surfaces[-1][1]["text"]
