@@ -10,6 +10,7 @@ import { latestPanel } from "@/lib/protocol/transcript";
 import { useUi, type MobileTab } from "@/lib/store";
 
 import { ActionBar } from "./ActionBar";
+import { CasePicker } from "./CasePicker";
 import { InterrogationPanel } from "./InterrogationPanel";
 
 const TABS: { id: MobileTab; label: string }[] = [
@@ -124,6 +125,7 @@ export function GameShell() {
           </div>
         </div>
       )}
+      <CasePicker />
     </div>
   );
 }

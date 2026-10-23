@@ -27,6 +27,7 @@ class Client:
         self.errors: list[str] = []
 
     async def act(self, action: dict | None = None) -> list:
+        action = action or {"type": "start", "caseId": "ashford_manor"}
         run_input = RunAgentInput(
             thread_id=self.thread_id,
             run_id=uuid.uuid4().hex,
@@ -34,7 +35,7 @@ class Client:
             messages=[],
             tools=[],
             context=[],
-            forwarded_props={"gameAction": action} if action else {},
+            forwarded_props={"gameAction": action},
         )
         events = [e async for e in self.game.run(run_input, self.owner)]
         assert events[0].type == EventType.RUN_STARTED

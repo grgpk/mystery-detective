@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
+import { useUi } from "@/lib/store";
 
 export function ActionBar() {
-  const { state, send, isRunning, newGame } = useGame();
+  const { state, send, isRunning } = useGame();
+  const openCasePicker = useUi((s) => s.setCasePickerOpen);
   if (!state) return null;
   const { turnsLeft, maxTurns, phase } = state;
   const canAccuse = phase === "investigating" || phase === "accusing";
@@ -33,9 +35,7 @@ export function ActionBar() {
       <Button
         variant="ghost"
         className="border-on-desk/30 text-on-desk-soft hover:bg-on-desk/10"
-        onClick={() => {
-          if (phase === "ended" || window.confirm("Abandon this case and start a new one?")) newGame();
-        }}
+        onClick={() => openCasePicker(true)}
       >
         New case
       </Button>

@@ -108,7 +108,7 @@ export interface Accusation {
 }
 
 export type GameAction =
-  | { type: "start" }
+  | { type: "start"; caseId?: string }
   | { type: "begin" }
   | { type: "interrogate"; suspectId: string; question: string }
   | { type: "examine"; locationId: string }
@@ -120,4 +120,13 @@ export type GameAction =
 
 export function isPublicState(value: unknown): value is PublicState {
   return typeof value === "object" && value !== null && "caseId" in value && "suspects" in value;
+}
+
+/** Spoiler-free summary from the agent's case catalogue. */
+export interface CaseSummary {
+  caseId: string;
+  title: string;
+  place: string;
+  blurb: string;
+  suspects: number;
 }

@@ -3,8 +3,12 @@
 A browser murder-mystery where Claude plays the suspects. The agent streams dialogue, shared game state and
 declarative UI to a React app over **AG-UI**, with UI described in **A2UI v0.9**.
 
-This is milestones M0–M3 of the plan: one hand-written, validated case (Ashford Manor), playable end to end:
-interrogate, examine, confront, accuse, verdict.
+This is milestones M0–M3 of the plan: three hand-written, validated cases, picked at random for each new game
+and playable end to end (interrogate, examine, confront, accuse, verdict):
+
+- **Murder at Ashford Manor**: a country house, 1928
+- **Death on the Midnight Sleeper**: a snowbound London–Edinburgh night train, 1931
+- **Snowbound at the Edelweiss**: an Alpine hotel cut off by an avalanche, 1936
 
 ```
 frontend/  Next.js 16 + React 19 + CopilotKit v2 (AG-UI client, A2UI renderer), react-flow board
@@ -48,7 +52,7 @@ npm run dev                                # http://localhost:3000
 ## Checks
 
 ```bash
-cd agent && uv run pytest                  # engine, validator, scoring, projection, guard, golden playthrough
+cd agent && uv run pytest                  # engine, validator, every case solvable, guard, golden playthrough
 cd agent && uv run python -m scripts.leak_eval   # real-model adversarial leak eval (needs credentials)
 cd frontend && npm run typecheck && npm run lint && npm run build
 ```

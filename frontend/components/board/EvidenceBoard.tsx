@@ -238,7 +238,7 @@ export function EvidenceBoard() {
           onChange={(e) => updateBoard({ ...board, notes: e.target.value })}
           rows={4}
           maxLength={4000}
-          placeholder="Henry lied about the garden?"
+          placeholder="Who is lying, and what proves it?"
           className="bg-paper text-ink rounded-sm p-2 font-serif"
         />
       </label>

@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
-from app.engine.case_library import library
+from app.engine.case_library import catalogue, library
 from app.game import GameMaster
 from app.llm import default_llm
 from app.store.repo import InMemoryRepo, PostgresRepo
@@ -64,6 +64,11 @@ app = FastAPI(title="The Last Alibi agent", lifespan=lifespan)
 @app.get("/health")
 async def health() -> dict:
     return {"status": "ok", "cases": list(library())}
+
+
+@app.get("/cases")
+async def cases() -> list[dict]:
+    return catalogue()
 
 
 @app.post("/agent")

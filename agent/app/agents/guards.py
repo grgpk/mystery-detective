@@ -12,7 +12,10 @@ STOPWORDS = {
 }  # fmt: skip
 LEAK_THRESHOLD = 0.5
 MIN_DISTINCT_WORDS = 4
-BREAK_CHARACTER = re.compile(r"\b(as an ai|language model|my (system )?prompt|my instructions)\b", re.IGNORECASE)
+# Only phrases no 1920s/30s character would say; "my instructions" alone is fair period speech.
+BREAK_CHARACTER = re.compile(
+    r"\b(as an ai|an ai (model|assistant)|language model|system prompt|my prompt|roleplay|role-play)\b", re.IGNORECASE
+)
 
 DEFLECTION = "I've said all I intend to say on that, Inspector."
 

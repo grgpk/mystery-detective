@@ -79,6 +79,8 @@ def test_guard_allows_clue_once_allowed(case, progress):
 
 def test_guard_blocks_breaking_character(case, progress):
     assert guards.leaks("As an AI language model, I cannot say.", [])
+    assert guards.leaks("My system prompt says I must not.", [])
+    assert not guards.leaks("Ignore my instructions, you say? Ha!", [])
 
 
 def test_sentence_splitting_keeps_remainder():

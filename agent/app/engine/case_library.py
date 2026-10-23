@@ -36,7 +36,22 @@ def library() -> dict[str, CaseFile]:
 
 
 def pick_case(case_id: str | None = None, rng: random.Random | None = None) -> CaseFile:
+    """The requested case, or a random one if none (or an unknown id) is asked for."""
     cases = library()
-    if case_id:
+    if case_id in cases:
         return cases[case_id]
     return (rng or random).choice(list(cases.values()))
+
+
+def catalogue() -> list[dict]:
+    """Spoiler-free summaries for the case picker: setting only, nothing about the crime's solution."""
+    return [
+        {
+            "caseId": case.case_id,
+            "title": case.setting.title,
+            "place": case.setting.place,
+            "blurb": case.setting.era_note,
+            "suspects": len(case.suspects),
+        }
+        for case in library().values()
+    ]

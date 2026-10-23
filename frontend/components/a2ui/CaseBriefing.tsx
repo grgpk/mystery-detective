@@ -2,9 +2,11 @@
 
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
+import { useUi } from "@/lib/store";
 
 export function CaseBriefing() {
   const { state, send, isRunning } = useGame();
+  const openCasePicker = useUi((s) => s.setCasePickerOpen);
   if (!state) return null;
   const { victim } = state;
 
@@ -36,13 +38,18 @@ export function CaseBriefing() {
 
       <p className="mb-4 leading-relaxed">{state.briefing}</p>
       <p className="text-ink-soft mb-6 text-sm">
-        {state.suspects.length} people remain in the house. You have {state.maxTurns} turns.
+        {state.suspects.length} suspects. {state.maxTurns} turns to find the truth.
       </p>
 
       {state.phase === "briefing" ? (
-        <Button onClick={() => send({ type: "begin" })} disabled={isRunning}>
-          Begin the investigation
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => send({ type: "begin" })} disabled={isRunning}>
+            Begin the investigation
+          </Button>
+          <Button variant="ghost" onClick={() => openCasePicker(true)} disabled={isRunning}>
+            Choose another case
+          </Button>
+        </div>
       ) : (
         <Stamp>Investigation under way</Stamp>
       )}

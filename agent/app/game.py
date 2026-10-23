@@ -438,7 +438,9 @@ class GameMaster:
                 max_tokens=max_tokens,
                 effort=effort,
             ):
-                yield stream.chunk(delta)
+                # Prose only: models sometimes add markdown emphasis, which would show literally.
+                if text := delta.replace("*", "").replace("_", ""):
+                    yield stream.chunk(text)
         except LLM_ERRORS:
             log.warning("narration failed", exc_info=True)
             yield stream.chunk("The fog thickens; the narrator falls silent.")

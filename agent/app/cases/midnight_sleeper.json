@@ -1,0 +1,187 @@
+{
+  "caseId": "midnight_sleeper",
+  "setting": {
+    "title": "Death on the Midnight Sleeper",
+    "place": "The night sleeper from London to Edinburgh, 1931",
+    "eraNote": "A snowstorm has stopped the train in the Northumberland hills. No one can get on or off until the line is cleared at dawn.",
+    "locations": [
+      {"id": "compartment_c", "label": "Compartment C", "description": "Sir Malcolm Drury's first-class sleeping compartment, where he was found at his writing desk."},
+      {"id": "dining_car", "label": "The Dining Car", "description": "White linen, brass lamps, and the last of the evening's port."},
+      {"id": "baggage_van", "label": "The Baggage Van", "description": "Trunks, hatboxes and mailbags stacked to the roof, lit by a single bulb."},
+      {"id": "sleeping_corridor", "label": "The Sleeping-Car Corridor", "description": "A narrow carpeted corridor lined with compartment doors."},
+      {"id": "attendants_pantry", "label": "The Attendant's Pantry", "description": "A cramped cubby with a spirit stove, cocoa tins and the attendant's ledger."}
+    ]
+  },
+  "victim": {
+    "name": "Sir Malcolm Drury",
+    "causeOfDeath": "A heavy blow to the head",
+    "timeOfDeath": "23:30-00:15",
+    "crimeScene": "compartment_c"
+  },
+  "briefing": "Sir Malcolm Drury, the City financier, rang for cocoa at a quarter past eleven. At half past midnight the attendant found him slumped over his writing desk, struck from behind. The train has been stopped by snow since eleven o'clock, so the killer is still aboard. You are the only policeman on the train.",
+  "culprit": "s3",
+  "motive": {"id": "exposure", "text": "Evelyn Marsh had forged £4,000 of cheques in Sir Malcolm's name, and he had just found out and meant to hand her to the Edinburgh police."},
+  "motiveOptions": [
+    {"id": "exposure", "label": "About to be exposed as a forger"},
+    {"id": "ruin", "label": "Revenge for a ruined partnership"},
+    {"id": "freedom", "label": "To escape an unhappy marriage"},
+    {"id": "papers", "label": "To protect a false identity"},
+    {"id": "bribes", "label": "Silencing a corrupt servant"}
+  ],
+  "truthTimeline": [
+    {"time": "21:30", "suspect": "s2", "event": "Dines with Sir Malcolm and begs him for time on a debt", "location": "dining_car"},
+    {"time": "22:30", "suspect": "s1", "event": "Retires to her compartment after a quarrel at dinner", "location": "sleeping_corridor"},
+    {"time": "23:15", "suspect": "s4", "event": "Begins a game of chess with Captain Vane in the dining car", "location": "dining_car"},
+    {"time": "23:25", "suspect": "s3", "event": "Takes a brass luggage weight from the baggage van", "location": "baggage_van"},
+    {"time": "23:45", "suspect": "s3", "event": "Is let into Compartment C with a folder of letters and strikes Sir Malcolm from behind", "location": "compartment_c"},
+    {"time": "23:47", "suspect": "s5", "event": "Glimpses Miss Marsh hurrying away from Compartment C", "location": "sleeping_corridor"},
+    {"time": "23:55", "suspect": "s3", "event": "Hides the weight behind the trunks, wrapped in her silk scarf", "location": "baggage_van"}
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Lady Constance Drury",
+      "role": "The wife",
+      "personality": "Brittle, elegant, quick to take offence; hides fear behind icy good manners.",
+      "appearance": "A sable stole and a face that has stopped expecting kindness.",
+      "alibiClaim": "I went to my compartment at half past ten and did not stir until the attendant screamed.",
+      "claimedTimeline": [{"time": "22:30", "event": "Retired to her own compartment"}],
+      "knows": [
+        "At dinner Malcolm said he had found 'a viper in the office' and would wire the Edinburgh police at the first station.",
+        "Malcolm and Captain Vane had argued over an old partnership."
+      ],
+      "motiveHint": "Her marriage was a cold and unhappy one.",
+      "secrets": [
+        {"id": "s1_sec", "text": "She had booked a one-way passage to New York to leave her husband for another man.", "confession": "Very well. I was leaving him. There is a passage booked on the Aquitania, one way, and a man in New York who is kind to me. That is not murder, Inspector.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s1_lie", "text": "Claims her marriage was a happy one", "statement": "Malcolm and I were perfectly content, whatever the gossips say.", "topics": ["marriage"], "contradictedBy": ["c4"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Captain Rupert Vane",
+      "role": "A former business partner",
+      "personality": "Hearty, ex-cavalry, drinks a little too much; turns sullen when money is mentioned.",
+      "appearance": "A regimental blazer gone shiny at the elbows.",
+      "alibiClaim": "Chess in the dining car with the Austrian fellow, from about a quarter past eleven till well after midnight.",
+      "claimedTimeline": [{"time": "23:15", "event": "Chess with Dr. Brenner in the dining car"}],
+      "knows": [
+        "Dr. Brenner never left the chess table.",
+        "Sir Malcolm ruined him in the Drury and Vane collapse of 1929."
+      ],
+      "motiveHint": "Sir Malcolm left him bankrupt when their firm collapsed.",
+      "secrets": [
+        {"id": "s2_sec", "text": "He is bankrupt and boarded the train to beg Sir Malcolm for mercy on an old debt.", "confession": "All right, damn it, I dined with him. I begged, Inspector. Begged a man who ruined me. He laughed. But I was at that chessboard until half past twelve, ask anyone.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s2_lie", "text": "Claims he hasn't spoken to Sir Malcolm in years", "statement": "Drury? I've not exchanged a word with the man in two years.", "topics": ["business", "victim"], "contradictedBy": ["c5"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Miss Evelyn Marsh",
+      "role": "Private secretary",
+      "personality": "Quiet, precise, helpful to a fault; very still when frightened.",
+      "appearance": "A grey costume, horn-rimmed spectacles, tortoiseshell pins in her hair.",
+      "alibiClaim": "I was in my compartment typing Sir Malcolm's letters until I fell asleep around eleven.",
+      "claimedTimeline": [{"time": "22:00", "event": "Typing letters in her compartment"}, {"time": "23:00", "event": "Asleep"}],
+      "knows": [
+        "Sir Malcolm kept the firm's ledger in a locked case in his compartment.",
+        "Sir Malcolm always let her in when she knocked with letters to sign."
+      ],
+      "motiveHint": "Handled all of Sir Malcolm's banking.",
+      "secrets": [
+        {"id": "s3_sec", "text": "She forged cheques in Sir Malcolm's name to pay for her mother's sanatorium.", "confession": "Yes. I signed his name. My mother is dying in a sanatorium in Davos and he paid me thirty shillings a week. But I never hurt him. I never could.", "revealAtComposure": 60}
+      ],
+      "lies": [
+        {"id": "s3_lie_alibi", "text": "Claims she never left her compartment", "statement": "I was in my compartment typing Sir Malcolm's letters until I fell asleep around eleven.", "topics": ["whereabouts"], "contradictedBy": ["c9", "c8"]},
+        {"id": "s3_lie_accounts", "text": "Claims Sir Malcolm's accounts were in perfect order", "statement": "Sir Malcolm's accounts were in perfect order. I kept them myself.", "topics": ["business", "money"], "contradictedBy": ["c1", "c10"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Dr. Otto Brenner",
+      "role": "A passenger from Vienna",
+      "personality": "Courteous, ironic, a chess player; evasive about his past.",
+      "appearance": "A worn astrakhan collar and ink-stained fingers.",
+      "alibiClaim": "I was at chess with the Captain in the dining car. A long and, I regret, losing game.",
+      "claimedTimeline": [{"time": "23:15", "event": "Chess with Captain Vane in the dining car"}],
+      "knows": [
+        "The Captain did not leave the chess table between a quarter past eleven and half past twelve.",
+        "He heard a woman's quick footsteps pass the dining car vestibule toward the baggage van shortly before midnight."
+      ],
+      "motiveHint": "Sir Malcolm's bank financed newspapers that hounded him out of Austria.",
+      "secrets": [
+        {"id": "s4_sec", "text": "He is a refugee journalist travelling on a forged passport.", "confession": "My name is not Brenner. I wrote things in Vienna that certain men did not like, and a forged passport was the price of staying alive. Please. I did not touch Sir Malcolm.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s4_lie", "text": "Claims his papers are in perfect order", "statement": "My papers are entirely in order, Inspector. You may inspect them at your leisure.", "topics": ["papers"], "contradictedBy": ["c6"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Albert Hobbs",
+      "role": "The sleeping-car attendant",
+      "personality": "Cheerful, nosy, eager to please, terrified of losing his position.",
+      "appearance": "A brown uniform with polished buttons and a pencil behind one ear.",
+      "alibiClaim": "Up and down the corridor all night, sir, answering bells and making cocoa.",
+      "claimedTimeline": [{"time": "23:15", "event": "Takes cocoa to Compartment C"}, {"time": "00:30", "event": "Finds Sir Malcolm dead"}],
+      "knows": [
+        "At about a quarter to twelve he saw Miss Marsh coming quickly away from Compartment C with a folder under her arm.",
+        "Sir Malcolm was alive and grumbling when he brought the cocoa at a quarter past eleven."
+      ],
+      "motiveHint": "Sir Malcolm had threatened to report him to the railway company.",
+      "secrets": [
+        {"id": "s5_sec", "text": "He takes money from passengers to keep quiet and sells gossip to the newspapers.", "confession": "A fiver now and then for keeping my eyes shut, sir, and a bit of gossip to the papers. It's not right, I know. But I never laid a finger on the gentleman.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s5_lie", "text": "Claims he never takes money from passengers", "statement": "Take money off the passengers? Never, sir. Not a farthing beyond my wages.", "topics": ["money"], "contradictedBy": ["c7"]}
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {"id": "c1", "title": "The torn ledger", "text": "In Sir Malcolm's case: the firm's ledger with pages razored out, and a note in his hand: 'E.M. - forged cheques, £4,000. Wire police at Edinburgh.'", "location": "compartment_c", "unlock": {"type": "examine", "target": "compartment_c"}, "pointsTo": ["s3"], "isRedHerring": false},
+    {"id": "c2", "title": "Spilled cocoa", "text": "The cocoa is spilled across the blotter. He was struck from behind while seated, and the door was bolted only from inside: he let his killer in.", "location": "compartment_c", "unlock": {"type": "examine", "target": "compartment_c"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c3", "title": "Weight in a silk scarf", "text": "Behind the trunks: a brass luggage weight wrapped in a grey silk scarf monogrammed 'E.M.'", "location": "baggage_van", "unlock": {"type": "examine", "target": "baggage_van"}, "pointsTo": ["s3"], "isRedHerring": false},
+    {"id": "c4", "title": "Steamer ticket", "text": "In Lady Constance's hatbox: a one-way first-class ticket on the Aquitania to New York, for one passenger.", "location": "baggage_van", "unlock": {"type": "examine", "target": "baggage_van"}, "pointsTo": ["s1"], "isRedHerring": true},
+    {"id": "c6", "title": "Forged passport", "text": "Sewn into the lining of Dr. Brenner's valise: a second passport in another name, with a crudely altered photograph.", "location": "baggage_van", "unlock": {"type": "examine", "target": "baggage_van"}, "pointsTo": ["s4"], "isRedHerring": true},
+    {"id": "c5", "title": "Dinner bill for two", "text": "The dining-car bill from half past nine: dinner for two, signed by Sir Malcolm, with Captain Vane's name pencilled beside it by the steward.", "location": "dining_car", "unlock": {"type": "examine", "target": "dining_car"}, "pointsTo": ["s2"], "isRedHerring": true},
+    {"id": "c7", "title": "Envelope of banknotes", "text": "Hidden in a cocoa tin: an envelope holding a £5 note and a card reading 'For your discretion. R.V.'", "location": "attendants_pantry", "unlock": {"type": "examine", "target": "attendants_pantry"}, "pointsTo": ["s5"], "isRedHerring": true},
+    {"id": "c8", "title": "Tortoiseshell hairpin", "text": "On the corridor carpet just outside Compartment C: a tortoiseshell hairpin, the kind Miss Marsh wears.", "location": "sleeping_corridor", "unlock": {"type": "examine", "target": "sleeping_corridor"}, "pointsTo": ["s3"], "isRedHerring": false},
+    {"id": "c9", "title": "The attendant's sighting", "text": "Hobbs saw Miss Marsh hurrying away from Compartment C with a folder under her arm at about a quarter to twelve.", "location": "sleeping_corridor", "unlock": {"type": "interrogate", "suspect": "s5", "topic": "corridor"}, "pointsTo": ["s3"], "isRedHerring": false, "timelineEvent": {"time": "23:45", "suspect": "s3", "event": "Seen leaving Compartment C (Hobbs's sighting)"}},
+    {"id": "c10", "title": "A viper in the office", "text": "Lady Constance: at dinner Sir Malcolm said he had found 'a viper in the office' and would wire the Edinburgh police at the first station.", "location": null, "unlock": {"type": "interrogate", "suspect": "s1", "topic": "business"}, "pointsTo": ["s3"], "isRedHerring": false, "timelineEvent": {"time": "21:00", "suspect": "s1", "event": "Hears Sir Malcolm vow to call the police on 'a viper in the office'"}},
+    {"id": "c11", "title": "Miss Marsh's admission", "text": "Cornered, Evelyn Marsh admits she took letters to Compartment C at a quarter to twelve, and insists he was alive when she left.", "location": "compartment_c", "unlock": {"type": "confront"}, "pointsTo": ["s3"], "isRedHerring": false, "timelineEvent": {"time": "23:45", "suspect": "s3", "event": "In Compartment C with letters (her own admission)"}},
+    {"id": "c12", "title": "The chess game", "text": "The dining-car steward confirms Captain Vane and Dr. Brenner played chess from 23:15 to 00:30 and neither left the table.", "location": "dining_car", "unlock": {"type": "confront"}, "pointsTo": [], "isRedHerring": false, "timelineEvent": {"time": "23:15", "suspect": "s2", "event": "Chess with Dr. Brenner until 00:30, never leaving the table"}}
+  ],
+  "contradictions": [
+    {"a": "s3_lie_alibi", "b": "c9", "effect": {"suspect": "s3", "composure": -30, "reveals": "c11"}},
+    {"a": "s3_lie_alibi", "b": "c8", "effect": {"suspect": "s3", "composure": -25, "reveals": "c11"}},
+    {"a": "s3_lie_accounts", "b": "c1", "effect": {"suspect": "s3", "composure": -30}},
+    {"a": "s3_lie_accounts", "b": "c10", "effect": {"suspect": "s3", "composure": -25}},
+    {"a": "s2_lie", "b": "c5", "effect": {"suspect": "s2", "composure": -35, "reveals": "c12"}},
+    {"a": "s4_lie", "b": "c6", "effect": {"suspect": "s4", "composure": -35, "reveals": "c12"}},
+    {"a": "s1_lie", "b": "c4", "effect": {"suspect": "s1", "composure": -35}},
+    {"a": "s5_lie", "b": "c7", "effect": {"suspect": "s5", "composure": -35}}
+  ],
+  "topics": [
+    {"id": "whereabouts", "label": "Where were you?", "keywords": ["where", "alibi", "evening", "tonight", "doing", "after dinner", "asleep"]},
+    {"id": "corridor", "label": "The corridor", "keywords": ["corridor", "passage", "saw", "seen", "see anyone", "compartment c", "door", "footsteps"]},
+    {"id": "business", "label": "Sir Malcolm's business", "keywords": ["business", "firm", "office", "ledger", "accounts", "partner", "work", "cheque", "viper"]},
+    {"id": "money", "label": "Money", "keywords": ["money", "debt", "owe", "pay", "paid", "bribe", "tip", "broke", "finances"]},
+    {"id": "marriage", "label": "The marriage", "keywords": ["marriage", "married", "wife", "husband", "happy", "leave him", "new york"]},
+    {"id": "papers", "label": "Travel papers", "keywords": ["papers", "passport", "vienna", "austria", "identity", "name", "refugee"]},
+    {"id": "victim", "label": "Sir Malcolm", "keywords": ["malcolm", "drury", "victim", "relationship", "know him", "quarrel", "argue"]},
+    {"id": "baggage", "label": "The baggage van", "keywords": ["baggage", "luggage", "trunk", "weight", "scarf", "van"]}
+  ],
+  "solution": {
+    "requiredEvidence": ["c1", "c3", "c11"],
+    "acceptableMotives": ["exposure"]
+  },
+  "maxTurns": 15
+}

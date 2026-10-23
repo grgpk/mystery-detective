@@ -23,7 +23,8 @@ interface GameContextValue {
   threadId: string;
   send: (action: GameAction, playerText?: string) => Promise<void>;
   updateBoard: (board: Board) => void;
-  newGame: () => void;
+  /** Starts a fresh thread; omit caseId for a random case. */
+  newGame: (caseId?: string) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -55,16 +56,27 @@ function storeThreadId(threadId: string): string {
 
 /** Client-only (rendered with ssr: false): owns the thread id, remounting the session for a new case. */
 export function GameProvider({ children }: { children: ReactNode }) {
-  const [threadId, setThreadId] = useState(readThreadId);
-  const newGame = useCallback(() => setThreadId(storeThreadId(crypto.randomUUID())), []);
+  const [game, setGame] = useState<{ threadId: string; caseId?: string }>(() => ({ threadId: readThreadId() }));
+  const newGame = useCallback(
+    (caseId?: string) => setGame({ threadId: storeThreadId(crypto.randomUUID()), caseId }),
+    [],
+  );
   return (
-    <GameSession key={threadId} threadId={threadId} newGame={newGame}>
+    <GameSession key={game.threadId} threadId={game.threadId} caseId={game.caseId} newGame={newGame}>
       {children}
     </GameSession>
   );
 }
 
-function GameSession({ threadId, newGame, children }: { threadId: string; newGame: () => void; children: ReactNode }) {
+interface GameSessionProps {
+  threadId: string;
+  /** Case to open if this thread has no game yet; the agent ignores it for an existing game. */
+  caseId?: string;
+  newGame: (caseId?: string) => void;
+  children: ReactNode;
+}
+
+function GameSession({ threadId, caseId, newGame, children }: GameSessionProps) {
   const { agent, isReady } = useAgent({
     agentId: `game-${threadId}`,
     runtimeAgentId: RUNTIME_AGENT_ID,
@@ -94,8 +106,8 @@ function GameSession({ threadId, newGame, children }: { threadId: string; newGam
   useEffect(() => {
     if (!isReady || started.current) return;
     started.current = true;
-    void send({ type: "start" });
-  }, [isReady, send]);
+    void send({ type: "start", caseId });
+  }, [isReady, send, caseId]);
 
   useEffect(() => () => {
     if (boardTimer.current) clearTimeout(boardTimer.current);

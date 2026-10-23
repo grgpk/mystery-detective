@@ -1,0 +1,186 @@
+{
+  "caseId": "edelweiss_hotel",
+  "setting": {
+    "title": "Snowbound at the Edelweiss",
+    "place": "Hotel Edelweiss, Bernese Oberland, 1936",
+    "eraNote": "An avalanche has buried the only road down the valley. The telephone line still works, but help cannot arrive for two days.",
+    "locations": [
+      {"id": "tower_balcony", "label": "The Tower Balcony", "description": "A narrow wooden balcony at the top of the hotel's tower, with a waist-high rail above a sheer drop."},
+      {"id": "music_room", "label": "The Music Room", "description": "A grand piano, a gramophone and tall windows onto the snow."},
+      {"id": "odette_suite", "label": "Madame Laurent's Suite", "description": "The best suite in the hotel, heavy with hothouse lilies and perfume."},
+      {"id": "ski_room", "label": "The Ski Room", "description": "Racks of skis, a waxing bench, and the porter's logbook."},
+      {"id": "hotel_office", "label": "The Hotel Office", "description": "Reception desk, switchboard, and the hotel safe."}
+    ]
+  },
+  "victim": {
+    "name": "Madame Odette Laurent",
+    "causeOfDeath": "A fall from the tower balcony",
+    "timeOfDeath": "21:00-21:30",
+    "crimeScene": "tower_balcony"
+  },
+  "briefing": "Odette Laurent, the most famous soprano in Europe, climbed the hotel tower after dinner to take the air, as she did every night. At half past nine a guide found her in the snow at the foot of the tower. Her wrists are bruised. The road is buried, the guests are restless, and the Swiss police have asked you, by telephone, to find out who was on that balcony with her.",
+  "culprit": "s5",
+  "motive": {"id": "career", "text": "Greta Holm had learned that Odette was about to have her dismissed from the Vienna Opera, ending her career before it began."},
+  "motiveOptions": [
+    {"id": "career", "label": "To save a career about to be destroyed"},
+    {"id": "insurance", "label": "To collect on a life insurance policy"},
+    {"id": "jealousy", "label": "Jealousy over a secret love affair"},
+    {"id": "scandal", "label": "To get a sensational story"},
+    {"id": "bankruptcy", "label": "To save a failing business"}
+  ],
+  "truthTimeline": [
+    {"time": "18:00", "suspect": "s5", "event": "Overhears Odette dictating a telegram to have her dismissed", "location": "odette_suite"},
+    {"time": "20:45", "suspect": "s3", "event": "Starts waxing skis with the porter", "location": "ski_room"},
+    {"time": "20:55", "suspect": "s1", "event": "Takes a long telephone call to Paris at the switchboard", "location": "hotel_office"},
+    {"time": "21:00", "suspect": "s5", "event": "Starts a gramophone record of scales in the music room and slips out", "location": "music_room"},
+    {"time": "21:10", "suspect": "s5", "event": "Climbs the tower stairs, seen by Miss Ashworth", "location": "tower_balcony"},
+    {"time": "21:15", "suspect": "s5", "event": "Struggles with Odette at the rail and pushes her over", "location": "tower_balcony"},
+    {"time": "21:25", "suspect": "s5", "event": "Slips back into the music room and lifts the gramophone needle", "location": "music_room"}
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Bertrand Laurent",
+      "role": "Husband and manager",
+      "personality": "Suave, theatrical, always performing; snaps when his finances are questioned.",
+      "appearance": "A camel-hair coat over evening dress and a pencil moustache.",
+      "alibiClaim": "I was on the telephone to Paris from before nine until well after half past. Ask the switchboard.",
+      "claimedTimeline": [{"time": "20:55", "event": "Telephone call to Paris from the hotel office"}],
+      "knows": [
+        "Odette was furious with Greta Holm and meant to 'finish her' with the Vienna Opera.",
+        "Odette climbed the tower every night after dinner, alone."
+      ],
+      "motiveHint": "He is the sole beneficiary of Odette's life insurance.",
+      "secrets": [
+        {"id": "s1_sec", "text": "He has been skimming Odette's fees for years and is deeply in debt.", "confession": "Yes, yes, I helped myself to her fees. Everyone in the business does it. Without Odette I have nothing, Inspector, why would I kill the goose?", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s1_lie", "text": "Claims their finances are in perfect order", "statement": "Our finances? Impeccable. Odette earned a fortune and I managed it wisely.", "topics": ["money"], "contradictedBy": ["c6"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Herr Anton Keller",
+      "role": "The hotelier",
+      "personality": "Anxious, obsequious, sweating; terrified of scandal.",
+      "appearance": "A green loden jacket and a ring of keys he never stops fiddling with.",
+      "alibiClaim": "I was everywhere at once, Inspector. The kitchens, the bar, the office. A hotelier's evening.",
+      "claimedTimeline": [{"time": "21:00", "event": "Seeing to guests in the bar"}],
+      "knows": [
+        "Only guests with tower keys can reach the balcony; Madame Laurent and Fräulein Holm both had one for the view.",
+        "Herr Laurent was on the switchboard to Paris for over half an hour."
+      ],
+      "motiveHint": "A death in the hotel could ruin him.",
+      "secrets": [
+        {"id": "s2_sec", "text": "The hotel is close to bankruptcy and he has been watering the wine.", "confession": "The bank will take the hotel in the spring. I have been stretching the wine. Shameful, I know. But a dead prima donna is the last thing I could want.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s2_lie", "text": "Claims the hotel is thriving", "statement": "The Edelweiss has never been busier, Inspector. We are full every season.", "topics": ["hotel", "money"], "contradictedBy": ["c7"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Luca Benedetti",
+      "role": "The ski instructor",
+      "personality": "Handsome, hot-tempered, wounded pride; grief he is trying to hide.",
+      "appearance": "A thick Fair Isle sweater and sunburned hands.",
+      "alibiClaim": "I was in the ski room waxing skis with the porter all evening.",
+      "claimedTimeline": [{"time": "20:45", "event": "Waxing skis with the porter in the ski room"}],
+      "knows": [
+        "Odette told him at lunch that 'that little Holm girl' would never sing in Vienna again.",
+        "The porter was with him the whole evening."
+      ],
+      "motiveHint": "Odette had ended something between them.",
+      "secrets": [
+        {"id": "s3_sec", "text": "He was Odette's secret lover, and she had ended the affair two days ago.", "confession": "We were lovers. Since last winter. She ended it on Tuesday, and yes, I was angry. But I loved her, Inspector. I would never have hurt her.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s3_lie", "text": "Claims he barely knew Odette", "statement": "Madame Laurent? I gave her two lessons. I barely knew her.", "topics": ["victim", "love"], "contradictedBy": ["c5"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Miss Penelope Ashworth",
+      "role": "A society columnist",
+      "personality": "Bright, sharp-eyed, inquisitive; enjoys knowing things others don't.",
+      "appearance": "A tweed skirt, a fountain pen, and a notebook never out of reach.",
+      "alibiClaim": "I was reading by the fire in the lounge, near the foot of the tower stairs.",
+      "claimedTimeline": [{"time": "20:30", "event": "Reading by the lounge fire near the tower stairs"}],
+      "knows": [
+        "At about ten past nine she saw a young woman in a mauve dress go quickly up the tower stairs.",
+        "She heard scales playing from the music room the whole time, which struck her as odd later."
+      ],
+      "motiveHint": "Odette had threatened to sue her paper for libel.",
+      "secrets": [
+        {"id": "s4_sec", "text": "She came to the hotel to dig up a scandal about Odette for her newspaper.", "confession": "All right, I'm not here for the skiing. My editor wanted dirt on Odette Laurent: the husband, the lover, the money. A dead source is no use to me, Inspector.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s4_lie", "text": "Claims she is only on holiday", "statement": "I'm here purely for the skiing, darling. Work is the last thing on my mind.", "topics": ["work"], "contradictedBy": ["c13"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Greta Holm",
+      "role": "The understudy",
+      "personality": "Sweet, eager, tremulous; a steel core under the shyness.",
+      "appearance": "A mauve silk evening dress and a nervous, lovely smile.",
+      "alibiClaim": "I was at the piano in the music room practising scales all evening.",
+      "claimedTimeline": [{"time": "20:30", "event": "Practising scales in the music room"}],
+      "knows": [
+        "Odette kept a key to the tower and climbed it every night after dinner.",
+        "Greta also has a tower key, given to her for the view."
+      ],
+      "motiveHint": "Odette's understudy for the Vienna season.",
+      "secrets": [
+        {"id": "s5_sec", "text": "That afternoon she overheard Odette dictating a telegram to have her dismissed from the Vienna Opera.", "confession": "I heard her. At six o'clock, through the door. 'She will never sing again while I live.' Do you know what that is like, Inspector? But I only wanted to talk to her.", "revealAtComposure": 60}
+      ],
+      "lies": [
+        {"id": "s5_lie_alibi", "text": "Claims she was at the piano all evening", "statement": "I was at the piano in the music room practising scales all evening.", "topics": ["whereabouts"], "contradictedBy": ["c3", "c8"]},
+        {"id": "s5_lie_friend", "text": "Claims she and Odette were close friends", "statement": "Odette was like a mother to me. She adored my voice.", "topics": ["victim", "career"], "contradictedBy": ["c4"]}
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {"id": "c1", "title": "Mauve silk button", "text": "Caught on a splinter of the balcony rail: a small covered button of mauve silk, torn from a dress.", "location": "tower_balcony", "unlock": {"type": "examine", "target": "tower_balcony"}, "pointsTo": ["s5"], "isRedHerring": false},
+    {"id": "c2", "title": "Signs of a struggle", "text": "The snow on the balcony is trampled by two pairs of feet. The rail is waist-high: nobody falls over it by accident.", "location": "tower_balcony", "unlock": {"type": "examine", "target": "tower_balcony"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c3", "title": "A record of scales", "text": "On the music-room gramophone: a recording of soprano scales, its last groove worn grey. Someone played a record instead of practising.", "location": "music_room", "unlock": {"type": "examine", "target": "music_room"}, "pointsTo": ["s5"], "isRedHerring": false},
+    {"id": "c4", "title": "Draft telegram", "text": "On Odette's writing desk: a draft telegram to the Vienna Opera. 'Dismiss Holm immediately. She will never sing again while I live. Laurent.'", "location": "odette_suite", "unlock": {"type": "examine", "target": "odette_suite"}, "pointsTo": ["s5"], "isRedHerring": false},
+    {"id": "c5", "title": "Love letters", "text": "In Odette's jewellery box: a bundle of passionate letters in Italian, each signed simply 'L.'", "location": "odette_suite", "unlock": {"type": "examine", "target": "odette_suite"}, "pointsTo": ["s3"], "isRedHerring": true},
+    {"id": "c6", "title": "Insurance and an overdraft", "text": "In the hotel safe, in Bertrand's name: a life policy on Odette for 100,000 francs and a Paris bank's notice that his account is badly overdrawn.", "location": "hotel_office", "unlock": {"type": "examine", "target": "hotel_office"}, "pointsTo": ["s1"], "isRedHerring": true},
+    {"id": "c7", "title": "Unpaid bills", "text": "Stuffed in the hotelier's drawer: months of unpaid bills and a bank letter threatening foreclosure in the spring.", "location": "hotel_office", "unlock": {"type": "examine", "target": "hotel_office"}, "pointsTo": ["s2"], "isRedHerring": true},
+    {"id": "c13", "title": "The columnist's notebook", "text": "Left at reception: Miss Ashworth's notebook. 'LAURENT: husband's debts? Italian lover? Get it before Paris-Soir does!'", "location": "hotel_office", "unlock": {"type": "examine", "target": "hotel_office"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c12", "title": "The porter's logbook", "text": "The ski-room log, signed by the porter: 'Benedetti and self, waxing, 20:45 to 21:50.'", "location": "ski_room", "unlock": {"type": "examine", "target": "ski_room"}, "pointsTo": [], "isRedHerring": false, "timelineEvent": {"time": "20:45", "suspect": "s3", "event": "Waxing skis with the porter until 21:50 (logbook)"}},
+    {"id": "c8", "title": "Figure on the stairs", "text": "Miss Ashworth saw a young woman in a mauve dress hurry up the tower stairs at about ten past nine, while scales went on playing in the music room.", "location": "tower_balcony", "unlock": {"type": "interrogate", "suspect": "s4", "topic": "tower"}, "pointsTo": ["s5"], "isRedHerring": false, "timelineEvent": {"time": "21:10", "suspect": "s5", "event": "A woman in mauve climbs the tower stairs (Miss Ashworth's sighting)"}},
+    {"id": "c9", "title": "Greta's admission", "text": "Cornered, Greta admits she left a record playing and went up the tower at ten past nine 'only to beg Odette to reconsider'.", "location": "tower_balcony", "unlock": {"type": "confront"}, "pointsTo": ["s5"], "isRedHerring": false, "timelineEvent": {"time": "21:10", "suspect": "s5", "event": "Goes up the tower to Odette (her own admission)"}},
+    {"id": "c11", "title": "The switchboard log", "text": "The operator's log: Herr Laurent on a call to Paris from 20:55 to 21:35, never off the line.", "location": "hotel_office", "unlock": {"type": "confront"}, "pointsTo": [], "isRedHerring": false, "timelineEvent": {"time": "20:55", "suspect": "s1", "event": "On the telephone to Paris until 21:35 (switchboard log)"}}
+  ],
+  "contradictions": [
+    {"a": "s5_lie_alibi", "b": "c3", "effect": {"suspect": "s5", "composure": -30, "reveals": "c9"}},
+    {"a": "s5_lie_alibi", "b": "c8", "effect": {"suspect": "s5", "composure": -25, "reveals": "c9"}},
+    {"a": "s5_lie_friend", "b": "c4", "effect": {"suspect": "s5", "composure": -30}},
+    {"a": "s1_lie", "b": "c6", "effect": {"suspect": "s1", "composure": -35, "reveals": "c11"}},
+    {"a": "s2_lie", "b": "c7", "effect": {"suspect": "s2", "composure": -35}},
+    {"a": "s3_lie", "b": "c5", "effect": {"suspect": "s3", "composure": -35}},
+    {"a": "s4_lie", "b": "c13", "effect": {"suspect": "s4", "composure": -35}}
+  ],
+  "topics": [
+    {"id": "whereabouts", "label": "Where were you?", "keywords": ["where", "alibi", "evening", "tonight", "doing", "after dinner"]},
+    {"id": "tower", "label": "The tower", "keywords": ["tower", "balcony", "stairs", "saw", "seen", "see anyone", "climb"]},
+    {"id": "career", "label": "The opera", "keywords": ["opera", "vienna", "career", "sing", "role", "understudy", "contract", "dismiss", "telegram"]},
+    {"id": "money", "label": "Money", "keywords": ["money", "debt", "owe", "insurance", "fees", "finances", "bank", "pay"]},
+    {"id": "victim", "label": "Madame Laurent", "keywords": ["odette", "laurent", "madame", "victim", "relationship", "know her", "friend"]},
+    {"id": "love", "label": "Love affairs", "keywords": ["love", "lover", "affair", "letters", "romance", "italian"]},
+    {"id": "hotel", "label": "The hotel", "keywords": ["hotel", "business", "guests", "season", "wine", "keller"]},
+    {"id": "work", "label": "Why are you here?", "keywords": ["why are you here", "work", "newspaper", "column", "journalist", "holiday", "notebook"]}
+  ],
+  "solution": {
+    "requiredEvidence": ["c1", "c3", "c9"],
+    "acceptableMotives": ["career"]
+  },
+  "maxTurns": 15
+}

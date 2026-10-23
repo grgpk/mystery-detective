@@ -101,10 +101,16 @@ def _pointing_errors(case: CaseFile) -> list[str]:
 def _timeline_errors(case: CaseFile) -> list[str]:
     """Rule 6: the culprit is at the scene during the time-of-death window."""
     start, end = (_minutes(t) for t in case.victim.time_of_death.split("-"))
+    day = 24 * 60
+
+    def in_window(hhmm: str) -> bool:
+        # Windows may cross midnight (e.g. 23:30-00:15): measure everything from the window's start.
+        return (_minutes(hhmm) - start) % day <= (end - start) % day
+
     at_scene = [
         e
         for e in case.truth_timeline
-        if e.suspect == case.culprit and e.location == case.victim.crime_scene and start <= _minutes(e.time) <= end
+        if e.suspect == case.culprit and e.location == case.victim.crime_scene and in_window(e.time)
     ]
     return [] if at_scene else ["culprit is never at the crime scene inside the time-of-death window"]
 

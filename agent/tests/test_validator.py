@@ -62,3 +62,16 @@ def test_confront_only_clue_must_be_revealable(raw_case):
         if c["effect"].get("reveals") == "c9":
             c["effect"]["reveals"] = None
     assert any("confront-only" in e for e in errors_for(raw))
+
+
+def test_time_window_may_cross_midnight(raw_case):
+    raw = copy.deepcopy(raw_case)
+    raw["victim"]["timeOfDeath"] = "23:30-00:15"
+    for event in raw["truthTimeline"]:
+        if event["location"] == "study":
+            event["time"] = "00:05"
+    assert errors_for(raw) == []
+    raw["truthTimeline"] = [e for e in raw["truthTimeline"] if e["location"] != "study"] + [
+        {"time": "00:30", "suspect": "s2", "event": "Too late", "location": "study"}
+    ]
+    assert any("crime scene" in e for e in errors_for(raw))

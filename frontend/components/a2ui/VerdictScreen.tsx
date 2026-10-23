@@ -4,9 +4,11 @@ import { useState } from "react";
 
 import { Button, Stamp } from "@/components/ui";
 import { useGame } from "@/lib/game-context";
+import { useUi } from "@/lib/store";
 
 export function VerdictScreen() {
-  const { state, newGame } = useGame();
+  const { state } = useGame();
+  const openCasePicker = useUi((s) => s.setCasePickerOpen);
   const [copied, setCopied] = useState(false);
   const verdict = state?.verdict;
   if (!state || !verdict) return null;
@@ -96,7 +98,7 @@ export function VerdictScreen() {
       )}
 
       <footer className="mt-6 flex flex-wrap gap-2">
-        <Button onClick={newGame}>Play again</Button>
+        <Button onClick={() => openCasePicker(true)}>Play again</Button>
         <Button variant="ghost" onClick={share}>
           {copied ? "Copied!" : "Share result"}
         </Button>
