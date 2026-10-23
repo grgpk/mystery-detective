@@ -1,0 +1,809 @@
+{
+  "caseId": "turn_of_the_wheel",
+  "setting": {
+    "title": "The Last Turn of the Wheel",
+    "place": "Villa Sérénité, Monte Carlo, 1930",
+    "eraNote": "Saturday, the 5th of April, 1930: the eve of the Monaco Grand Prix. The town is drunk on petrol fumes and champagne, and Count Anton Moravec is hosting his annual race-eve party at his villa above the harbour, a house with its own private gaming salon.",
+    "locations": [
+      {
+        "id": "study",
+        "label": "The Count's Study",
+        "description": "A panelled room with a balcony over the harbour, where the Count was found dead in his armchair by the open balcony doors."
+      },
+      {
+        "id": "gaming_salon",
+        "label": "The Private Gaming Salon",
+        "description": "Green baize, crystal chandeliers, a roulette wheel under a dust sheet, and a chemin de fer table still littered with plaques."
+      },
+      {
+        "id": "terrace",
+        "label": "The Harbour Terrace",
+        "description": "A balustraded terrace hung with paper lanterns, braziers lit against the sea wind, and the best view of the fireworks over the bay."
+      },
+      {
+        "id": "garage",
+        "label": "The Villa Garage",
+        "description": "A whitewashed garage smelling of castor oil, where the Count's blue Bugatti Type 35B waits for tomorrow's race."
+      },
+      {
+        "id": "bedrooms",
+        "label": "The Bedroom Corridor",
+        "description": "The upper corridor of bedrooms: Madame's lavish suite, the guest rooms, and the companion's narrow room at the end."
+      }
+    ]
+  },
+  "victim": {
+    "name": "Count Anton Moravec",
+    "causeOfDeath": "A whole bottle of his own digitalis heart drops, poured into his cognac",
+    "timeOfDeath": "23:00-23:30",
+    "crimeScene": "study"
+  },
+  "briefing": "At twenty to midnight, while the last smoke of the race-eve fireworks drifted over the harbour, Count Anton Moravec's secretary found his master dead in his study. An empty bottle of heart drops stood beside an overturned cognac glass. The Monégasque police are content to call it an old man's careless accident, but the doctor says no man takes a whole bottle by mistake. The villa gates have been closed since the fireworks. You have until the cars line up on the quay tomorrow to name a murderer.",
+  "culprit": "s3",
+  "motive": {
+    "id": "revenge",
+    "text": "Prudence is the daughter of Captain Edward Harland, who was ruined in 1927 at the Count's rigged roulette wheel and died a broken man in a Nice lodging house. She took the post of Madame's companion under a false name to settle the account."
+  },
+  "motiveOptions": [
+    {
+      "id": "revenge",
+      "label": "Revenge for a father ruined at the Count's tables"
+    },
+    {
+      "id": "inheritance",
+      "label": "Inheriting the villa and the Moravec fortune"
+    },
+    {
+      "id": "dismissal",
+      "label": "Fear of being dropped from the racing team"
+    },
+    {
+      "id": "exposure",
+      "label": "Silencing the Count before he exposed a card cheat"
+    },
+    {
+      "id": "forgery",
+      "label": "Hiding forged cheques before the accounts were checked"
+    }
+  ],
+  "truthTimeline": [
+    {
+      "time": "22:30",
+      "suspect": "s4",
+      "event": "Sits down to chemin de fer with the croupier and does not leave the table until 23:45",
+      "location": "gaming_salon"
+    },
+    {
+      "time": "22:45",
+      "suspect": "s2",
+      "event": "Receives the betting syndicate's runner, Russo, in the garage and counts out a bribe",
+      "location": "garage"
+    },
+    {
+      "time": "22:55",
+      "suspect": "s5",
+      "event": "Joins Madame at the terrace balustrade and secretly burns a bank telegram in the brazier",
+      "location": "terrace"
+    },
+    {
+      "time": "23:00",
+      "suspect": "s3",
+      "event": "Slips away from Madame's side as the first rockets go up",
+      "location": "terrace"
+    },
+    {
+      "time": "23:05",
+      "suspect": "s3",
+      "event": "While the Count watches the fireworks from his balcony, empties his digitalis drops into his cognac, dropping her spectacles case",
+      "location": "study"
+    },
+    {
+      "time": "23:25",
+      "suspect": "s3",
+      "event": "Rejoins Madame on the terrace as the fireworks end",
+      "location": "terrace"
+    },
+    {
+      "time": "23:40",
+      "suspect": "s5",
+      "event": "Goes up with the race-day schedule and finds the Count dead",
+      "location": "study"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Madame Hélène Moravec",
+      "role": "The Count's wife",
+      "personality": "Theatrical, warm-hearted and quick-tempered; laughs too loudly when she is frightened.",
+      "appearance": "A silver lamé gown, a platinum shingle, and an emerald the size of a pigeon's egg.",
+      "alibiClaim": "I watched the fireworks from the terrace with Mr. Ashby, Inspector. Prudence was supposed to be beside me, but the girl vanished the moment the rockets began.",
+      "claimedTimeline": [
+        {
+          "time": "22:55",
+          "event": "On the terrace with Mr. Ashby, waiting for the fireworks"
+        },
+        {
+          "time": "23:00",
+          "event": "Watched the fireworks from the terrace; Prudence slipped away and came back near half past"
+        }
+      ],
+      "knows": [
+        "Prudence was meant to stand beside her for the fireworks but slipped away when the first rocket went up at eleven, and did not come back until nearly half past.",
+        "Anton had a weak heart and took drops for it every night.",
+        "Anton was in a vile temper at dinner and quarrelled with Fabbri about the race."
+      ],
+      "motiveHint": "As the Count's widow she inherits the villa and his fortune.",
+      "secrets": [
+        {
+          "id": "s1_sec",
+          "text": "Her first husband, a Marseilles accordion player named Jules Ferrand, is very much alive. Her marriage to the Count is bigamous, and she pays Jules to keep quiet.",
+          "confession": "Bon, bon! Jules is alive, curse him, playing his accordion in some bar on the Vieux-Port. I never divorced him. I send him money so he stays there. Anton never knew, and now he never will.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s1_lie_marriage",
+          "text": "Claims she was a widow when she married the Count",
+          "statement": "I was a widow when Anton married me, Inspector. My first husband fell at Verdun, God rest him.",
+          "topics": [
+            "marriage"
+          ],
+          "contradictedBy": [
+            "c4"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Enrico Fabbri",
+      "role": "The Count's racing driver",
+      "personality": "Dashing, boastful and superstitious; crosses himself whenever luck is mentioned.",
+      "appearance": "A white dinner jacket, oil under his fingernails, and a St. Christopher medal at his throat.",
+      "alibiClaim": "I was in the garage with my motor car all night. Tomorrow I race; tonight I stay with her, like a bridegroom.",
+      "claimedTimeline": [
+        {
+          "time": "22:30",
+          "event": "In the garage tuning the Bugatti alone until midnight"
+        }
+      ],
+      "knows": [
+        "At dinner the Count told him that unless he won tomorrow he was finished with the team.",
+        "He heard the fireworks from the garage but never went up to the house."
+      ],
+      "motiveHint": "The Count had threatened to give his seat to a younger driver.",
+      "secrets": [
+        {
+          "id": "s2_sec",
+          "text": "He took 50,000 francs from a Milanese betting syndicate to finish no better than third tomorrow.",
+          "confession": "Madonna... yes. Fifty thousand francs to come third. The Count was going to throw me out anyway. A man must eat. But I did not touch him, I swear it on my mother.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s2_lie_race",
+          "text": "Claims he would never sell a race",
+          "statement": "Sell a race? I am Fabbri! I drive to win, or I drive into the sea.",
+          "topics": [
+            "race"
+          ],
+          "contradictedBy": [
+            "c6"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Miss Prudence Lisle",
+      "role": "Madame's paid companion",
+      "personality": "Mousy, soft-voiced and endlessly helpful; apologises for everything and is forever knitting. Now and then a flash of steel shows through.",
+      "appearance": "A grey cardigan over a plain navy frock, steel-rimmed spectacles, and a knitting bag never out of reach.",
+      "alibiClaim": "I stood beside Madame on the terrace for the whole of the fireworks, Inspector. I never stirred.",
+      "claimedTimeline": [
+        {
+          "time": "22:50",
+          "event": "Joined Madame on the terrace"
+        },
+        {
+          "time": "23:00",
+          "event": "Watched the fireworks beside Madame until they ended"
+        },
+        {
+          "time": "23:45",
+          "event": "Heard Mr. Ashby cry out from upstairs"
+        }
+      ],
+      "knows": [
+        "She is really Prudence Harland, daughter of Captain Edward Harland, who was ruined at the Count's rigged roulette wheel in 1927.",
+        "The Count kept his digitalis drops in the study and always watched the fireworks from his balcony with a cognac.",
+        "She asked Mr. Ashby where the drops were kept and what made a dose."
+      ],
+      "motiveHint": "The Count treated Madame's companion like a piece of furniture and had spoken of turning her off without a character.",
+      "secrets": [
+        {
+          "id": "s3_sec",
+          "text": "'Prudence Lisle' is a false name. She is Prudence Harland, daughter of the man the Count's crooked tables ruined.",
+          "confession": "Very well. My name is Harland. Captain Edward Harland was my father, and that man's crooked wheel took every penny he had. I came here under another name because I wanted to look at his face. That is all I wanted.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s3_lie_alibi",
+          "text": "Claims she never left Madame's side during the fireworks",
+          "statement": "I stood beside Madame on the terrace for the whole of the fireworks, Inspector. I never stirred.",
+          "topics": [
+            "whereabouts"
+          ],
+          "contradictedBy": [
+            "c2",
+            "c5"
+          ]
+        },
+        {
+          "id": "s3_lie_harland",
+          "text": "Claims she has no past connection with the Count",
+          "statement": "My father was a country schoolmaster in Shropshire. I'd never so much as heard of the Count before Madame engaged me.",
+          "topics": [
+            "family"
+          ],
+          "contradictedBy": [
+            "c3"
+          ]
+        },
+        {
+          "id": "s3_lie_drops",
+          "text": "Claims she knows nothing about the Count's medicine",
+          "statement": "Medicine? Oh, I've no head for such things. I couldn't tell you where the Count kept so much as an aspirin.",
+          "topics": [
+            "poison"
+          ],
+          "contradictedBy": [
+            "c12"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Major Hugo Thackeray",
+      "role": "A retired officer and gentleman gambler",
+      "personality": "Bluff, florid and jovial at the table; turns icy and pompous when his honour is questioned.",
+      "appearance": "A monocle, a regimental moustache waxed to points, and suspiciously supple fingers.",
+      "alibiClaim": "At the chemin de fer table in the salon, old man, from half past ten until the hullabaloo.",
+      "claimedTimeline": [
+        {
+          "time": "22:30",
+          "event": "Playing chemin de fer in the gaming salon until 23:45"
+        }
+      ],
+      "knows": [
+        "Back in '27 the Count's old roulette wheel was fitted with a magnet. He watched an English officer named Harland lose every penny at it, and heard the poor devil died soon after in Nice.",
+        "The croupier Gaston dealt to him all evening."
+      ],
+      "motiveHint": "The Count had begun to suspect how the Major won so steadily at his tables.",
+      "secrets": [
+        {
+          "id": "s4_sec",
+          "text": "He is a card sharp who has been fleecing the Count's guests with shaded decks for two seasons.",
+          "confession": "Oh, confound it. Yes, the backs are shaded. A man can't live on a Major's pension in Monte Carlo. Moravec's own wheel was crooked for years; I merely evened the odds. But murder? Never.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s4_lie_cards",
+          "text": "Claims he has always played fair",
+          "statement": "Cheat? Sir, I've played square at every table from Simla to Deauville.",
+          "topics": [
+            "cards"
+          ],
+          "contradictedBy": [
+            "c8"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Mr. Clement Ashby",
+      "role": "The Count's private secretary",
+      "personality": "Fussy, deferential and tirelessly efficient; goes very still whenever money is mentioned.",
+      "appearance": "Pale and precise, with ink on his right cuff and a gold propelling pencil always in hand.",
+      "alibiClaim": "I joined Madame on the terrace just before the fireworks and stayed there until I went up to the Count at twenty to twelve and found him.",
+      "claimedTimeline": [
+        {
+          "time": "22:55",
+          "event": "On the terrace beside Madame for the fireworks"
+        },
+        {
+          "time": "23:40",
+          "event": "Went up to the study and found the Count dead"
+        }
+      ],
+      "knows": [
+        "Yesterday Miss Lisle asked him exactly where the Count kept his heart drops and how many made a dose, 'for Madame's peace of mind'.",
+        "At twenty to twelve he took the race-day schedule up to the study and found the Count slumped by the balcony doors, his cognac glass on the carpet.",
+        "The Count meant to go through the accounts with him on Monday."
+      ],
+      "motiveHint": "The Count was to audit the household accounts after the race.",
+      "secrets": [
+        {
+          "id": "s5_sec",
+          "text": "He forged the Count's signature on three cheques worth 60,000 francs to cover his own losses at the Casino.",
+          "confession": "Yes, I signed his name. Three cheques, sixty thousand francs, to cover my losses at the Casino. I meant to put every centime back after the race. But I did not harm him. I was on that terrace burning the bank's telegram.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s5_lie_books",
+          "text": "Claims the Count's accounts are in perfect order",
+          "statement": "The Count's books are in perfect order, Inspector. I would answer for every centime.",
+          "topics": [
+            "money"
+          ],
+          "contradictedBy": [
+            "c10"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {
+      "id": "c1",
+      "title": "The empty drops bottle",
+      "text": "On the low table by the balcony doors stands the Count's brown bottle of digitalis drops, quite empty, and a cognac glass lies on the carpet. The doctor says a whole bottle in one glass would stop any heart. Someone meant it to look like an old man's careless overdose.",
+      "location": "study",
+      "unlock": {
+        "type": "examine",
+        "target": "study"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c2",
+      "title": "A spectacles case under the desk",
+      "text": "Kicked under the Count's desk lies a cheap steel spectacles case with a worn lining, stamped with the initials 'P.H.' It is hardly the sort of thing a Count, or a Countess, would own.",
+      "location": "study",
+      "unlock": {
+        "type": "examine",
+        "target": "study"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c3",
+      "title": "The cutting in the knitting bag",
+      "text": "Sewn into the lining of the companion's knitting bag: a yellowed cutting from L'Éclaireur de Nice, 1927, headed 'English Officer Ruined at Private Villa Tables: Captain E. Harland Dies in Nice Lodgings', and a photograph inscribed 'To my Prue, from Father.'",
+      "location": "bedrooms",
+      "unlock": {
+        "type": "examine",
+        "target": "bedrooms"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c4",
+      "title": "A letter from Marseilles",
+      "text": "Hidden in Madame's dressing-table drawer: 'Lène, five thousand more by Easter, or I come to Monte Carlo and tell your Count which of us is really your husband. Jules, Marseille.' If the Count had learned of it, Madame would have lost everything.",
+      "location": "bedrooms",
+      "unlock": {
+        "type": "examine",
+        "target": "bedrooms"
+      },
+      "pointsTo": [
+        "s1"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c5",
+      "title": "The empty place on the terrace",
+      "text": "Madame: Prudence was meant to stand beside her for the fireworks, but slipped away as the first rocket went up at eleven and did not come back until nearly half past.",
+      "location": "terrace",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s1",
+        "topic": "whereabouts"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:00",
+        "suspect": "s3",
+        "event": "Leaves Madame's side on the terrace as the fireworks begin (Madame's account)",
+        "location": null
+      }
+    },
+    {
+      "id": "c6",
+      "title": "Envelope in the toolbox",
+      "text": "In the Bugatti's toolbox: an envelope holding 50,000 francs and a note in Italian: 'Third place or worse. If the Count makes trouble, he will be dealt with. R.'",
+      "location": "garage",
+      "unlock": {
+        "type": "examine",
+        "target": "garage"
+      },
+      "pointsTo": [
+        "s2"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c7",
+      "title": "The syndicate's runner",
+      "text": "Fabbri confesses that a syndicate man named Russo sat with him in the garage from a quarter to eleven until half past, counting out the money. The night watchman at the gate saw Russo arrive and leave.",
+      "location": "garage",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:45",
+        "suspect": "s2",
+        "event": "In the garage with the syndicate's runner until 23:30, seen by the watchman",
+        "location": null
+      }
+    },
+    {
+      "id": "c8",
+      "title": "Shaded cards under the baize",
+      "text": "Tucked beneath the baize of the chemin de fer table: a deck with faintly shaded backs, and a card in the Count's hand reading 'Thackeray: I know what you are. My study, after the fireworks. M.'",
+      "location": "gaming_salon",
+      "unlock": {
+        "type": "examine",
+        "target": "gaming_salon"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c9",
+      "title": "The croupier's tally",
+      "text": "The Major thrusts the croupier's tally sheet at you: Gaston dealt to him without a break from 22:30 until 23:45, and swears the Major never left his chair.",
+      "location": "gaming_salon",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:30",
+        "suspect": "s4",
+        "event": "At the chemin de fer table without a break until 23:45, vouched for by the croupier",
+        "location": null
+      }
+    },
+    {
+      "id": "c10",
+      "title": "A half-burnt telegram",
+      "text": "In the ashes of a terrace brazier: a half-burnt telegram reading '...ASHBY ... CHEQUE 20,000 SIGNATURE MORAVEC QUERIED STOP PLEASE ADVISE ... CRÉDIT LYONNAIS NICE.'",
+      "location": "terrace",
+      "unlock": {
+        "type": "examine",
+        "target": "terrace"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c11",
+      "title": "Ashby at the balustrade",
+      "text": "Ashby admits he burned the bank's telegram in the brazier while the rockets went up. Madame and two guests confirm he stood at the balustrade beside her from 22:55 until 23:35.",
+      "location": "terrace",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:55",
+        "suspect": "s5",
+        "event": "On the terrace beside Madame until 23:35, confirmed by guests",
+        "location": null
+      }
+    },
+    {
+      "id": "c12",
+      "title": "A question about the drops",
+      "text": "Mr. Ashby: only yesterday Miss Lisle asked him exactly where the Count kept his heart drops and how many made a dose, 'for Madame's peace of mind', she said.",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s5",
+        "topic": "poison"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c13",
+      "title": "Miss Lisle's admission",
+      "text": "Cornered, Miss Lisle admits she left the terrace when the fireworks began and went up to the Count's study at about five past eleven, 'only to ask for my wages'. She insists he was out on the balcony and never saw her.",
+      "location": "study",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:05",
+        "suspect": "s3",
+        "event": "In the Count's study during the fireworks (her own admission)",
+        "location": null
+      }
+    },
+    {
+      "id": "c14",
+      "title": "The Count's crooked wheel",
+      "text": "Major Thackeray: back in '27 the Count's old roulette wheel was fitted with a magnet. He watched an English officer named Harland lose every penny at it, and heard the poor fellow died soon after in Nice.",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s4",
+        "topic": "victim"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c15",
+      "title": "The discovery",
+      "text": "Mr. Ashby: at twenty to twelve he took the race-day schedule up to the study and found the Count slumped in his armchair by the balcony doors, his cognac glass on the carpet.",
+      "location": "study",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s5",
+        "topic": "whereabouts"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:40",
+        "suspect": "s5",
+        "event": "Finds the Count dead in his study",
+        "location": null
+      }
+    }
+  ],
+  "contradictions": [
+    {
+      "a": "s3_lie_alibi",
+      "b": "c2",
+      "effect": {
+        "suspect": "s3",
+        "composure": -30,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s3_lie_alibi",
+      "b": "c5",
+      "effect": {
+        "suspect": "s3",
+        "composure": -25,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s3_lie_harland",
+      "b": "c3",
+      "effect": {
+        "suspect": "s3",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s3_lie_drops",
+      "b": "c12",
+      "effect": {
+        "suspect": "s3",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s1_lie_marriage",
+      "b": "c4",
+      "effect": {
+        "suspect": "s1",
+        "composure": -35,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s2_lie_race",
+      "b": "c6",
+      "effect": {
+        "suspect": "s2",
+        "composure": -35,
+        "reveals": "c7"
+      }
+    },
+    {
+      "a": "s4_lie_cards",
+      "b": "c8",
+      "effect": {
+        "suspect": "s4",
+        "composure": -35,
+        "reveals": "c9"
+      }
+    },
+    {
+      "a": "s5_lie_books",
+      "b": "c10",
+      "effect": {
+        "suspect": "s5",
+        "composure": -35,
+        "reveals": "c11"
+      }
+    }
+  ],
+  "topics": [
+    {
+      "id": "whereabouts",
+      "label": "Where were you?",
+      "keywords": [
+        "where",
+        "alibi",
+        "fireworks",
+        "terrace",
+        "evening",
+        "tonight",
+        "doing",
+        "eleven",
+        "after dinner"
+      ]
+    },
+    {
+      "id": "poison",
+      "label": "The heart drops",
+      "keywords": [
+        "poison",
+        "digitalis",
+        "drops",
+        "medicine",
+        "heart",
+        "bottle",
+        "cognac",
+        "glass",
+        "dose"
+      ]
+    },
+    {
+      "id": "family",
+      "label": "Family and past",
+      "keywords": [
+        "harland",
+        "father",
+        "family",
+        "past",
+        "background",
+        "parents",
+        "real name",
+        "shropshire"
+      ]
+    },
+    {
+      "id": "marriage",
+      "label": "The marriage",
+      "keywords": [
+        "marriage",
+        "married",
+        "first husband",
+        "wedding",
+        "jules",
+        "marseille",
+        "widow",
+        "verdun"
+      ]
+    },
+    {
+      "id": "race",
+      "label": "The Grand Prix",
+      "keywords": [
+        "race",
+        "grand prix",
+        "bugatti",
+        "betting",
+        "syndicate",
+        "bookmaker",
+        "throw",
+        "motor",
+        "driver"
+      ]
+    },
+    {
+      "id": "cards",
+      "label": "The card tables",
+      "keywords": [
+        "cards",
+        "cheat",
+        "baccarat",
+        "chemin de fer",
+        "deck",
+        "marked",
+        "croupier",
+        "sharp"
+      ]
+    },
+    {
+      "id": "money",
+      "label": "Money and accounts",
+      "keywords": [
+        "money",
+        "accounts",
+        "books",
+        "cheque",
+        "bank",
+        "debt",
+        "forg",
+        "embezzl",
+        "telegram"
+      ]
+    },
+    {
+      "id": "victim",
+      "label": "Count Moravec",
+      "keywords": [
+        "moravec",
+        "the count",
+        "victim",
+        "anton",
+        "roulette",
+        "wheel",
+        "employer",
+        "get along",
+        "relationship"
+      ]
+    }
+  ],
+  "solution": {
+    "requiredEvidence": [
+      "c2",
+      "c3",
+      "c13"
+    ],
+    "acceptableMotives": [
+      "revenge"
+    ]
+  },
+  "maxTurns": 15
+}

@@ -1,0 +1,840 @@
+{
+  "caseId": "stage_seven",
+  "setting": {
+    "title": "Death on Stage Seven",
+    "place": "Sound Stage 7, Monarch Pictures, Culver City, California, 1938",
+    "eraNote": "A hot October night at the height of the studio system. The night shoot on Victor Kessler's prestige picture 'Midnight Harbor' wrapped at half past nine, but a handful of the company stayed behind after hours.",
+    "locations": [
+      {
+        "id": "stage_floor",
+        "label": "Sound Stage 7: The Nightclub Set",
+        "description": "The glittering Club Cockatoo set: potted palms, an empty bandstand, and Kessler's canvas director's chair beside the script table, where he was found."
+      },
+      {
+        "id": "catwalk",
+        "label": "The Lighting Catwalk",
+        "description": "A narrow iron gallery thirty feet above the stage, hung with arc lamps and coils of cable, with a clear view down onto the set."
+      },
+      {
+        "id": "camera_room",
+        "label": "The Camera Room & Darkroom",
+        "description": "Film magazines, camera cases, and a red-lit darkroom with a locked cabinet of developing chemicals."
+      },
+      {
+        "id": "production_office",
+        "label": "The Production Office",
+        "description": "A cramped office off the stage door: two desks, a mimeograph machine, a switchboard extension, and cigar smoke in the curtains."
+      },
+      {
+        "id": "dressing_rooms",
+        "label": "The Star Dressing Rooms",
+        "description": "A corridor of bungalow dressing rooms, the grandest with a gold star on the door and 'MISS LANE' beneath it."
+      }
+    ]
+  },
+  "victim": {
+    "name": "Victor Kessler",
+    "causeOfDeath": "Potassium cyanide in his nightcap of rye",
+    "timeOfDeath": "22:30-23:00",
+    "crimeScene": "stage_floor"
+  },
+  "briefing": "Victor Kessler, the most feared director at Monarch Pictures, was found dead in his director's chair on Stage 7 at five past eleven. The gaffer found him with a glass by his hand and the next day's pages in his lap. The studio doctor caught the smell of bitter almonds: cyanide. The studio police have shut the gates, and nobody has left the lot. Mr. Abner Gold, head of the studio, wants a name before the morning editions do it for him.",
+  "culprit": "s5",
+  "motive": {
+    "id": "stolen_credit",
+    "text": "Dorothy Pruitt wrote 'Midnight Harbor' herself. Kessler took her screenplay for a promise of shared credit, and at five o'clock that afternoon the studio press release named him sole author."
+  },
+  "motiveOptions": [
+    {
+      "id": "stolen_credit",
+      "label": "Robbed of credit for her own screenplay"
+    },
+    {
+      "id": "blackmail",
+      "label": "Silencing a blackmailer's threats"
+    },
+    {
+      "id": "embezzlement",
+      "label": "Hiding a fraud in the picture's books"
+    },
+    {
+      "id": "career",
+      "label": "Revenge for being thrown off the picture"
+    },
+    {
+      "id": "jealousy",
+      "label": "A lovers' quarrel turned deadly"
+    }
+  ],
+  "truthTimeline": [
+    {
+      "time": "17:00",
+      "suspect": "s5",
+      "event": "Reads the studio press release naming Kessler sole author of 'Midnight Harbor'",
+      "location": "production_office"
+    },
+    {
+      "time": "21:45",
+      "suspect": "s5",
+      "event": "Signs the camera-room key log with the camera reports and takes potassium cyanide from the darkroom cabinet",
+      "location": "camera_room"
+    },
+    {
+      "time": "22:00",
+      "suspect": "s1",
+      "event": "Joins her secret husband, Eddie Moran, in her dressing room",
+      "location": "dressing_rooms"
+    },
+    {
+      "time": "22:05",
+      "suspect": "s3",
+      "event": "Begins developing test footage in the darkroom with the lab boy",
+      "location": "camera_room"
+    },
+    {
+      "time": "22:10",
+      "suspect": "s2",
+      "event": "Climbs to the catwalk to re-hang lamps for the morning setup",
+      "location": "catwalk"
+    },
+    {
+      "time": "22:25",
+      "suspect": "s4",
+      "event": "Telephones Abner Gold at home from the production office and stays on the line until 22:55",
+      "location": "production_office"
+    },
+    {
+      "time": "22:40",
+      "suspect": "s5",
+      "event": "Brings Kessler the revised pages and pours his rye, slipping the cyanide into the glass",
+      "location": "stage_floor"
+    },
+    {
+      "time": "23:05",
+      "suspect": "s2",
+      "event": "Comes down from the catwalk and finds Kessler dead in his chair",
+      "location": "stage_floor"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Vivian Lane",
+      "role": "The leading lady",
+      "personality": "Glamorous, theatrical, quick with a wisecrack; turns brittle and grand when anyone pries into her private life.",
+      "appearance": "Still in the white satin gown from the nightclub scene, a silver fox stole and platinum waves.",
+      "alibiClaim": "After wrap I went to my dressing room at ten to take off my face, and I didn't stir until Mr. Mulcahy started bellowing.",
+      "claimedTimeline": [
+        {
+          "time": "22:00",
+          "event": "In her dressing room, taking off her makeup, until the alarm was raised"
+        }
+      ],
+      "knows": [
+        "Kessler took a nightcap of rye from his silver flask at his chair every night after wrap. Dorothy usually poured it for him.",
+        "Kessler bullied everyone on the picture and liked to keep a hold over each of them.",
+        "Kessler had sent her a nasty note threatening to tell Hedda Hopper about her chauffeur."
+      ],
+      "motiveHint": "Kessler had found out something that could end her contract.",
+      "secrets": [
+        {
+          "id": "s1_sec",
+          "text": "She is secretly married to her chauffeur, Eddie Moran, which breaks the morals clause of her studio contract.",
+          "confession": "Oh, very well. I married Eddie Moran in Tijuana last June. My chauffeur, Inspector. If the studio finds out, my contract is torn up and I'm back slinging hash in Fresno. Victor knew. But I'd have bought him off. I wouldn't have poisoned him.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s1_lie_married",
+          "text": "Claims she has no husband or sweetheart",
+          "statement": "Married? Darling, I'm wedded to my public. There isn't a man alive I'd give up top billing for.",
+          "topics": [
+            "romance"
+          ],
+          "contradictedBy": [
+            "c7"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Frank Mulcahy",
+      "role": "The gaffer (chief electrician)",
+      "personality": "Big, gruff, plain-spoken Irishman; fiercely loyal to his crew and suspicious of anyone in a necktie.",
+      "appearance": "Rolled shirtsleeves, leather gloves jammed in a hip pocket, a pencil stub behind one ear.",
+      "alibiClaim": "I was up on the catwalk re-hanging the big lamps from ten o'clock till I came down and found him.",
+      "claimedTimeline": [
+        {
+          "time": "22:10",
+          "event": "Up on the catwalk re-hanging lamps"
+        },
+        {
+          "time": "23:05",
+          "event": "Came down and found Mr. Kessler dead"
+        }
+      ],
+      "knows": [
+        "From the catwalk he saw Miss Pruitt typing at the script table, and at about twenty to eleven she carried pages to Kessler's chair and poured him a drink from his flask.",
+        "He found Kessler dead in the chair at five past eleven and raised the alarm.",
+        "Kessler cursed him out that afternoon over a blown lamp and swore to have him thrown off the lot."
+      ],
+      "motiveHint": "Kessler had sworn to have him thrown off the lot.",
+      "secrets": [
+        {
+          "id": "s2_sec",
+          "text": "He runs a book on the horse races for half the studio crew, and Kessler had found his betting slips.",
+          "confession": "All right, so I make a little book. Two bits on a nag at Santa Anita. The boys like a flutter. The old man found my slips and said he'd tell the front office. That's a sacking, mister, not a reason to kill a man.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s2_lie_betting",
+          "text": "Claims he never gambles",
+          "statement": "Bets? I don't hold with gambling, mister. Never laid a dollar on a horse in my life.",
+          "topics": [
+            "gambling"
+          ],
+          "contradictedBy": [
+            "c8"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Otto Brandt",
+      "role": "The cinematographer",
+      "personality": "Precise, melancholy and courteous, with Old World formality; goes very still whenever his past is mentioned.",
+      "appearance": "A grey beret, a light meter on a cord round his neck, and a faint scar along one cheekbone.",
+      "alibiClaim": "From five past ten I was in the darkroom developing tests with the lab boy, Jimmy Reyes.",
+      "claimedTimeline": [
+        {
+          "time": "22:05",
+          "event": "Developing test footage in the darkroom with Jimmy Reyes until after eleven"
+        }
+      ],
+      "knows": [
+        "Last spring Dorothy Pruitt showed him her own screenplay of 'Midnight Harbor', written long before Kessler claimed it. Kessler had promised her a shared credit.",
+        "Potassium cyanide is kept in the darkroom cabinet for reducing negatives. Anyone with the camera-room key could reach it.",
+        "The script girl brings the camera reports to the camera room every night after wrap."
+      ],
+      "motiveHint": "Kessler knew him from Berlin and was taking a cut of his salary.",
+      "secrets": [
+        {
+          "id": "s3_sec",
+          "text": "His real name is Ernst Weill. He fled Germany in 1934 and entered America on forged papers, and Kessler was blackmailing him.",
+          "confession": "My name is Ernst Weill. I shot pictures at Babelsberg until the Brownshirts came for my friends. I bought these papers in Antwerp. Victor knew me from Berlin and took a third of my salary to keep quiet. If I am sent back, Inspector, I am a dead man. That is exactly why I would never risk a murder.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s3_lie_papers",
+          "text": "Claims his immigration papers are genuine",
+          "statement": "My papers? Perfectly in order, Inspector. I came through New York in '33 with a proper visa, like any honest man.",
+          "topics": [
+            "past"
+          ],
+          "contradictedBy": [
+            "c4"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Leonard Shaw",
+      "role": "The producer",
+      "personality": "Fast-talking, back-slapping, never without a cigar; starts to sweat the moment anyone mentions money.",
+      "appearance": "A double-breasted chalk-stripe suit, a gold cigarette case, and a damp handkerchief.",
+      "alibiClaim": "I was in the production office going over the week's numbers, on the telephone half the night.",
+      "claimedTimeline": [
+        {
+          "time": "22:00",
+          "event": "Working over the week's figures in the production office, mostly on the telephone"
+        }
+      ],
+      "knows": [
+        "The press release crediting 'Original screenplay by Victor Kessler' came off the mimeograph at five. Miss Pruitt read it over his shoulder, said 'He promised,' and walked out white as paper.",
+        "Kessler kept a silver flask of rye at his chair and drank from it every night after wrap.",
+        "Kessler had threatened to go over his head to Mr. Gold."
+      ],
+      "motiveHint": "Kessler had been asking hard questions about the picture's costs.",
+      "secrets": [
+        {
+          "id": "s4_sec",
+          "text": "He has been padding the payroll with phantom extras and pocketing the difference, and Kessler had caught on.",
+          "confession": "Ghost extras. Forty on the books, twelve on the floor. I needed the dough for my wife's sanatorium bills. Kessler counted heads. But a man doesn't kill over three thousand bucks, not when he can pay it back.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s4_lie_budget",
+          "text": "Claims the picture's budget is entirely honest",
+          "statement": "The budget's clean as a whistle. Every nickel on this picture is up there on the screen.",
+          "topics": [
+            "budget"
+          ],
+          "contradictedBy": [
+            "c6"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Dorothy Pruitt",
+      "role": "The script supervisor",
+      "personality": "Quiet, meticulous and eager to help; apologizes for everything, but shows a flash of steel whenever writing credit comes up.",
+      "appearance": "A grey cardigan, horn-rimmed spectacles, a pencil behind her ear and a stopwatch on a ribbon.",
+      "alibiClaim": "I left the lot right after we wrapped at half past nine and caught the Red Car home to Venice.",
+      "claimedTimeline": [
+        {
+          "time": "21:30",
+          "event": "Left the lot after wrap and caught the Red Car home"
+        },
+        {
+          "time": "23:00",
+          "event": "In bed at her boarding house in Venice"
+        }
+      ],
+      "knows": [
+        "She wrote 'Midnight Harbor' and Kessler promised her a shared credit.",
+        "Kessler drank rye from his silver flask at his chair every night, and she usually poured it.",
+        "She typed revised pages for the morning at the script table tonight.",
+        "Potassium cyanide is kept in the darkroom cabinet."
+      ],
+      "motiveHint": "Kessler relied on her for everything and thanked her for nothing.",
+      "secrets": [
+        {
+          "id": "s5_sec",
+          "text": "She is the true author of 'Midnight Harbor'. Kessler took her screenplay for a promise and claimed sole credit.",
+          "confession": "Yes. I wrote 'Midnight Harbor'. Every scene, every line he takes his bows for. He bought it for a promise: 'Shared credit, kid.' Today I read the press release. That's all. Being robbed doesn't make me a murderess.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s5_lie_alibi",
+          "text": "Claims she left the lot right after wrap",
+          "statement": "I left the lot right after we wrapped at half past nine and caught the Red Car home to Venice.",
+          "topics": [
+            "whereabouts"
+          ],
+          "contradictedBy": [
+            "c1",
+            "c9"
+          ]
+        },
+        {
+          "id": "s5_lie_script",
+          "text": "Claims the screenplay is entirely Kessler's work",
+          "statement": "'Midnight Harbor' is Mr. Kessler's story through and through. I only keep track of which hand the cigarette was in.",
+          "topics": [
+            "screenplay"
+          ],
+          "contradictedBy": [
+            "c5",
+            "c10"
+          ]
+        },
+        {
+          "id": "s5_lie_camera",
+          "text": "Claims she never goes into the camera room",
+          "statement": "The camera room? I never go in there. That's Mr. Brandt's domain, and those chemicals frighten me.",
+          "topics": [
+            "camera_room"
+          ],
+          "contradictedBy": [
+            "c3"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {
+      "id": "c1",
+      "title": "The revised pages",
+      "text": "In Kessler's lap: fresh carbon copies of tomorrow's revised scene, each initialled in the corner in a neat hand: 'Rev. 10:35 P.M. - D.P.' Someone brought these to him after half past ten.",
+      "location": "stage_floor",
+      "unlock": {
+        "type": "examine",
+        "target": "stage_floor"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:35",
+        "suspect": "s5",
+        "event": "Revised pages initialled 'D.P.' at 10:35 P.M.",
+        "location": null
+      }
+    },
+    {
+      "id": "c2",
+      "title": "The glass and the flask",
+      "text": "Kessler's tumbler has rolled beneath the director's chair, and the dregs smell sharply of bitter almonds. His silver flask on the script table smells only of good rye. The poison went into the glass, not the bottle, so whoever poured the drink did the deed.",
+      "location": "stage_floor",
+      "unlock": {
+        "type": "examine",
+        "target": "stage_floor"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c3",
+      "title": "Key log and poison cabinet",
+      "text": "The camera-room key log reads 'D. Pruitt - 9:45 P.M. - camera reports.' In the darkroom cabinet, the jar of potassium cyanide has been opened and a spoonful is gone. The label bears a smudged thumbprint of blue typewriter-ribbon ink.",
+      "location": "camera_room",
+      "unlock": {
+        "type": "examine",
+        "target": "camera_room"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "21:45",
+        "suspect": "s5",
+        "event": "Signs the camera-room key log",
+        "location": null
+      }
+    },
+    {
+      "id": "c4",
+      "title": "Two passports",
+      "text": "In Brandt's locker: an American visa in the name Otto Brandt and an older German passport for one Ernst Weill. Same face, same scar. Pinned to them is a note in Kessler's hand: 'Ernst, the pay cut, or a call to Immigration. V.K.'",
+      "location": "camera_room",
+      "unlock": {
+        "type": "examine",
+        "target": "camera_room"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c5",
+      "title": "The original manuscript",
+      "text": "In Kessler's desk drawer: a dog-eared screenplay titled 'MIDNIGHT HARBOR, an original screenplay by Dorothy Pruitt', dated 1936. Her name has been struck through in pencil and 'Victor Kessler' written above it.",
+      "location": "production_office",
+      "unlock": {
+        "type": "examine",
+        "target": "production_office"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c6",
+      "title": "The payroll ledger",
+      "text": "Shaw's payroll ledger lists forty atmosphere extras paid for every day of the nightclub shoot, though the set never held more than twelve. In the margin, in Kessler's red pencil: 'Leonard, I count heads. Tell Gold by Monday or I will.'",
+      "location": "production_office",
+      "unlock": {
+        "type": "examine",
+        "target": "production_office"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c7",
+      "title": "Tijuana certificate",
+      "text": "In Vivian's jewel case: a Tijuana marriage certificate, Vivian Lane to Edward Moran, June 1937. Beside it lies a crumpled note on Kessler's monogrammed paper: 'Play the scene my way, sweetheart, or Hedda Hopper hears all about your chauffeur.'",
+      "location": "dressing_rooms",
+      "unlock": {
+        "type": "examine",
+        "target": "dressing_rooms"
+      },
+      "pointsTo": [
+        "s1"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c8",
+      "title": "The betting book",
+      "text": "Tucked behind a lamp housing on the catwalk: a greasy notebook of race bets in Frank Mulcahy's square hand, listing crew names, horses and Santa Anita odds, with a roll of small bills.",
+      "location": "catwalk",
+      "unlock": {
+        "type": "examine",
+        "target": "catwalk"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c9",
+      "title": "View from the catwalk",
+      "text": "Frank Mulcahy: from the catwalk he saw Miss Pruitt typing at the script table. At about twenty to eleven she carried pages to the old man's chair and poured him a drink from his flask. 'Thought nothing of it. She always fixes his nightcap.'",
+      "location": "stage_floor",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s2",
+        "topic": "stage"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:40",
+        "suspect": "s5",
+        "event": "At Kessler's chair, pouring his drink (Mulcahy's sighting)",
+        "location": null
+      }
+    },
+    {
+      "id": "c10",
+      "title": "Otto remembers the manuscript",
+      "text": "Otto Brandt: last spring Dorothy showed him her own screenplay of 'Midnight Harbor', written long before Kessler claimed it. Kessler, she told him, had promised her a shared credit.",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s3",
+        "topic": "screenplay"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c11",
+      "title": "The press release",
+      "text": "Leonard Shaw: the press release crediting 'Original screenplay by Victor Kessler' came off the mimeograph at five. Miss Pruitt read it over his shoulder, whispered 'He promised,' and walked out white as paper.",
+      "location": "production_office",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s4",
+        "topic": "screenplay"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "17:00",
+        "suspect": "s5",
+        "event": "Reads the press release crediting Kessler as sole author",
+        "location": null
+      }
+    },
+    {
+      "id": "c12",
+      "title": "Dorothy's admission",
+      "text": "Cornered, Dorothy admits she never left the lot. She typed the revised pages at the script table, carried them to Kessler's chair at twenty to eleven and poured his nightcap from the flask, 'as I always do.' She swears he was alive when she walked away.",
+      "location": "stage_floor",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:40",
+        "suspect": "s5",
+        "event": "Pours Kessler's nightcap at his chair (her own admission)",
+        "location": null
+      }
+    },
+    {
+      "id": "c13",
+      "title": "Eddie Moran's visit",
+      "text": "Vivian admits her husband, Eddie Moran, was with her in the dressing room from ten until a little after eleven, when he slipped out at the shouting. The gate log shows Moran's Packard entering the lot at 21:55.",
+      "location": "dressing_rooms",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:00",
+        "suspect": "s1",
+        "event": "In her dressing room with her husband Eddie Moran until after 23:00",
+        "location": null
+      }
+    },
+    {
+      "id": "c14",
+      "title": "The lab boy's word",
+      "text": "Otto produces the darkroom timing sheet, filled in every few minutes from 22:05 to 23:05. The lab boy, Jimmy Reyes, confirms Brandt never left the red-lit darkroom in all that time.",
+      "location": "camera_room",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:05",
+        "suspect": "s3",
+        "event": "In the darkroom with Jimmy Reyes until 23:05",
+        "location": null
+      }
+    },
+    {
+      "id": "c15",
+      "title": "The switchboard log",
+      "text": "The studio switchboard log shows the production office line connected to Abner Gold's Beverly Hills residence from 22:25 to 22:55. Gold's butler confirms it was Shaw on the line, pleading about the budget.",
+      "location": "production_office",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:25",
+        "suspect": "s4",
+        "event": "On the telephone to Abner Gold from the production office until 22:55",
+        "location": null
+      }
+    }
+  ],
+  "contradictions": [
+    {
+      "a": "s5_lie_alibi",
+      "b": "c1",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": "c12"
+      }
+    },
+    {
+      "a": "s5_lie_alibi",
+      "b": "c9",
+      "effect": {
+        "suspect": "s5",
+        "composure": -25,
+        "reveals": "c12"
+      }
+    },
+    {
+      "a": "s5_lie_camera",
+      "b": "c3",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s5_lie_script",
+      "b": "c5",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s5_lie_script",
+      "b": "c10",
+      "effect": {
+        "suspect": "s5",
+        "composure": -25,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s1_lie_married",
+      "b": "c7",
+      "effect": {
+        "suspect": "s1",
+        "composure": -35,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s2_lie_betting",
+      "b": "c8",
+      "effect": {
+        "suspect": "s2",
+        "composure": -35,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s3_lie_papers",
+      "b": "c4",
+      "effect": {
+        "suspect": "s3",
+        "composure": -35,
+        "reveals": "c14"
+      }
+    },
+    {
+      "a": "s4_lie_budget",
+      "b": "c6",
+      "effect": {
+        "suspect": "s4",
+        "composure": -35,
+        "reveals": "c15"
+      }
+    }
+  ],
+  "topics": [
+    {
+      "id": "whereabouts",
+      "label": "Where were you?",
+      "keywords": [
+        "where",
+        "alibi",
+        "evening",
+        "tonight",
+        "doing",
+        "after wrap",
+        "after hours"
+      ]
+    },
+    {
+      "id": "screenplay",
+      "label": "The screenplay",
+      "keywords": [
+        "script",
+        "screenplay",
+        "story",
+        "writer",
+        "wrote",
+        "credit",
+        "midnight harbor",
+        "pages",
+        "author",
+        "press release"
+      ]
+    },
+    {
+      "id": "camera_room",
+      "label": "The camera room & chemicals",
+      "keywords": [
+        "camera",
+        "darkroom",
+        "chemical",
+        "cyanide",
+        "poison",
+        "key log",
+        "almond",
+        "film lab",
+        "cabinet"
+      ]
+    },
+    {
+      "id": "stage",
+      "label": "The stage & what was seen",
+      "keywords": [
+        "stage",
+        "on set",
+        "chair",
+        "catwalk",
+        "saw",
+        "notice",
+        "witness",
+        "flask",
+        "nightcap",
+        "body"
+      ]
+    },
+    {
+      "id": "romance",
+      "label": "Romance & marriage",
+      "keywords": [
+        "married",
+        "marriage",
+        "husband",
+        "wedding",
+        "romance",
+        "love",
+        "sweetheart",
+        "boyfriend",
+        "chauffeur",
+        "eddie",
+        "tijuana"
+      ]
+    },
+    {
+      "id": "gambling",
+      "label": "Gambling",
+      "keywords": [
+        "betting",
+        "bets",
+        "bookie",
+        "gambl",
+        "horse",
+        "races",
+        "odds",
+        "wager",
+        "santa anita"
+      ]
+    },
+    {
+      "id": "past",
+      "label": "Past & papers",
+      "keywords": [
+        "papers",
+        "passport",
+        "visa",
+        "immigra",
+        "germany",
+        "berlin",
+        "real name",
+        "past",
+        "weill",
+        "europe"
+      ]
+    },
+    {
+      "id": "budget",
+      "label": "The budget",
+      "keywords": [
+        "budget",
+        "ledger",
+        "books",
+        "accounts",
+        "payroll",
+        "extras",
+        "embezzl",
+        "finance",
+        "money",
+        "cost"
+      ]
+    }
+  ],
+  "solution": {
+    "requiredEvidence": [
+      "c1",
+      "c3",
+      "c12"
+    ],
+    "acceptableMotives": [
+      "stolen_credit"
+    ]
+  },
+  "maxTurns": 15
+}

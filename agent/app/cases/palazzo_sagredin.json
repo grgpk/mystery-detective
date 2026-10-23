@@ -1,0 +1,832 @@
+{
+  "caseId": "palazzo_sagredin",
+  "setting": {
+    "title": "The Unmasking at Palazzo Sagredin",
+    "place": "Palazzo Sagredin, on the Grand Canal, Venice, 1929",
+    "eraNote": "Carnival, February 1929, the bitterest winter in living memory. Ice has crept across the lagoon and fog lies thick on the canals. Count Sagredin's masked ball is the last flicker of a fortune long since spent.",
+    "locations": [
+      {
+        "id": "studiolo",
+        "label": "The Count's Studiolo",
+        "description": "A small panelled study off the portego beneath a flaking Tiepolo ceiling, where the Count was found slumped in his chair."
+      },
+      {
+        "id": "salone",
+        "label": "The Salone da Ballo",
+        "description": "The great ballroom, its frescoes peeling and its Murano chandeliers blazing. The orchestra plays from the musicians' gallery."
+      },
+      {
+        "id": "altana",
+        "label": "The Altana",
+        "description": "A rickety wooden roof terrace above the chimney pots, white with frost, overlooking a sea of fog."
+      },
+      {
+        "id": "water_gate",
+        "label": "The Water Gate & Androne",
+        "description": "The damp stone hall on the ground floor, opening onto the canal, where gondolas knock against the mooring posts."
+      },
+      {
+        "id": "guest_rooms",
+        "label": "The Mezzanine Guest Rooms",
+        "description": "Low-ceilinged rooms smelling of mildew and lavender. Miss Croft has turned a linen closet into a darkroom."
+      }
+    ]
+  },
+  "victim": {
+    "name": "Count Ottavio Sagredin",
+    "causeOfDeath": "Cyanide in his nightly glass of amaretto",
+    "timeOfDeath": "23:15-23:45",
+    "crimeScene": "studiolo"
+  },
+  "briefing": "At midnight the orchestra struck up for the unmasking, and Count Ottavio Sagredin did not come down. His majordomo found him in his studiolo, slumped beside a glass of amaretto with the scent of bitter almonds about him. Fog and ice have closed the canals, and the guests are trapped in the palazzo with their masks in their hands. The Questore wants a name before the bells of San Marco ring for Mass.",
+  "culprit": "s5",
+  "motive": {
+    "id": "revenge",
+    "text": "Lavinia Croft is the daughter of Edwin Croft, an English collector whom the Count swindled with a forged Titian. Ruined and disgraced, her father shot himself. She took the photography commission to get close to the Count and make him pay."
+  },
+  "motiveOptions": [
+    {
+      "id": "revenge",
+      "label": "Revenge for a father ruined by a forgery"
+    },
+    {
+      "id": "inheritance",
+      "label": "Inheriting the title and fortune"
+    },
+    {
+      "id": "escape_marriage",
+      "label": "Escaping a loveless marriage"
+    },
+    {
+      "id": "forgery_exposure",
+      "label": "Silencing a threat to expose fraud"
+    },
+    {
+      "id": "jilted_lover",
+      "label": "A discarded mistress's bitterness"
+    }
+  ],
+  "truthTimeline": [
+    {
+      "time": "22:30",
+      "suspect": "s4",
+      "event": "Pockets the Count's silver snuffbox from the portego cabinet",
+      "location": "salone"
+    },
+    {
+      "time": "23:00",
+      "suspect": "s2",
+      "event": "Climbs to the altana to hide a bundle of anti-Fascist leaflets and smoke",
+      "location": "altana"
+    },
+    {
+      "time": "23:10",
+      "suspect": "s1",
+      "event": "Goes down to the water gate to load her trunk into Tonin's gondola",
+      "location": "water_gate"
+    },
+    {
+      "time": "23:15",
+      "suspect": "s5",
+      "event": "Leaves her camera on its tripod and slips out of the salone",
+      "location": "salone"
+    },
+    {
+      "time": "23:20",
+      "suspect": "s3",
+      "event": "Begins the long tarantella with Signora Corner under the chandeliers",
+      "location": "salone"
+    },
+    {
+      "time": "23:20",
+      "suspect": "s5",
+      "event": "Enters the studiolo with a photograph to show the Count",
+      "location": "studiolo"
+    },
+    {
+      "time": "23:25",
+      "suspect": "s5",
+      "event": "Tips cyanide salts into the Count's amaretto while he studies the photograph",
+      "location": "studiolo"
+    },
+    {
+      "time": "23:30",
+      "suspect": "s5",
+      "event": "Leaves the studiolo and is glimpsed by Marco from the stairs",
+      "location": "studiolo"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Contessa Isabella Sagredin",
+      "role": "The Count's young wife",
+      "personality": "Cool, brittle and Triestine. She laughs a little too brightly and goes very still when the future is mentioned.",
+      "appearance": "A Fortuny gown of silver-grey pleated silk, with a black moretta mask dangling from a ribbon at her wrist.",
+      "alibiClaim": "I received our guests in the salone, and later I went down to the water gate to see about the gondolas.",
+      "claimedTimeline": [
+        {
+          "time": "21:00",
+          "event": "Receiving guests in the salone"
+        },
+        {
+          "time": "23:10",
+          "event": "Went down to the water gate to see about the gondolas"
+        }
+      ],
+      "knows": [
+        "Ottavio took a single glass of amaretto alone in his studiolo every night at eleven, and wished to be undisturbed until the unmasking.",
+        "Ottavio despised Marco's politics and had threatened to cut him off.",
+        "Signora Corner was once Ottavio's mistress, and he had lately stopped her allowance."
+      ],
+      "motiveHint": "Married to a man thirty years her senior who kept her on a miserly purse.",
+      "secrets": [
+        {
+          "id": "s1_sec",
+          "text": "She was about to leave her husband for good and sail for New York under her maiden name.",
+          "confession": "Yes, the ticket is mine. Eight years in this damp mausoleum, Commissario. I was taking the dawn train to Trieste and I was never coming back. Leaving a husband is not the same as murdering one.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s1_lie_marriage",
+          "text": "Claims she was content in her marriage and would never leave",
+          "statement": "Leave Ottavio? Never. I was perfectly content as his wife.",
+          "topics": [
+            "marriage"
+          ],
+          "contradictedBy": [
+            "c6"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Marco Sagredin",
+      "role": "The nephew and heir",
+      "personality": "Languid and sardonic, the very picture of a wastrel heir, but he flushes hotly at any mention of the Duce.",
+      "appearance": "A Harlequin costume of faded diamonds, with ink stains on his fingers that no costume can hide.",
+      "alibiClaim": "I went up to the altana for air and a cigarette around eleven, away from the crush.",
+      "claimedTimeline": [
+        {
+          "time": "23:00",
+          "event": "Went up to the altana for air and a cigarette"
+        },
+        {
+          "time": "23:30",
+          "event": "Came down the stairs, then went back up to the altana"
+        }
+      ],
+      "knows": [
+        "At half past eleven he came down meaning to tackle his uncle about money, and saw the English photographer hurry out of the studiolo.",
+        "His uncle had threatened to cut him off unless he gave up his 'bad company'.",
+        "Half of Uncle's collection is of doubtful pedigree."
+      ],
+      "motiveHint": "Heir to the title and what remains of the fortune. His uncle loathed his politics.",
+      "secrets": [
+        {
+          "id": "s2_sec",
+          "text": "He pays for and distributes anti-Fascist leaflets, a crime that would mean prison or exile to the islands.",
+          "confession": "All right. The leaflets are mine. I pay a printer in Cannaregio. If the Blackshirts hear of it I'll be packed off to the confino on Lipari. Hand me over if you must, but I never touched Uncle.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s2_lie_politics",
+          "text": "Claims he has no interest in politics",
+          "statement": "Politics? Dull stuff. I read the racing pages and nothing else.",
+          "topics": [
+            "politics"
+          ],
+          "contradictedBy": [
+            "c5"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Signor Enrico Dalla Torre",
+      "role": "Murano glass dealer",
+      "personality": "Expansive, oily and charming, his hands always moving. He turns pale whenever the authenticity of his glass is questioned.",
+      "appearance": "A brocade waistcoat, a gold dolphin pin, and fingertips faintly stained a curious yellow.",
+      "alibiClaim": "I was in the salone all evening, dancing and talking glass with anyone who would listen.",
+      "claimedTimeline": [
+        {
+          "time": "21:30",
+          "event": "Dancing and talking glass in the salone"
+        },
+        {
+          "time": "23:20",
+          "event": "Danced the tarantella with Signora Corner until nearly midnight"
+        }
+      ],
+      "knows": [
+        "In 1919 the Count sold a 'Titian' to an English collector named Edwin Croft. It was a modern copy, and Croft later shot himself.",
+        "The Count had lately begun asking pointed questions about some of the glass in his collection."
+      ],
+      "motiveHint": "The Count had begun asking awkward questions about the glass he had bought from him.",
+      "secrets": [
+        {
+          "id": "s3_sec",
+          "text": "He has been selling the Count newly made glass, artificially aged, as Renaissance treasures.",
+          "confession": "Ah, Madonna. Yes, I made them. A little lampblack, a little gilding, and a goblet blown last spring becomes cinquecento. The Count paid for beauty and he got it. But murder? Never.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s3_lie_forgery",
+          "text": "Claims every piece he sold the Count was genuine",
+          "statement": "Every glass I sold the Count was genuine cinquecento. I have not touched a furnace in twenty years.",
+          "topics": [
+            "art"
+          ],
+          "contradictedBy": [
+            "c7"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Signora Nives Corner",
+      "role": "A fading opera soprano",
+      "personality": "Theatrical and imperious, given to sudden tears and grand gestures. She remembers every curtain call of 1908.",
+      "appearance": "A feathered tricorn and a faded velvet gown let out at the seams, her rings set with stones that sparkle a shade too brightly.",
+      "alibiClaim": "I sang for the company a little after eleven, then danced with Signor Dalla Torre until the unmasking.",
+      "claimedTimeline": [
+        {
+          "time": "23:05",
+          "event": "Sang 'Vissi d'arte' for the company in the salone"
+        },
+        {
+          "time": "23:20",
+          "event": "Danced the tarantella with Signor Dalla Torre"
+        }
+      ],
+      "knows": [
+        "From a quarter past eleven, the English girl's camera stood alone on its tripod by the musicians' gallery, and no photograph was taken until nearly midnight.",
+        "Ottavio had stopped the little allowance he paid her for old times' sake."
+      ],
+      "motiveHint": "The Count had cut off the allowance he paid his former mistress.",
+      "secrets": [
+        {
+          "id": "s4_sec",
+          "text": "She is penniless and has been pilfering small silver from the palazzo to pawn.",
+          "confession": "Very well! I took it. A snuffbox, a pair of spoons. The great Corner, reduced to filching trinkets for the pawnshop on the Rialto. Are you satisfied? But I did not harm him.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s4_lie_silver",
+          "text": "Claims she has never taken anything from the palazzo",
+          "statement": "Take something from this house? Signore, I am Nives Corner. I want for nothing.",
+          "topics": [
+            "silver"
+          ],
+          "contradictedBy": [
+            "c4"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Miss Lavinia Croft",
+      "role": "English photographer engaged to record the frescoes",
+      "personality": "Quiet, polite and self-effacing, forever apologising for being in the way. Steel shows beneath when she is cornered.",
+      "appearance": "A plain black dress, a white volto mask pushed up on her hair, and grey smudges on her cotton gloves.",
+      "alibiClaim": "I was in the ballroom photographing the dancers until the unmasking at midnight.",
+      "claimedTimeline": [
+        {
+          "time": "21:00",
+          "event": "Photographing the dancers in the salone"
+        },
+        {
+          "time": "00:00",
+          "event": "Photographed the unmasking in the salone"
+        }
+      ],
+      "knows": [
+        "She is the daughter of Edwin Croft, ruined by the Count's forged Titian.",
+        "The reducer in her darkroom is potassium cyanide.",
+        "The servants told her the Count took a glass of amaretto alone in his studiolo at eleven."
+      ],
+      "motiveHint": "Accepted the commission to photograph the Sagredin frescoes for a curiously small fee.",
+      "secrets": [
+        {
+          "id": "s5_sec",
+          "text": "She is the daughter of Edwin Croft, the collector the Count ruined with a forged Titian.",
+          "confession": "Yes. Edwin Croft was my father. The Count sold him a Titian painted in 1910, and when it came out, Father could not face the world. I came to Venice to look the man in the face. That is all I will say.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s5_lie_alibi",
+          "text": "Claims she was photographing in the ballroom all evening",
+          "statement": "I was in the ballroom photographing the dancers until the unmasking at midnight.",
+          "topics": [
+            "whereabouts"
+          ],
+          "contradictedBy": [
+            "c2",
+            "c9"
+          ]
+        },
+        {
+          "id": "s5_lie_croft",
+          "text": "Claims she had no connection to the Count before this commission",
+          "statement": "I'd never heard the name Sagredin until his secretary wrote engaging me to photograph the frescoes.",
+          "topics": [
+            "victim"
+          ],
+          "contradictedBy": [
+            "c10"
+          ]
+        },
+        {
+          "id": "s5_lie_chemicals",
+          "text": "Claims her photographic chemicals are harmless",
+          "statement": "My chemicals? Developer and fixer, Commissario. Nothing you couldn't bathe in.",
+          "topics": [
+            "poison"
+          ],
+          "contradictedBy": [
+            "c8"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {
+      "id": "c1",
+      "title": "The amaretto glass",
+      "text": "On the Count's desk stands a half-drunk glass of amaretto beside its decanter. Beneath the sweet almond scent of the liqueur lies a sharper bitterness: cyanide. The decanter is clean. The poison went into the glass itself, put there by someone in the room.",
+      "location": "studiolo",
+      "unlock": {
+        "type": "examine",
+        "target": "studiolo"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c2",
+      "title": "Grey dust on the door handle",
+      "text": "A fine silvery-grey dust smears the brass handle of the studiolo door and the edge of the blotter. It is magnesium flash powder, the stuff photographers burn for their pictures. The maid swears she polished that handle at eleven o'clock.",
+      "location": "studiolo",
+      "unlock": {
+        "type": "examine",
+        "target": "studiolo"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c3",
+      "title": "The photographer's plate log",
+      "text": "On a chair by the musicians' gallery sit Miss Croft's plate box and her neat pencilled log. Exposures are timed every few minutes through the evening (22:48, 22:57, 23:05, 23:12), and then nothing at all until 23:45.",
+      "location": "salone",
+      "unlock": {
+        "type": "examine",
+        "target": "salone"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:12",
+        "suspect": "s5",
+        "event": "Last photograph in the salone before a half-hour gap in her log",
+        "location": null
+      }
+    },
+    {
+      "id": "c4",
+      "title": "A snuffbox in the reticule",
+      "text": "Signora Corner's beaded reticule lies abandoned on a gilt chair. Inside, wrapped in a lace handkerchief, is the Count's silver snuffbox from the portego cabinet, engraved with the Sagredin arms.",
+      "location": "salone",
+      "unlock": {
+        "type": "examine",
+        "target": "salone"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c5",
+      "title": "Leaflets under the geraniums",
+      "text": "Beneath a pot of frozen geraniums lies a bundle of leaflets reading 'ABBASSO IL DUCE! Venezia non dimentica Matteotti', together with a printer's bill from Cannaregio made out to M. Sagredin.",
+      "location": "altana",
+      "unlock": {
+        "type": "examine",
+        "target": "altana"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c6",
+      "title": "The corded trunk",
+      "text": "A corded trunk waits by the water gate, tagged for the Trieste train. Inside are a fat roll of lire and a Cosulich Line ticket on the Saturnia, Trieste to New York, sailing 4 March, made out to 'Signora I. Ravà'. Ravà is the Contessa's maiden name.",
+      "location": "water_gate",
+      "unlock": {
+        "type": "examine",
+        "target": "water_gate"
+      },
+      "pointsTo": [
+        "s1"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c7",
+      "title": "The gilder's kit",
+      "text": "Signor Dalla Torre's sample case holds a gilder's kit: brushes, gold leaf and a tin of cyanide gilding salts. Beside it sits a 'sixteenth-century' goblet still tacky with fresh varnish and lampblack 'age'.",
+      "location": "guest_rooms",
+      "unlock": {
+        "type": "examine",
+        "target": "guest_rooms"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c8",
+      "title": "The brown bottle in the darkroom",
+      "text": "Behind the curtain of Miss Croft's makeshift darkroom stands a brown bottle labelled 'Potassium Cyanide. Reducer. POISON.' It is nearly empty, though her developing dishes are bone dry, and someone has wiped it clean of fingerprints.",
+      "location": "guest_rooms",
+      "unlock": {
+        "type": "examine",
+        "target": "guest_rooms"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c9",
+      "title": "A figure leaving the studiolo",
+      "text": "Marco Sagredin: 'At half past eleven I came down from the altana meaning to tackle Uncle about money. The English photographer came out of the studiolo very quick, her hand at her throat. She didn't see me. I lost my nerve and went back up.'",
+      "location": "studiolo",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s2",
+        "topic": "victim"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:30",
+        "suspect": "s5",
+        "event": "Seen hurrying out of the studiolo (Marco's sighting)",
+        "location": null
+      }
+    },
+    {
+      "id": "c10",
+      "title": "The Croft affair",
+      "text": "Signor Dalla Torre: 'In 1919 the Count sold a \"Titian\" to an English collector, Edwin Croft of Hampstead. It was a modern copy. Croft was ruined and shot himself two years later, and his daughter wrote the Count letter after letter. Croft, the same name as our little photographer, no?'",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s3",
+        "topic": "victim"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c11",
+      "title": "The abandoned camera",
+      "text": "Signora Corner: 'From a quarter past eleven, while I sang and afterwards, the English girl's camera stood all alone on its tripod by the musicians' gallery. Not a single flash until nearly midnight.'",
+      "location": "salone",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s4",
+        "topic": "whereabouts"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:15",
+        "suspect": "s5",
+        "event": "Leaves her camera unattended in the salone (Signora Corner's observation)",
+        "location": null
+      }
+    },
+    {
+      "id": "c12",
+      "title": "The Count's nightly habit",
+      "text": "Contessa Isabella: 'Ottavio took a single glass of amaretto alone in his studiolo every night at eleven. Anyone who had stayed a day in this house knew it. He wished to be undisturbed until the unmasking.'",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s1",
+        "topic": "poison"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c13",
+      "title": "Miss Croft's admission",
+      "text": "Cornered, Miss Croft admits she slipped into the studiolo at twenty past eleven 'to show the Count a proof of the ceiling frescoes', and stayed ten minutes while he drank his amaretto. She insists he was alive when she left.",
+      "location": "studiolo",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:20",
+        "suspect": "s5",
+        "event": "In the Count's studiolo while he drank his amaretto (her own admission)",
+        "location": null
+      }
+    },
+    {
+      "id": "c14",
+      "title": "The gondolier's word",
+      "text": "The Contessa admits she spent from ten past eleven to ten to twelve at the water gate, loading her trunk into Tonin's gondola for the dawn train. Tonin, shivering by the mooring posts, swears she never left his sight.",
+      "location": "water_gate",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:10",
+        "suspect": "s1",
+        "event": "At the water gate with the gondolier Tonin until 23:50",
+        "location": null
+      }
+    },
+    {
+      "id": "c15",
+      "title": "The bandmaster's programme",
+      "text": "Caught out, Dalla Torre appeals to the bandmaster, who produces his programme. Signora Corner sang 'Vissi d'arte' at 23:05. From 23:20 to 23:50 Dalla Torre partnered her in the long tarantella beneath the chandeliers, in full view of eighty guests.",
+      "location": "salone",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:20",
+        "suspect": "s3",
+        "event": "Dancing the tarantella with Signora Corner in the salone until 23:50 (bandmaster's programme)",
+        "location": null
+      }
+    }
+  ],
+  "contradictions": [
+    {
+      "a": "s5_lie_alibi",
+      "b": "c2",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s5_lie_alibi",
+      "b": "c9",
+      "effect": {
+        "suspect": "s5",
+        "composure": -25,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s5_lie_croft",
+      "b": "c10",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s5_lie_chemicals",
+      "b": "c8",
+      "effect": {
+        "suspect": "s5",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s1_lie_marriage",
+      "b": "c6",
+      "effect": {
+        "suspect": "s1",
+        "composure": -35,
+        "reveals": "c14"
+      }
+    },
+    {
+      "a": "s2_lie_politics",
+      "b": "c5",
+      "effect": {
+        "suspect": "s2",
+        "composure": -35,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s3_lie_forgery",
+      "b": "c7",
+      "effect": {
+        "suspect": "s3",
+        "composure": -35,
+        "reveals": "c15"
+      }
+    },
+    {
+      "a": "s4_lie_silver",
+      "b": "c4",
+      "effect": {
+        "suspect": "s4",
+        "composure": -35,
+        "reveals": null
+      }
+    }
+  ],
+  "topics": [
+    {
+      "id": "whereabouts",
+      "label": "Where were you?",
+      "keywords": [
+        "where",
+        "alibi",
+        "evening",
+        "tonight",
+        "doing",
+        "night",
+        "midnight",
+        "unmasking"
+      ]
+    },
+    {
+      "id": "victim",
+      "label": "Count Sagredin",
+      "keywords": [
+        "count",
+        "ottavio",
+        "sagredin",
+        "husband",
+        "uncle",
+        "victim",
+        "relationship",
+        "know him",
+        "knew him",
+        "employer"
+      ]
+    },
+    {
+      "id": "poison",
+      "label": "The poisoned amaretto",
+      "keywords": [
+        "poison",
+        "cyanide",
+        "almond",
+        "amaretto",
+        "drink",
+        "chemical",
+        "darkroom",
+        "bottle",
+        "developer"
+      ]
+    },
+    {
+      "id": "art",
+      "label": "The Count's collection",
+      "keywords": [
+        "painting",
+        "titian",
+        "forgery",
+        "forged",
+        "fake",
+        "antique",
+        "murano",
+        "goblet",
+        "collection",
+        "gilding",
+        "glassware"
+      ]
+    },
+    {
+      "id": "money",
+      "label": "Money and the inheritance",
+      "keywords": [
+        "money",
+        "will",
+        "inherit",
+        "heir",
+        "debt",
+        "estate",
+        "fortune",
+        "allowance"
+      ]
+    },
+    {
+      "id": "politics",
+      "label": "Politics",
+      "keywords": [
+        "politic",
+        "fascist",
+        "duce",
+        "mussolini",
+        "leaflet",
+        "pamphlet",
+        "socialist",
+        "communist",
+        "blackshirt"
+      ]
+    },
+    {
+      "id": "marriage",
+      "label": "The marriage",
+      "keywords": [
+        "marriage",
+        "married",
+        "elope",
+        "run away",
+        "ticket",
+        "steamer",
+        "ship",
+        "trunk",
+        "america",
+        "new york",
+        "unhappy",
+        "divorce"
+      ]
+    },
+    {
+      "id": "silver",
+      "label": "The missing silver",
+      "keywords": [
+        "silver",
+        "snuffbox",
+        "steal",
+        "stole",
+        "stolen",
+        "theft",
+        "thief",
+        "missing",
+        "reticule",
+        "purse"
+      ]
+    }
+  ],
+  "solution": {
+    "requiredEvidence": [
+      "c2",
+      "c8",
+      "c13"
+    ],
+    "acceptableMotives": [
+      "revenge"
+    ]
+  },
+  "maxTurns": 15
+}

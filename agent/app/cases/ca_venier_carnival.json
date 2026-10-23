@@ -1,0 +1,790 @@
+{
+  "caseId": "ca_venier_carnival",
+  "setting": {
+    "title": "The Last Carnival at Ca' Venier",
+    "place": "Ca' Venier, a palazzo on the Grand Canal, Venice, 1929",
+    "eraNote": "Shrove Tuesday, February 1929. Fog on the lagoon and fireworks over the Grand Canal. The Venier family, crippled by debt, gives one last masked ball in a palazzo whose plaster is falling like snow.",
+    "locations": [
+      {
+        "id": "studio",
+        "label": "The Count's Study",
+        "description": "A panelled study on the piano nobile, its tall window giving onto the Grand Canal. Here the Count was found dead in his chair, a glass of Marsala at his elbow."
+      },
+      {
+        "id": "salone",
+        "label": "The Grand Salone",
+        "description": "The great ballroom, all faded frescoes and guttering candelabra, opening onto a stone balcony above the water."
+      },
+      {
+        "id": "ground_floor",
+        "label": "The Ground-Floor Apartments",
+        "description": "Damp, low-ceilinged rooms beside the old servants' stair, where Donna Ermelinda has lived since she took to her wheelchair."
+      },
+      {
+        "id": "guest_floor",
+        "label": "The Upper Bedrooms",
+        "description": "The family and guest bedrooms under the leaking roof: the Contessa's boudoir, Marco's rooms and the English visitor's quarters."
+      },
+      {
+        "id": "water_gate",
+        "label": "The Water-Gate & Boathouse",
+        "description": "The vaulted androne where gondolas tie up at striped poles, with a cluttered boathouse full of oars and tarpaulins."
+      }
+    ]
+  },
+  "victim": {
+    "name": "Count Ottavio Venier",
+    "causeOfDeath": "A massive dose of digitalis tincture stirred into his nightly glass of Marsala; his heart simply stopped.",
+    "timeOfDeath": "23:00-23:30",
+    "crimeScene": "studio"
+  },
+  "briefing": "At eleven o'clock, as the first rockets burst over the Grand Canal, Count Ottavio Venier withdrew to his study with his customary glass of Marsala. When the Contessa went to fetch him at half past, he was dead in his chair by the window. Dr. Sardi, plucked from among the masked guests, pronounces it digitalis. The fog has closed the lagoon, the gondolas are tied up, and the Questura expects a name before Ash Wednesday dawns.",
+  "culprit": "s4",
+  "motive": {
+    "id": "home",
+    "text": "Ottavio had secretly sold Ca' Venier to a hotel company. He meant to pack Ermelinda off to the Ursuline sisters at Treviso, exiling her from the only home she had known in seventy years."
+  },
+  "motiveOptions": [
+    {
+      "id": "home",
+      "label": "Losing her home to a secret sale"
+    },
+    {
+      "id": "blackmail",
+      "label": "Preventing exposure of a scandalous past"
+    },
+    {
+      "id": "inheritance",
+      "label": "Inheriting the estate to clear debts"
+    },
+    {
+      "id": "forgery",
+      "label": "Hiding an art fraud the Count had uncovered"
+    },
+    {
+      "id": "revenge",
+      "label": "Revenge for a humiliating dismissal"
+    }
+  ],
+  "truthTimeline": [
+    {
+      "time": "17:00",
+      "suspect": "s3",
+      "event": "Told by the Count that Ca' Venier is sold and Donna Ermelinda will go to the Ursulines",
+      "location": "studio"
+    },
+    {
+      "time": "17:10",
+      "suspect": "s4",
+      "event": "Standing unseen outside the study door, overhears that she is to be sent away",
+      "location": "studio"
+    },
+    {
+      "time": "22:45",
+      "suspect": "s2",
+      "event": "Begins printing anti-Fascist leaflets in the boathouse",
+      "location": "water_gate"
+    },
+    {
+      "time": "22:55",
+      "suspect": "s4",
+      "event": "Leaves her wheelchair and climbs the servants' stair on foot, glimpsed by Nico",
+      "location": "ground_floor"
+    },
+    {
+      "time": "23:00",
+      "suspect": "s3",
+      "event": "Watches the fireworks from the salone balcony beside the Contessa",
+      "location": "salone"
+    },
+    {
+      "time": "23:05",
+      "suspect": "s4",
+      "event": "Empties her digitalis tincture into her brother's Marsala while he watches the fireworks",
+      "location": "studio"
+    },
+    {
+      "time": "23:15",
+      "suspect": "s5",
+      "event": "Rows American tourists out for cash and waves to Marco at the boathouse",
+      "location": "water_gate"
+    },
+    {
+      "time": "23:20",
+      "suspect": "s4",
+      "event": "Back in her wheelchair in her rooms, rosary in hand",
+      "location": "ground_floor"
+    }
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Contessa Livia Venier",
+      "role": "The young second wife",
+      "personality": "Languid, witty and brittle; laughs a little too brightly whenever Paris is mentioned.",
+      "appearance": "A Columbina costume of silver lamé, a feathered fan, and a dancer's carriage she cannot quite disguise.",
+      "alibiClaim": "I led the quadrille in the salone, then watched the fireworks from the balcony with Mr. Hollis.",
+      "claimedTimeline": [
+        {
+          "time": "22:30",
+          "event": "Leading the quadrille in the salone"
+        },
+        {
+          "time": "23:00",
+          "event": "Watching the fireworks from the balcony with Mr. Hollis"
+        }
+      ],
+      "knows": [
+        "Ottavio drank a glass of Marsala alone in his study at eleven every night.",
+        "Marco and Ottavio quarrelled bitterly over money at dinner.",
+        "Ottavio was closeted with Mr. Hollis all afternoon."
+      ],
+      "motiveHint": "A cold marriage to a man thirty-five years her senior; as his widow she would be free.",
+      "secrets": [
+        {
+          "id": "s1_sec",
+          "text": "Before her marriage she danced at the Bal Tabarin in Paris as 'Lili Vanne', and she is paying a blackmailer for the photographs.",
+          "confession": "Very well. Before Ottavio, I was Lili Vanne, and I danced at the Bal Tabarin in rather fewer feathers than a countess ought. Someone has the photographs. I have been paying him with my pearls, one by one.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s1_lie_paris",
+          "text": "Claims she was a convent girl with no theatrical past",
+          "statement": "Paris? I was raised by the nuns in Lucca, Inspector. I never saw a stage until the day I married.",
+          "topics": [
+            "past"
+          ],
+          "contradictedBy": [
+            "c5"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Marco Venier",
+      "role": "The son and heir",
+      "personality": "Sardonic, restless and quick to anger; openly despises his father's guests.",
+      "appearance": "Harlequin motley half unbuttoned, a cigarette behind his ear, and ink-stained fingers.",
+      "alibiClaim": "I was down at the water-gate having a smoke, well out of Father's way.",
+      "claimedTimeline": [
+        {
+          "time": "22:45",
+          "event": "Smoking at the water-gate, away from the ball, until the body was found"
+        }
+      ],
+      "knows": [
+        "The only digitalis in Ca' Venier is Aunt Ermelinda's heart tincture, kept at her bedside. Dr. Sardi once warned that the whole bottle would stop a horse.",
+        "Father refused to pay his debts and cut off his allowance at dinner.",
+        "Nico the gondolier was in a black temper all evening."
+      ],
+      "motiveHint": "His father cut off his allowance and refused to settle his debts that very evening.",
+      "secrets": [
+        {
+          "id": "s2_sec",
+          "text": "He secretly prints anti-Fascist leaflets on a hand press hidden in the boathouse.",
+          "confession": "Yes, the press is mine. I print against the Blackshirts, and if the Questura hears of it I shall be on a prison island by Lent. Father knew nothing. He'd have handed me over himself.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s2_lie_politics",
+          "text": "Claims he has no political views and is loyal to the regime",
+          "statement": "Politics? I'm as loyal to the Duce as the next man. I haven't a political thought in my head.",
+          "topics": [
+            "politics"
+          ],
+          "contradictedBy": [
+            "c7"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Mr. Ambrose Hollis",
+      "role": "An English art dealer",
+      "personality": "Urbane, fussy and fond of quoting Ruskin; perspires when provenance is questioned.",
+      "appearance": "A black domino cloak over impeccable evening dress, a monocle on a silk ribbon.",
+      "alibiClaim": "In the salone, and from eleven on the balcony beside the Contessa, watching the fireworks.",
+      "claimedTimeline": [
+        {
+          "time": "22:00",
+          "event": "Mingling in the salone"
+        },
+        {
+          "time": "23:00",
+          "event": "On the balcony with the Contessa for the fireworks"
+        }
+      ],
+      "knows": [
+        "That afternoon the Count told him Ca' Venier was sold to the Grand Lagoon Hotel Company, to be signed Monday. His sister was to be sent to the Ursuline sisters at Treviso, and he meant to tell her after the fireworks.",
+        "The Contessa never left the balcony between eleven and half past."
+      ],
+      "motiveHint": "The Count had begun asking awkward questions about the Tintoretto.",
+      "secrets": [
+        {
+          "id": "s3_sec",
+          "text": "He smuggled the genuine Tintoretto out of Italy to an American buyer and hung a copy in its place.",
+          "confession": "The real Tintoretto is in a private collection in Philadelphia. I had it crated as 'school of' and shipped out under the very nose of the export office. That is fraud, Inspector. It is not murder.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s3_lie_painting",
+          "text": "Claims the Tintoretto in the salone is genuine",
+          "statement": "The Tintoretto? Genuine to the last brushstroke. I authenticated it myself.",
+          "topics": [
+            "painting"
+          ],
+          "contradictedBy": [
+            "c4"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Donna Ermelinda Venier",
+      "role": "The Count's elder sister",
+      "personality": "Gentle, pious and self-effacing, forever murmuring over her beads; a will of iron beneath the lace.",
+      "appearance": "Black lace and a widow's veil though she never married, a wheelchair with a tartan rug, an ebony cane with a silver lion's head across her lap, and a jet rosary with a gap among its beads.",
+      "alibiClaim": "I was in my rooms on the ground floor all evening, at my prayers. Where else should a crippled old woman be?",
+      "claimedTimeline": [
+        {
+          "time": "21:00",
+          "event": "Retired to her ground-floor rooms to pray"
+        },
+        {
+          "time": "23:30",
+          "event": "Asleep in her chair when the alarm was raised"
+        }
+      ],
+      "knows": [
+        "She keeps a bottle of digitalis tincture at her bedside for her heart.",
+        "She overheard Ottavio telling the Englishman the palazzo was sold.",
+        "She can walk perfectly well."
+      ],
+      "motiveHint": "Born in Ca' Venier seventy years ago, she has never lived anywhere else.",
+      "secrets": [
+        {
+          "id": "s4_sec",
+          "text": "She has feigned being unable to walk for six years, to be pitied and kept rather than sent away.",
+          "confession": "Yes. I can walk. I have walked these corridors by night for six years while the house slept. A woman in a chair is pitied and kept, Inspector. A woman on her feet is packed off to the nuns.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s4_lie_alibi",
+          "text": "Claims she never left her ground-floor rooms",
+          "statement": "I was in my rooms on the ground floor all evening, at my prayers. Where else should a crippled old woman be?",
+          "topics": [
+            "whereabouts"
+          ],
+          "contradictedBy": [
+            "c2",
+            "c8"
+          ]
+        },
+        {
+          "id": "s4_lie_walk",
+          "text": "Claims she cannot walk or climb stairs",
+          "statement": "I have not taken a step unaided since my fall in 1923. Those stairs might as well be the Alps.",
+          "topics": [
+            "stairs"
+          ],
+          "contradictedBy": [
+            "c3"
+          ]
+        },
+        {
+          "id": "s4_lie_sale",
+          "text": "Claims she knew nothing of any sale of the palazzo",
+          "statement": "Sell Ca' Venier? Ottavio would sooner sell his soul. He never breathed a word of it to me.",
+          "topics": [
+            "sale"
+          ],
+          "contradictedBy": [
+            "c1",
+            "c9"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Nicolò 'Nico' Zanin",
+      "role": "The family gondolier",
+      "personality": "Proud, laconic and superstitious; crosses himself at every mention of the dead.",
+      "appearance": "Striped jersey, battered straw boater, and hands calloused by twelve years at the oar.",
+      "alibiClaim": "At the water-gate and on the canal all evening, seeing the guests in and out by gondola.",
+      "claimedTimeline": [
+        {
+          "time": "21:00",
+          "event": "At the water-gate handing guests from their gondolas"
+        },
+        {
+          "time": "23:00",
+          "event": "Still at the water-gate and on the canal"
+        }
+      ],
+      "knows": [
+        "At five to eleven, coming in from the water-gate, he saw a small veiled figure in black lace climbing the servants' stair on foot, an ebony cane with a silver lion's head tapping each step.",
+        "Signor Marco was in the boathouse all evening; Nico waved to him at a quarter past eleven."
+      ],
+      "motiveHint": "The Count dismissed him that very afternoon.",
+      "secrets": [
+        {
+          "id": "s5_sec",
+          "text": "He has been hiring out the family gondola to tourists by night, and the Count sacked him for it.",
+          "confession": "Sì, sì. I rowed the Americans about by night in the Count's gondola. They pay in dollars. He found out and threw me out. That is all, signore.",
+          "revealAtComposure": 60
+        }
+      ],
+      "lies": [
+        {
+          "id": "s5_lie_gondola",
+          "text": "Claims he was never dismissed and was on good terms with the Count",
+          "statement": "Dismissed? Me? Twelve years I have rowed for the Venier, signore. The Count and I never had a cross word.",
+          "topics": [
+            "gondola"
+          ],
+          "contradictedBy": [
+            "c6"
+          ]
+        }
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {
+      "id": "c1",
+      "title": "The hotel contract",
+      "text": "On the Count's blotter lies a contract of sale for Ca' Venier to the Grand Lagoon Hotel Company, to be signed Monday, 'with vacant possession by Easter'. In the margin, in the Count's hand: 'Tell E. tonight. The Ursulines at Treviso will take her.'",
+      "location": "studio",
+      "unlock": {
+        "type": "examine",
+        "target": "studio"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c2",
+      "title": "A jet bead",
+      "text": "Under the Count's desk, resting on top of tonight's scattered Carnival confetti: a single faceted jet bead on a torn scrap of black silk thread, the kind strung on an old mourning rosary.",
+      "location": "studio",
+      "unlock": {
+        "type": "examine",
+        "target": "studio"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c3",
+      "title": "Walking shoes in the rug",
+      "text": "In Donna Ermelinda's rooms, folded inside the tartan rug on her wheelchair: a pair of black buttoned shoes, the soles worn thin by walking and powdered with the red marble dust of the servants' stair.",
+      "location": "ground_floor",
+      "unlock": {
+        "type": "examine",
+        "target": "ground_floor"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c4",
+      "title": "The Tintoretto",
+      "text": "The great 'Annunciation' above the salone fireplace smells of fresh varnish, and the canvas at the stretcher's edge is new white linen. It is a copy, and a superb one. Mr. Hollis's signed appraisal declaring it genuine lies on a side table.",
+      "location": "salone",
+      "unlock": {
+        "type": "examine",
+        "target": "salone"
+      },
+      "pointsTo": [
+        "s3"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c5",
+      "title": "A blackmail note",
+      "text": "In the Contessa's dressing table, a note in French: 'Ten thousand lire by Ash Wednesday, Lili, or the Count receives the photographs from the Bal Tabarin.' Beneath it lies a faded picture of a feathered dancer wearing Livia's face.",
+      "location": "guest_floor",
+      "unlock": {
+        "type": "examine",
+        "target": "guest_floor"
+      },
+      "pointsTo": [
+        "s1"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c6",
+      "title": "The gondolier's dismissal",
+      "text": "In the boathouse, Nico's kitbag sits packed and corded beside a note in the Count's hand: 'Zanin, you have hired out my gondola to tourists by night for the last time. You will leave this house on Sunday.'",
+      "location": "water_gate",
+      "unlock": {
+        "type": "examine",
+        "target": "water_gate"
+      },
+      "pointsTo": [
+        "s5"
+      ],
+      "isRedHerring": true,
+      "timelineEvent": null
+    },
+    {
+      "id": "c7",
+      "title": "A hidden printing press",
+      "text": "Behind the stacked oars stands a small hand press, its rollers still tacky, beside a bundle of leaflets: 'Venetians! Throw off the Blackshirts!' The ink is the same violet that stains Marco's fingers.",
+      "location": "water_gate",
+      "unlock": {
+        "type": "examine",
+        "target": "water_gate"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c8",
+      "title": "The figure on the servants' stair",
+      "text": "Nico: at five to eleven, coming in from the water-gate, he saw a small veiled figure in black lace climbing the servants' stair on her own two feet, an ebony cane with a silver lion's head tapping each step.",
+      "location": "ground_floor",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s5",
+        "topic": "stairs"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:55",
+        "suspect": "s4",
+        "event": "A veiled figure with a lion-headed cane climbs the servants' stair (Nico's sighting)",
+        "location": null
+      }
+    },
+    {
+      "id": "c9",
+      "title": "The Count's confidence",
+      "text": "Mr. Hollis: that afternoon the Count told him Ca' Venier was sold to a hotel company and that Donna Ermelinda would be sent to the Ursulines at Treviso. 'I shall tell her after the fireworks,' he said. A shadow moved beyond the study door as he spoke.",
+      "location": "studio",
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s3",
+        "topic": "sale"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "17:00",
+        "suspect": "s3",
+        "event": "Told by the Count of the sale and of Donna Ermelinda's banishment",
+        "location": null
+      }
+    },
+    {
+      "id": "c10",
+      "title": "Aunt Ermelinda's tincture",
+      "text": "Marco: the only digitalis in Ca' Venier is Aunt Ermelinda's heart tincture, kept at her bedside. Dr. Sardi once warned the household that the whole bottle would stop a horse.",
+      "location": null,
+      "unlock": {
+        "type": "interrogate",
+        "suspect": "s2",
+        "topic": "poison"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": null
+    },
+    {
+      "id": "c11",
+      "title": "Donna Ermelinda's admission",
+      "text": "Cornered, Donna Ermelinda rises from her chair unaided. She admits she climbed the servants' stair to her brother's study at eleven, 'only to beg him not to sell our home', while the fireworks began.",
+      "location": "studio",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [
+        "s4"
+      ],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:05",
+        "suspect": "s4",
+        "event": "In her brother's study during the fireworks (her own admission)",
+        "location": null
+      }
+    },
+    {
+      "id": "c12",
+      "title": "On the balcony",
+      "text": "Hollis, owning up to the copy, adds that from eleven until twenty-five to twelve he stood on the salone balcony beside the Contessa in full view of a dozen guests. Neither left the other's sight.",
+      "location": "salone",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "23:00",
+        "suspect": "s3",
+        "event": "On the salone balcony with the Contessa until 23:35, before a dozen witnesses",
+        "location": null
+      }
+    },
+    {
+      "id": "c13",
+      "title": "Ink on wet leaflets",
+      "text": "Marco confesses he ran off five hundred leaflets in the boathouse from a quarter to eleven until twenty to twelve. Nico rowed past with his tourists at a quarter past eleven and waved to him.",
+      "location": "water_gate",
+      "unlock": {
+        "type": "confront"
+      },
+      "pointsTo": [],
+      "isRedHerring": false,
+      "timelineEvent": {
+        "time": "22:45",
+        "suspect": "s2",
+        "event": "Printing in the boathouse until 23:40; seen by Nico at 23:15",
+        "location": null
+      }
+    }
+  ],
+  "contradictions": [
+    {
+      "a": "s4_lie_alibi",
+      "b": "c2",
+      "effect": {
+        "suspect": "s4",
+        "composure": -30,
+        "reveals": "c11"
+      }
+    },
+    {
+      "a": "s4_lie_alibi",
+      "b": "c8",
+      "effect": {
+        "suspect": "s4",
+        "composure": -25,
+        "reveals": "c11"
+      }
+    },
+    {
+      "a": "s4_lie_walk",
+      "b": "c3",
+      "effect": {
+        "suspect": "s4",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s4_lie_sale",
+      "b": "c1",
+      "effect": {
+        "suspect": "s4",
+        "composure": -30,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s4_lie_sale",
+      "b": "c9",
+      "effect": {
+        "suspect": "s4",
+        "composure": -25,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s1_lie_paris",
+      "b": "c5",
+      "effect": {
+        "suspect": "s1",
+        "composure": -35,
+        "reveals": null
+      }
+    },
+    {
+      "a": "s2_lie_politics",
+      "b": "c7",
+      "effect": {
+        "suspect": "s2",
+        "composure": -35,
+        "reveals": "c13"
+      }
+    },
+    {
+      "a": "s3_lie_painting",
+      "b": "c4",
+      "effect": {
+        "suspect": "s3",
+        "composure": -35,
+        "reveals": "c12"
+      }
+    },
+    {
+      "a": "s5_lie_gondola",
+      "b": "c6",
+      "effect": {
+        "suspect": "s5",
+        "composure": -35,
+        "reveals": null
+      }
+    }
+  ],
+  "topics": [
+    {
+      "id": "whereabouts",
+      "label": "Where were you?",
+      "keywords": [
+        "where",
+        "alibi",
+        "doing",
+        "tonight",
+        "evening",
+        "eleven",
+        "fireworks"
+      ]
+    },
+    {
+      "id": "stairs",
+      "label": "The stairs and walking",
+      "keywords": [
+        "stair",
+        "walk",
+        "climb",
+        "wheelchair",
+        "cane",
+        "legs",
+        "upstairs"
+      ]
+    },
+    {
+      "id": "sale",
+      "label": "The sale of the palazzo",
+      "keywords": [
+        "sell",
+        "sale",
+        "selling",
+        "sold",
+        "hotel",
+        "contract",
+        "buyer",
+        "syndicate",
+        "convent",
+        "ursuline"
+      ]
+    },
+    {
+      "id": "poison",
+      "label": "The poisoned Marsala",
+      "keywords": [
+        "poison",
+        "marsala",
+        "digitalis",
+        "tincture",
+        "medicine",
+        "drops",
+        "glass",
+        "heart"
+      ]
+    },
+    {
+      "id": "painting",
+      "label": "The Tintoretto",
+      "keywords": [
+        "painting",
+        "tintoretto",
+        "picture",
+        "canvas",
+        "copy",
+        "forgery",
+        "appraisal"
+      ]
+    },
+    {
+      "id": "past",
+      "label": "The Contessa's past",
+      "keywords": [
+        "paris",
+        "dancer",
+        "stage",
+        "photograph",
+        "blackmail",
+        "tabarin",
+        "cabaret"
+      ]
+    },
+    {
+      "id": "politics",
+      "label": "Politics",
+      "keywords": [
+        "politic",
+        "fascist",
+        "blackshirt",
+        "mussolini",
+        "leaflet",
+        "pamphlet",
+        "printing",
+        "sedition"
+      ]
+    },
+    {
+      "id": "gondola",
+      "label": "The gondola and the gondolier",
+      "keywords": [
+        "gondola",
+        "boat",
+        "dismiss",
+        "sacked",
+        "tourist",
+        "fares",
+        "rowing"
+      ]
+    }
+  ],
+  "solution": {
+    "requiredEvidence": [
+      "c2",
+      "c3",
+      "c11"
+    ],
+    "acceptableMotives": [
+      "home"
+    ]
+  },
+  "maxTurns": 15
+}
