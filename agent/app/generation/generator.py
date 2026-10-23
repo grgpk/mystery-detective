@@ -18,7 +18,7 @@ from app.engine.case_library import library
 from app.engine.validator import validate_case
 from app.generation.schema import GeneratedCase, from_case_file, to_case_file
 from app.llm import GENERATOR_MODEL, LLM, LLMRefusal, LLMTruncated
-from app.models.case import CaseFile
+from app.models.case import GENERATED_PREFIX, CaseFile
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +41,20 @@ SETTINGS = [
     "a Swiss sanatorium high above Davos, 1928",
     "a Paris couture house the night before a collection is shown, 1935",
 ]
+
+
+def choose_setting(recent: list[str], rng: random.Random | None = None) -> str:
+    """A setting not used recently; once every setting has been used, the one used longest ago.
+
+    `recent` lists settings newest first (duplicates allowed).
+    """
+    rng = rng or random
+    fresh = [s for s in SETTINGS if s not in recent]
+    if fresh:
+        return rng.choice(fresh)
+    last_used = {s: recent.index(s) for s in SETTINGS}  # higher index = used longer ago
+    return max(SETTINGS, key=last_used.__getitem__)
+
 
 DESIGN_RULES = """You are a mystery novelist designing a fair-play golden-age whodunit for an interactive detective \
 game. The player has 15 turns to question suspects, search rooms, and catch liars out with proof. Game code (not \
@@ -184,7 +198,7 @@ async def generate_case(
 ) -> GenerationResult:
     """Generates and validates one case, repairing it up to max_attempts times. `case` is None if all fail."""
     setting = setting or (rng or random).choice(SETTINGS)
-    case_id = f"gen_{uuid.uuid4().hex[:10]}"
+    case_id = f"{GENERATED_PREFIX}{uuid.uuid4().hex[:10]}"
     result = GenerationResult(case=None, setting=setting)
     messages: list[dict] = [{"role": "user", "content": _brief(setting)}]
 

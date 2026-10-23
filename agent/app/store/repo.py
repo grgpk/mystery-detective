@@ -2,11 +2,12 @@
 
 import json
 from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from typing import Protocol
 
 import asyncpg
 
-from app.models.case import CaseFile
+from app.models.case import GENERATED_PREFIX, CaseFile
 from app.models.public import Progress
 
 
@@ -21,22 +22,52 @@ class GameSession:
 class SessionRepo(Protocol):
     async def get(self, thread_id: str) -> GameSession | None: ...
     async def save(self, session: GameSession) -> None: ...
+    async def delete(self, thread_id: str) -> None: ...
+
+    async def unstarted_generated(
+        self, owner: str | None = None, idle_for: timedelta | None = None
+    ) -> list[GameSession]:
+        """Games on a generated case still on the briefing: one owner's, or anyone's idle for `idle_for`."""
+        ...
 
 
 class InMemoryRepo:
     def __init__(self) -> None:
-        self._rows: dict[str, tuple[str, dict, dict]] = {}
+        self._rows: dict[str, tuple[str, dict, dict, datetime]] = {}
 
     async def get(self, thread_id: str) -> GameSession | None:
         row = self._rows.get(thread_id)
         if row is None:
             return None
-        owner, case, progress = row
+        owner, case, progress, _ = row
         return GameSession(thread_id, owner, CaseFile.model_validate(case), Progress.model_validate(progress))
 
     async def save(self, session: GameSession) -> None:
         # Store serialized copies so callers can't mutate persisted state by reference.
-        self._rows[session.thread_id] = (session.owner, session.case.dump(), session.progress.dump())
+        self._rows[session.thread_id] = (
+            session.owner,
+            session.case.dump(),
+            session.progress.dump(),
+            datetime.now(UTC),
+        )
+
+    async def delete(self, thread_id: str) -> None:
+        self._rows.pop(thread_id, None)
+
+    async def unstarted_generated(
+        self, owner: str | None = None, idle_for: timedelta | None = None
+    ) -> list[GameSession]:
+        cutoff = datetime.now(UTC) - idle_for if idle_for is not None else None
+        found = []
+        for thread_id, (row_owner, case, progress, updated) in self._rows.items():
+            if (
+                case["caseId"].startswith(GENERATED_PREFIX)
+                and progress["phase"] == "briefing"
+                and (owner is None or row_owner == owner)
+                and (cutoff is None or updated <= cutoff)
+            ):
+                found.append(await self.get(thread_id))
+        return found
 
 
 SCHEMA = """
@@ -95,3 +126,30 @@ class PostgresRepo:
             json.dumps(session.case.dump()),
             json.dumps(session.progress.dump()),
         )
+
+    async def delete(self, thread_id: str) -> None:
+        await self.pool.execute("DELETE FROM game_sessions WHERE thread_id = $1", thread_id)
+
+    async def unstarted_generated(
+        self, owner: str | None = None, idle_for: timedelta | None = None
+    ) -> list[GameSession]:
+        rows = await self.pool.fetch(
+            """
+            SELECT thread_id, owner, case_file, progress FROM game_sessions
+             WHERE starts_with(case_id, $1) AND progress->>'phase' = 'briefing'
+               AND ($2::text IS NULL OR owner = $2)
+               AND ($3::interval IS NULL OR updated_at <= now() - $3::interval)
+            """,
+            GENERATED_PREFIX,
+            owner,
+            idle_for,
+        )
+        return [
+            GameSession(
+                row["thread_id"],
+                row["owner"],
+                CaseFile.model_validate(json.loads(row["case_file"])),
+                Progress.model_validate(json.loads(row["progress"])),
+            )
+            for row in rows
+        ]

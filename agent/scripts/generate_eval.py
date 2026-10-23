@@ -17,8 +17,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from app.generation.generator import GenerationResult, generate_case
+from app.generation.generator import SETTINGS, GenerationResult, choose_setting, generate_case
+from app.generation.pool import PostgresCasePool
 from app.llm import AnthropicLLM
+from app.store.repo import PostgresRepo
 
 # Claude Opus 5.5 list prices, USD per million tokens.
 PRICES = {
@@ -33,15 +35,33 @@ def cost(usage: dict[str, int]) -> float:
     return sum(usage.get(k, 0) * price for k, price in PRICES.items()) / 1_000_000
 
 
+def batch_settings(n: int, recent: list[str]) -> list[str]:
+    """A distinct setting per case where possible, avoiding settings already in the pool."""
+    chosen: list[str] = []
+    for _ in range(n):
+        chosen.append(choose_setting([*reversed(chosen), *recent]))
+    return chosen
+
+
 async def run(n: int, out: Path, concurrency: int, into_pool: bool) -> int:
     llm = AnthropicLLM()
     gate = asyncio.Semaphore(concurrency)
     out.mkdir(parents=True, exist_ok=True)
 
+    repo = pool = None
+    if into_pool:
+        # Connect up front so each case lands in the pool as soon as it passes; stopping early loses nothing.
+        repo = await PostgresRepo.connect(os.environ["DATABASE_URL"])
+        pool = await PostgresCasePool.create(repo.pool)
+    recent = await pool.recent_settings(len(SETTINGS)) if pool else []
+    settings = batch_settings(n, recent)
+    added = 0
+
     async def one(index: int) -> GenerationResult:
+        nonlocal added
         async with gate:
             started = time.monotonic()
-            result = await generate_case(llm)
+            result = await generate_case(llm, setting=settings[index])
             status = "PASS" if result.case else "FAIL"
             title = result.case.setting.title if result.case else result.setting
             print(
@@ -55,9 +75,17 @@ async def run(n: int, out: Path, concurrency: int, into_pool: bool) -> int:
             if result.case:
                 path = out / f"{result.case.case_id}.json"
                 path.write_text(json.dumps(result.case.dump(), indent=2))
+                if pool:
+                    await pool.add(result.case, attempts=len(result.attempts), setting=result.setting)
+                    added += 1
+                    print(f"       added to the pool ({result.setting})", flush=True)
             return result
 
-    results = await asyncio.gather(*(one(i) for i in range(n)))
+    try:
+        results = await asyncio.gather(*(one(i) for i in range(n)))
+    finally:
+        if repo:
+            await repo.close()
     passed = [r for r in results if r.case]
     first = [r for r in results if r.first_try]
     total_cost = sum(cost(r.usage) for r in results)
@@ -68,17 +96,8 @@ async def run(n: int, out: Path, concurrency: int, into_pool: bool) -> int:
     print(f"total cost:          ${total_cost:.2f} (${total_cost / n:.2f} per case)")
     if error_kinds:
         print("most common rejections:", ", ".join(f"{k} x{v}" for k, v in error_kinds.most_common(5)))
-
-    if into_pool and passed:
-        from app.generation.pool import PostgresCasePool
-        from app.store.repo import PostgresRepo
-
-        repo = await PostgresRepo.connect(os.environ["DATABASE_URL"])
-        pool = await PostgresCasePool.create(repo.pool)
-        for result in passed:
-            await pool.add(result.case, attempts=len(result.attempts))
-        print(f"added {len(passed)} case(s) to the pool")
-        await repo.close()
+    if into_pool:
+        print(f"added {added} case(s) to the pool")
     return 0 if len(passed) == n else 1
 
 

@@ -6,6 +6,8 @@ from pydantic import Field
 
 from .base import CamelModel
 
+GENERATED_PREFIX = "gen_"  # case ids written by the case generator start with this
+
 
 class Location(CamelModel):
     id: str

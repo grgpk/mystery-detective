@@ -1,13 +1,14 @@
 """Case generation pipeline, offline: scripted 'Claude' outputs drive the generate -> validate -> repair loop."""
 
 import uuid
+from datetime import timedelta
 
 from ag_ui.core import RunAgentInput
 
 from app.engine.case_library import NEW_CASE_ID, library
 from app.game import NO_FRESH_CASE, GameMaster
 from app.generation import generator
-from app.generation.generator import check, generate_case, system_prompt
+from app.generation.generator import SETTINGS, check, choose_setting, generate_case, system_prompt
 from app.generation.pool import InMemoryCasePool, PoolFiller
 from app.generation.schema import GeneratedCase, from_case_file, to_case_file
 from app.llm import ScriptedLLM
@@ -107,18 +108,20 @@ async def test_filler_reports_failure():
     assert await filler.pool.ready() == 0
 
 
-async def start_new_case(game: GameMaster) -> tuple[dict, list[str]]:
+async def start_new_case(
+    game: GameMaster, owner: str = "player", action: dict | None = None, thread_id: str | None = None
+) -> tuple[dict, list[str]]:
     run_input = RunAgentInput(
-        thread_id=f"t-{uuid.uuid4().hex[:6]}",
+        thread_id=thread_id or f"t-{uuid.uuid4().hex[:6]}",
         run_id="r1",
         state={},
         messages=[],
         tools=[],
         context=[],
-        forwarded_props={"gameAction": {"type": "start", "caseId": NEW_CASE_ID}},
+        forwarded_props={"gameAction": action or {"type": "start", "caseId": NEW_CASE_ID}},
     )
-    events = [e async for e in game.run(run_input, "player")]
-    snapshot = next(e.snapshot for e in events if e.type == "STATE_SNAPSHOT")
+    events = [e async for e in game.run(run_input, owner)]
+    snapshot = next((e.snapshot for e in events if e.type == "STATE_SNAPSHOT"), {})
     texts = [e.delta for e in events if e.type == "TEXT_MESSAGE_CONTENT"]
     return snapshot, texts
 
@@ -138,3 +141,66 @@ async def test_new_game_falls_back_to_archive_when_pool_is_empty():
     snapshot, texts = await start_new_case(game)
     assert snapshot["caseId"] in library()
     assert NO_FRESH_CASE in texts
+
+
+def test_choose_setting_avoids_recent_ones():
+    recent = SETTINGS[:-2]
+    for _ in range(20):
+        assert choose_setting(recent) in SETTINGS[-2:]
+
+
+def test_choose_setting_falls_back_to_least_recently_used():
+    recent = list(reversed(SETTINGS))  # newest first, so SETTINGS[0] was used longest ago
+    assert choose_setting(recent) == SETTINGS[0]
+
+
+async def test_filler_never_repeats_a_setting_until_all_are_used():
+    n = len(SETTINGS)
+    pool = InMemoryCasePool()
+    filler = PoolFiller(pool, scripted(*[valid_generated()] * n), target=n)
+    for _ in range(n):
+        assert await filler.fill_once()
+    assert sorted(await pool.recent_settings(n)) == sorted(SETTINGS)
+
+
+async def pool_with(n: int) -> PoolFiller:
+    filler = PoolFiller(InMemoryCasePool(), scripted(*[valid_generated()] * n), target=n)
+    for _ in range(n):
+        await filler.fill_once()
+    return filler
+
+
+async def test_browsing_past_a_fresh_case_returns_it_to_the_pool():
+    filler = await pool_with(1)
+    repo = InMemoryRepo()
+    game = GameMaster(ScriptedLLM(), repo, fresh_cases=filler)
+    first, _ = await start_new_case(game)  # opened, never begun
+    assert first["caseId"].startswith("gen_")
+    assert await filler.pool.ready() == 0
+
+    second, _ = await start_new_case(game, action={"type": "start", "caseId": "ashford_manor"})
+    assert await filler.pool.ready() == 1  # the generated case is back
+    assert second["caseId"] == "ashford_manor"
+    assert await repo.unstarted_generated(owner="player") == []
+
+
+async def test_a_begun_case_is_never_returned():
+    filler = await pool_with(1)
+    game = GameMaster(ScriptedLLM(), InMemoryRepo(), fresh_cases=filler)
+    thread = "t-begun"
+    await start_new_case(game, thread_id=thread)
+    await start_new_case(game, thread_id=thread, action={"type": "begin"})
+    await start_new_case(game, action={"type": "start", "caseId": "ashford_manor"})
+    assert await filler.pool.ready() == 0
+
+
+async def test_other_players_cases_are_returned_only_once_idle(monkeypatch):
+    filler = await pool_with(1)
+    game = GameMaster(ScriptedLLM(), InMemoryRepo(), fresh_cases=filler)
+    await start_new_case(game, owner="alice")  # alice opens it and wanders off
+    _, texts = await start_new_case(game, owner="bob")
+    assert NO_FRESH_CASE in texts  # not idle long enough: bob does not get alice's case
+
+    monkeypatch.setattr("app.game.ABANDONED_BRIEFING", timedelta(0))
+    snapshot, texts = await start_new_case(game, owner="carol")
+    assert snapshot["caseId"].startswith("gen_") and NO_FRESH_CASE not in texts

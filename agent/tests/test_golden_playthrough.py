@@ -148,3 +148,31 @@ async def test_reconnect_resends_snapshot_and_board(game):
     await client.act({"type": "start"})
     assert client.state["phase"] == "investigating"
     assert len([s for s, _ in client.surfaces if s.startswith(("roster", "map"))]) == 2
+
+
+async def test_api_outage_degrades_instead_of_crashing():
+    """No credit / API down: every LLM call fails, but the turn still completes with fallback lines."""
+    import anthropic
+    import httpx2
+
+    class DownLLM(ScriptedLLM):
+        def _fail(self):
+            request = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+            raise anthropic.BadRequestError(
+                "credit balance too low", response=httpx2.Response(400, request=request), body=None
+            )
+
+        async def stream(self, **kwargs):
+            self._fail()
+            yield ""
+
+        async def parse(self, **kwargs):
+            self._fail()
+
+    client = Client(GameMaster(DownLLM(), InMemoryRepo()))
+    await client.act()
+    await client.act({"type": "interrogate", "suspectId": "s2", "question": "How do you feel tonight?"})
+    await client.act({"type": "examine", "locationId": "study"})
+    assert client.errors == []
+    assert client.state["turnsLeft"] == 13
+    assert any("library reading all evening" in m for m in client.messages.values())

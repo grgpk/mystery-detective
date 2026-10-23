@@ -4,6 +4,7 @@ import asyncio
 import logging
 from collections import defaultdict
 from collections.abc import AsyncIterator
+from datetime import timedelta
 from typing import Protocol
 
 import anthropic
@@ -54,8 +55,11 @@ class FreshCases(Protocol):
     """Source of newly generated, validated cases (the background pool)."""
 
     async def take(self) -> CaseFile | None: ...
+    async def release(self, case: CaseFile) -> None: ...
 
 
+# A generated case opened but never begun has given nothing away (the briefing is spoiler-free), so it goes back.
+ABANDONED_BRIEFING = timedelta(hours=1)
 NO_FRESH_CASE = "No freshly written case is ready yet, so here is one from the archive."
 
 
@@ -147,6 +151,7 @@ class GameMaster:
         fresh = session is None or isinstance(action, NewGame)
         notice = None
         if fresh:
+            await self._return_unstarted(owner=owner)
             case, notice = await self._choose_case(getattr(action, "case_id", None))
             session = GameSession(thread_id, owner, case, clue_engine.new_progress(case))
 
@@ -182,9 +187,19 @@ class GameMaster:
     async def _choose_case(self, requested: str | None) -> tuple[CaseFile, str | None]:
         if requested != NEW_CASE_ID:
             return pick_case(requested), None
+        await self._return_unstarted(idle_for=ABANDONED_BRIEFING)  # tabs closed on the briefing
         if self.fresh_cases and (case := await self.fresh_cases.take()):
             return case, None
         return pick_case(None), NO_FRESH_CASE
+
+    async def _return_unstarted(self, owner: str | None = None, idle_for: timedelta | None = None) -> None:
+        """Returns generated cases from games that never got past the briefing to the pool."""
+        if self.fresh_cases is None:
+            return
+        for abandoned in await self.repo.unstarted_generated(owner=owner, idle_for=idle_for):
+            await self.repo.delete(abandoned.thread_id)
+            await self.fresh_cases.release(abandoned.case)
+            log.info("returned unstarted case %s to the pool", abandoned.case.case_id)
 
     async def _dispatch(self, turn: Turn, action: GameAction, fresh: bool) -> AsyncIterator[BaseEvent]:
         match action:

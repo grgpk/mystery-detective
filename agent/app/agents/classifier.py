@@ -2,6 +2,7 @@
 
 import re
 
+import anthropic
 from pydantic import BaseModel, Field
 
 from app.llm import LLM, PERSONA_MODEL, LLMRefusal
@@ -34,7 +35,7 @@ async def classify_topics(llm: LLM, case: CaseFile, question: str) -> list[str]:
             output_type=TopicGuess,
             max_tokens=256,
         )
-    except LLMRefusal:
-        return []
+    except (LLMRefusal, anthropic.APIError):
+        return []  # an unclassified question still gets an answer, just without topic unlocks
     allowed = {t.id for t in case.topics}
     return [t for t in guess.topics if t in allowed]
