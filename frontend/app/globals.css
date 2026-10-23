@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+/* 1920s noir: a dark desk, cream paper cards, typewriter headings, red string. */
+:root {
+  --desk: #1c1814;
+  --desk-raised: #26201b;
+  --paper: #f2e8d5;
+  --paper-shade: #e4d6bb;
+  --ink: #221c16;
+  --ink-soft: #5b4f43;
+  --sepia: #9a7b4f;
+  --brass: #c9a45c;
+  --string: #b3201f;
+  --alert: #b3201f;
+  --success: #3f6b3a;
+  --on-desk: #e9dfcb;
+  --on-desk-soft: #a99c87;
+}
+
+@theme inline {
+  --color-desk: var(--desk);
+  --color-desk-raised: var(--desk-raised);
+  --color-paper: var(--paper);
+  --color-paper-shade: var(--paper-shade);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-sepia: var(--sepia);
+  --color-brass: var(--brass);
+  --color-string: var(--string);
+  --color-alert: var(--alert);
+  --color-success: var(--success);
+  --color-on-desk: var(--on-desk);
+  --color-on-desk-soft: var(--on-desk-soft);
+  --font-type: var(--font-typewriter);
+  --font-serif: var(--font-body);
+  --animate-shake: shake 0.45s ease-in-out;
+  --animate-flash: flash 1.6s ease-out;
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px) rotate(-0.6deg); }
+    40% { transform: translateX(4px) rotate(0.6deg); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+  }
+
+  @keyframes flash {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brass) 80%, transparent); }
+    100% { box-shadow: 0 0 0 10px transparent; }
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top, color-mix(in srgb, var(--brass) 10%, transparent), transparent 60%),
+    var(--desk);
+  color: var(--on-desk);
+  font-family: var(--font-body), Georgia, serif;
+}
+
+.paper {
+  background-color: var(--paper);
+  color: var(--ink);
+  background-image: linear-gradient(transparent 0, color-mix(in srgb, var(--paper-shade) 35%, transparent) 100%);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.25), 0 8px 20px -12px rgb(0 0 0 / 0.7);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

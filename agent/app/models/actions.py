@@ -1,0 +1,67 @@
+"""Player actions, sent by the frontend as `forwardedProps.gameAction` on each AG-UI run."""
+
+from typing import Annotated, Literal
+
+from pydantic import Field, TypeAdapter
+
+from .base import CamelModel
+from .public import Accusation, Board
+
+
+class Start(CamelModel):
+    """First run of a thread, or a reconnect: (re)sends the snapshot and the current surfaces."""
+
+    type: Literal["start"]
+    case_id: str | None = None
+
+
+class NewGame(CamelModel):
+    type: Literal["new_game"]
+    case_id: str | None = None
+
+
+class Begin(CamelModel):
+    type: Literal["begin"]
+
+
+class Interrogate(CamelModel):
+    type: Literal["interrogate"]
+    suspect_id: str
+    question: str = Field(min_length=1, max_length=500)
+
+
+class Examine(CamelModel):
+    type: Literal["examine"]
+    location_id: str
+
+
+class OpenConfront(CamelModel):
+    type: Literal["open_confront"]
+    suspect_id: str
+
+
+class Confront(CamelModel):
+    type: Literal["confront"]
+    suspect_id: str
+    items: list[str] = Field(min_length=2, max_length=2)
+
+
+class OpenAccuse(CamelModel):
+    type: Literal["open_accuse"]
+
+
+class Accuse(CamelModel):
+    type: Literal["accuse"]
+    accusation: Accusation
+
+
+class SyncBoard(CamelModel):
+    type: Literal["sync_board"]
+    board: Board
+
+
+GameAction = Annotated[
+    Start | NewGame | Begin | Interrogate | Examine | OpenConfront | Confront | OpenAccuse | Accuse | SyncBoard,
+    Field(discriminator="type"),
+]
+game_action_adapter: TypeAdapter[GameAction] = TypeAdapter(GameAction)

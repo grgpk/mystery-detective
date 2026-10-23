@@ -1,0 +1,191 @@
+{
+  "caseId": "ashford_manor",
+  "setting": {
+    "title": "Murder at Ashford Manor",
+    "place": "Ashford Manor, Wiltshire, 1928",
+    "eraNote": "A wet October weekend. The family and two guests are gathered for Lord Ashford's sixtieth birthday.",
+    "locations": [
+      {"id": "study", "label": "The Study", "description": "Lord Ashford's private study, where he was found slumped over his desk."},
+      {"id": "library", "label": "The Library", "description": "Tall shelves, a card table, and a dying fire."},
+      {"id": "garden", "label": "The Garden & Potting Shed", "description": "Rain-soaked lawns leading to the gardener's potting shed."},
+      {"id": "kitchen", "label": "The Kitchen", "description": "The servants' domain, still warm from the evening's supper."},
+      {"id": "guest_wing", "label": "The Guest Wing", "description": "Bedrooms for family and visitors along the east corridor."}
+    ]
+  },
+  "victim": {
+    "name": "Lord Edmund Ashford",
+    "causeOfDeath": "Arsenic in his evening brandy",
+    "timeOfDeath": "22:00-22:30",
+    "crimeScene": "study"
+  },
+  "briefing": "Lord Edmund Ashford took his customary brandy alone in his study at ten o'clock. By half past, he was dead. The local doctor smells garlic on his lips: arsenic. The roads are flooded, nobody has left the house, and the Chief Constable wants a name by morning.",
+  "culprit": "s2",
+  "motive": {"id": "inheritance", "text": "Henry learned at tea that afternoon that his uncle was cutting him out of the will."},
+  "motiveOptions": [
+    {"id": "inheritance", "label": "About to be cut out of the will"},
+    {"id": "debts", "label": "Desperate gambling debts"},
+    {"id": "blackmail", "label": "Silencing a threat of exposure"},
+    {"id": "jealousy", "label": "Jealousy and a secret affair"},
+    {"id": "loan", "label": "An unpaid loan between old friends"}
+  ],
+  "truthTimeline": [
+    {"time": "17:00", "suspect": "s2", "event": "Told by Lord Ashford at tea that he will be cut out of the will", "location": "library"},
+    {"time": "21:30", "suspect": "s4", "event": "Starts a game of bridge with Lady Margaret in the library", "location": "library"},
+    {"time": "21:40", "suspect": "s2", "event": "Slips out to the potting shed and takes arsenic weed killer", "location": "garden"},
+    {"time": "21:45", "suspect": "s2", "event": "Crosses the wet lawn back to the house, seen from the kitchen window", "location": "garden"},
+    {"time": "21:50", "suspect": "s5", "event": "Goes to the kitchen to cadge supper from Mrs. Pell", "location": "kitchen"},
+    {"time": "22:05", "suspect": "s2", "event": "Doctors the brandy decanter in the empty study", "location": "study"},
+    {"time": "22:15", "suspect": "s2", "event": "Changes out of muddy shoes in the guest wing", "location": "guest_wing"}
+  ],
+  "suspects": [
+    {
+      "id": "s1",
+      "name": "Lady Margaret Ashford",
+      "role": "The widow",
+      "personality": "Cool, precise, aristocratic; hides worry behind impeccable manners.",
+      "appearance": "Grey silk, a single strand of pearls that are not quite real.",
+      "alibiClaim": "I spent the whole evening at bridge in the library with Dr. Finch.",
+      "claimedTimeline": [{"time": "21:30", "event": "Bridge with Dr. Finch in the library until after half past ten"}],
+      "knows": [
+        "At tea, Edmund told Henry he would be cut out of the will. Henry stormed out.",
+        "Edmund had been unwell and irritable for weeks.",
+        "Dr. Finch and Edmund had argued by letter recently."
+      ],
+      "motiveHint": "The estate is less wealthy than it appears.",
+      "secrets": [
+        {"id": "s1_sec", "text": "She secretly pawned the family pearls to pay household bills.", "confession": "Very well. The pearls I wear are paste. I pawned the real ones in Bath to keep this house running. Edmund never knew.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s1_lie", "text": "Claims the family has no money troubles", "statement": "Money? The Ashfords have never had to think about money.", "topics": ["money"], "contradictedBy": ["c16"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s2",
+      "name": "Henry Ashford",
+      "role": "The nephew",
+      "personality": "Charming, quick with a joke, turns sharp and defensive when money or the will comes up.",
+      "appearance": "A pale linen dinner jacket and a too-ready smile.",
+      "alibiClaim": "I was in the library reading all evening.",
+      "claimedTimeline": [{"time": "21:00", "event": "Reading in the library all evening"}, {"time": "23:00", "event": "Went up to bed"}],
+      "knows": [
+        "Uncle Edmund told him at tea that he was to be cut out of the will.",
+        "The gardener keeps arsenic weed killer in the potting shed."
+      ],
+      "motiveHint": "Expected to inherit the estate.",
+      "secrets": [
+        {"id": "s2_sec", "text": "He owes a great deal of money to dangerous men in London from gambling.", "confession": "All right! I owe money to some rather unpleasant fellows in London. Cards. It's hardly a crime.", "revealAtComposure": 60}
+      ],
+      "lies": [
+        {"id": "s2_lie_alibi", "text": "Claims he was in the library all evening", "statement": "I was in the library reading all evening.", "topics": ["whereabouts"], "contradictedBy": ["c12"]},
+        {"id": "s2_lie_garden", "text": "Claims he never went to the garden", "statement": "I never set foot in the garden tonight. In this rain? Hardly.", "topics": ["garden"], "contradictedBy": ["c3", "c8"]},
+        {"id": "s2_lie_will", "text": "Claims he didn't know about the will change", "statement": "Uncle's will? I had no idea he meant to change anything.", "topics": ["will", "money"], "contradictedBy": ["c5", "c15"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s3",
+      "name": "Mrs. Agnes Pell",
+      "role": "The housekeeper",
+      "personality": "Brisk, loyal, a little sharp-tongued, proud of thirty years' service.",
+      "appearance": "Black dress, starched apron, keys at her waist.",
+      "alibiClaim": "I was in my kitchen from supper until midnight, as always.",
+      "claimedTimeline": [{"time": "21:00", "event": "Clearing up in the kitchen"}],
+      "knows": [
+        "Around a quarter to ten she saw a figure in a pale jacket cross the lawn from the potting shed toward the garden door.",
+        "Colonel Hayes came down to the kitchen for supper around ten to ten and stayed chatting until half past."
+      ],
+      "motiveHint": "Lord Ashford had threatened to pension her off.",
+      "secrets": [
+        {"id": "s3_sec", "text": "She has been quietly drinking from the master's wine cellar for years.", "confession": "Oh, have it your way. A glass from the cellar now and then. Thirty years I've given this house. A glass of claret is hardly theft.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s3_lie", "text": "Claims she never touches the cellar", "statement": "I would never touch the master's cellar. Never.", "topics": ["brandy", "kitchen"], "contradictedBy": ["c11"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s4",
+      "name": "Dr. Julian Finch",
+      "role": "The family physician",
+      "personality": "Smooth, clinical, condescending; sweats when his professional reputation is questioned.",
+      "appearance": "Tweed suit, gold pince-nez, a doctor's bag never far away.",
+      "alibiClaim": "Bridge in the library with Lady Margaret, from half past nine.",
+      "claimedTimeline": [{"time": "21:30", "event": "Bridge with Lady Margaret in the library"}],
+      "knows": [
+        "Lord Ashford showed classic signs of arsenic poisoning.",
+        "Nobody else came into the library during the bridge game, from half past nine to twenty to eleven."
+      ],
+      "motiveHint": "Lord Ashford threatened to report him to the Medical Council.",
+      "secrets": [
+        {"id": "s4_sec", "text": "He has been over-prescribing laudanum to Lady Margaret, and Edmund threatened to report him.", "confession": "Edmund found out about the laudanum prescriptions. He threatened to write to the Council. But I did not kill him, Inspector. I was at cards the whole night.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s4_lie", "text": "Claims he and Edmund were on the best of terms", "statement": "Edmund and I were the best of friends. Never a cross word.", "topics": ["victim", "letters"], "contradictedBy": ["c7"]}
+      ],
+      "startingComposure": 100
+    },
+    {
+      "id": "s5",
+      "name": "Colonel Reginald Hayes",
+      "role": "An old army friend",
+      "personality": "Bluff, loud, old-fashioned; blusters when cornered.",
+      "appearance": "Regimental tie, a magnificent moustache, frayed cuffs.",
+      "alibiClaim": "Went down to the kitchen for a spot of supper, then turned in.",
+      "claimedTimeline": [{"time": "21:50", "event": "Supper in the kitchen"}],
+      "knows": [
+        "He saw Henry in the guest wing corridor around a quarter past ten, carrying his shoes.",
+        "Edmund and Henry had a shouting match at tea."
+      ],
+      "motiveHint": "Owed Lord Ashford a large sum.",
+      "secrets": [
+        {"id": "s5_sec", "text": "He is broke and came to beg Edmund for more time on a £2,000 loan.", "confession": "Dash it all. I'm stony broke. I came to ask Edmund for more time on the loan. Hardly a reason to kill the man who might give it to me.", "revealAtComposure": 70}
+      ],
+      "lies": [
+        {"id": "s5_lie", "text": "Claims Edmund owed him money, not the other way round", "statement": "Money between us? If anything, Edmund owed me, old boy.", "topics": ["money"], "contradictedBy": ["c13"]}
+      ],
+      "startingComposure": 100
+    }
+  ],
+  "clues": [
+    {"id": "c3", "title": "Muddy shoes", "text": "In Henry's room in the guest wing: a pair of evening shoes caked with fresh garden mud and pushed under the bed.", "location": "guest_wing", "unlock": {"type": "examine", "target": "guest_wing"}, "pointsTo": ["s2"], "isRedHerring": false},
+    {"id": "c13", "title": "The Colonel's IOU", "text": "In the Colonel's room: an IOU for £2,000, signed 'R. Hayes' and made out to Lord Ashford.", "location": "guest_wing", "unlock": {"type": "examine", "target": "guest_wing"}, "pointsTo": ["s5"], "isRedHerring": true},
+    {"id": "c5", "title": "Letter to the solicitor", "text": "On the study desk, an unfinished letter in Lord Ashford's hand: 'Henry is to receive nothing. I told him so myself this afternoon.'", "location": "study", "unlock": {"type": "examine", "target": "study"}, "pointsTo": ["s2"], "isRedHerring": false},
+    {"id": "c6", "title": "The brandy decanter", "text": "The decanter smells faintly of garlic. One glass used, one clean. Whoever poisoned it knew he always drank alone at ten.", "location": "study", "unlock": {"type": "examine", "target": "study"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c4", "title": "Weed killer tin", "text": "In the potting shed, a tin of arsenic weed killer with its lid freshly prised open. Wet footprints lead back toward the house.", "location": "garden", "unlock": {"type": "examine", "target": "garden"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c11", "title": "Hidden bottles", "text": "Under the scullery sink: three empty bottles from the master's cellar, carefully hidden.", "location": "kitchen", "unlock": {"type": "examine", "target": "kitchen"}, "pointsTo": ["s3"], "isRedHerring": true},
+    {"id": "c16", "title": "Pawn ticket", "text": "Tucked inside a book of sermons in the library: a Bath pawnbroker's ticket for 'one pearl necklace', signed M. Ashford.", "location": "library", "unlock": {"type": "examine", "target": "library"}, "pointsTo": [], "isRedHerring": false},
+    {"id": "c8", "title": "Figure on the lawn", "text": "Mrs. Pell saw a figure in a pale jacket cross from the potting shed to the garden door at about a quarter to ten.", "location": "garden", "unlock": {"type": "interrogate", "suspect": "s3", "topic": "garden"}, "pointsTo": ["s2"], "isRedHerring": false, "timelineEvent": {"time": "21:45", "suspect": "s2", "event": "A figure in a pale jacket crosses from the shed (Mrs. Pell's sighting)"}},
+    {"id": "c15", "title": "Quarrel at tea", "text": "Lady Margaret: at tea, Edmund told Henry he would be cut out of the will. Henry went white and stormed out.", "location": null, "unlock": {"type": "interrogate", "suspect": "s1", "topic": "will"}, "pointsTo": ["s2"], "isRedHerring": false, "timelineEvent": {"time": "17:00", "suspect": "s2", "event": "Told at tea he is cut out of the will"}},
+    {"id": "c7", "title": "Torn letter", "text": "Dr. Finch drops a torn note: '...cannot keep silent about your prescriptions any longer. E.A.'", "location": null, "unlock": {"type": "interrogate", "suspect": "s4", "topic": "letters"}, "pointsTo": ["s4"], "isRedHerring": true},
+    {"id": "c9", "title": "Henry's admission", "text": "Cornered, Henry admits he walked to the potting shed at about twenty to ten, 'for a smoke'.", "location": "garden", "unlock": {"type": "confront"}, "pointsTo": ["s2"], "isRedHerring": false, "timelineEvent": {"time": "21:40", "suspect": "s2", "event": "At the potting shed (his own admission)"}},
+    {"id": "c12", "title": "The bridge game", "text": "Dr. Finch's score card: he and Lady Margaret played bridge in the library from 21:30 to 22:40, and no one else came in.", "location": "library", "unlock": {"type": "confront"}, "pointsTo": [], "isRedHerring": false, "timelineEvent": {"time": "21:30", "suspect": "s4", "event": "Bridge in the library with Lady Margaret until 22:40, nobody else present"}},
+    {"id": "c14", "title": "Supper in the kitchen", "text": "The Colonel and Mrs. Pell vouch for each other: he ate supper in the kitchen from 21:50 until 22:30.", "location": "kitchen", "unlock": {"type": "confront"}, "pointsTo": [], "isRedHerring": false, "timelineEvent": {"time": "21:50", "suspect": "s5", "event": "Supper in the kitchen with Mrs. Pell until 22:30"}}
+  ],
+  "contradictions": [
+    {"a": "s2_lie_garden", "b": "c3", "effect": {"suspect": "s2", "composure": -30, "reveals": "c9"}},
+    {"a": "s2_lie_garden", "b": "c8", "effect": {"suspect": "s2", "composure": -25, "reveals": "c9"}},
+    {"a": "s2_lie_will", "b": "c5", "effect": {"suspect": "s2", "composure": -30}},
+    {"a": "s2_lie_will", "b": "c15", "effect": {"suspect": "s2", "composure": -25}},
+    {"a": "s2_lie_alibi", "b": "c12", "effect": {"suspect": "s2", "composure": -30}},
+    {"a": "s4_lie", "b": "c7", "effect": {"suspect": "s4", "composure": -35, "reveals": "c12"}},
+    {"a": "s5_lie", "b": "c13", "effect": {"suspect": "s5", "composure": -35, "reveals": "c14"}},
+    {"a": "s3_lie", "b": "c11", "effect": {"suspect": "s3", "composure": -35}},
+    {"a": "s1_lie", "b": "c16", "effect": {"suspect": "s1", "composure": -35}}
+  ],
+  "topics": [
+    {"id": "whereabouts", "label": "Where were you?", "keywords": ["where", "alibi", "evening", "tonight", "doing", "night", "after dinner"]},
+    {"id": "garden", "label": "The garden", "keywords": ["garden", "shed", "outside", "lawn", "mud", "shoes", "rain"]},
+    {"id": "will", "label": "The will", "keywords": ["will", "inherit", "inheritance", "estate", "solicitor", "heir"]},
+    {"id": "money", "label": "Money troubles", "keywords": ["money", "debt", "owe", "finances", "pay", "broke", "gambl", "loan"]},
+    {"id": "brandy", "label": "The brandy", "keywords": ["brandy", "decanter", "drink", "poison", "arsenic", "glass", "cellar", "wine"]},
+    {"id": "victim", "label": "Lord Ashford", "keywords": ["edmund", "lord", "uncle", "husband", "victim", "relationship", "friend", "get along"]},
+    {"id": "letters", "label": "Letters", "keywords": ["letter", "note", "wrote", "write", "correspondence", "post"]},
+    {"id": "kitchen", "label": "The kitchen", "keywords": ["kitchen", "supper", "servants", "cook", "scullery"]}
+  ],
+  "solution": {
+    "requiredEvidence": ["c3", "c5", "c9"],
+    "acceptableMotives": ["inheritance", "debts"]
+  },
+  "maxTurns": 15
+}
